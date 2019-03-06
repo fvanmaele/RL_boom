@@ -1,0 +1,1025 @@
+2019-03-05 07:34:05,456 [simple_agent_0_wrapper] INFO: Import agent code from "agent_code/simple_agent/callbacks.py"
+2019-03-05 07:34:05,499 [simple_agent_0_wrapper] INFO: Initialize agent code
+2019-03-05 07:34:05,500 [simple_agent_0_code] DEBUG: Successfully entered setup code
+2019-03-05 07:34:06,568 [simple_agent_0_wrapper] INFO: STARTING ROUND #1
+2019-03-05 07:34:06,671 [simple_agent_0_wrapper] INFO: STARTING STEP 1
+2019-03-05 07:34:06,671 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:06,672 [simple_agent_0_code] DEBUG: Encountered 0 game event(s)
+2019-03-05 07:34:06,672 [simple_agent_0_wrapper] ERROR: Error in callback function: 'types.SimpleNamespace' object has no attribute 'next_action'
+Traceback (most recent call last):
+  File "C:\Users\Lily\Documents\UNI\FML\project\RL_boom_team\agents.py", line 95, in run
+    self.code.reward_update(self.fake_self)
+  File "C:\Users\Lily\Documents\UNI\FML\project\RL_boom_team\agent_code\simple_agent\callbacks.py", line 219, in reward_update
+    action = self.next_action
+AttributeError: 'types.SimpleNamespace' object has no attribute 'next_action'
+2019-03-05 07:34:06,677 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:06,677 [simple_agent_0_code] DEBUG: Valid actions: ['RIGHT', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:06,685 [simple_agent_0_code] DEBUG: Suitable target found at (1, 7)
+2019-03-05 07:34:06,686 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.009s of thinking
+2019-03-05 07:34:06,773 [simple_agent_0_wrapper] INFO: STARTING STEP 2
+2019-03-05 07:34:06,774 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:06,774 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:06,802 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:06,803 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:06,810 [simple_agent_0_code] DEBUG: Suitable target found at (1, 7)
+2019-03-05 07:34:06,811 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.009s of thinking
+2019-03-05 07:34:06,875 [simple_agent_0_wrapper] INFO: STARTING STEP 3
+2019-03-05 07:34:06,876 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:06,876 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:06,908 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:06,909 [simple_agent_0_code] DEBUG: Valid actions: ['RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:06,919 [simple_agent_0_code] DEBUG: Suitable target found at (1, 7)
+2019-03-05 07:34:06,920 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.012s of thinking
+2019-03-05 07:34:06,978 [simple_agent_0_wrapper] INFO: STARTING STEP 4
+2019-03-05 07:34:06,978 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:06,979 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:07,012 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:07,013 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:07,021 [simple_agent_0_code] DEBUG: Suitable target found at (1, 7)
+2019-03-05 07:34:07,021 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.009s of thinking
+2019-03-05 07:34:07,079 [simple_agent_0_wrapper] INFO: STARTING STEP 5
+2019-03-05 07:34:07,079 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:07,080 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:07,107 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:07,108 [simple_agent_0_code] DEBUG: Valid actions: ['RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:07,118 [simple_agent_0_code] DEBUG: Suitable target found at (1, 7)
+2019-03-05 07:34:07,118 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.012s of thinking
+2019-03-05 07:34:07,193 [simple_agent_0_wrapper] INFO: STARTING STEP 6
+2019-03-05 07:34:07,204 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:07,205 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:07,225 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:07,226 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:07,233 [simple_agent_0_code] DEBUG: Suitable target found at (1, 7)
+2019-03-05 07:34:07,233 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.008s of thinking
+2019-03-05 07:34:07,301 [simple_agent_0_wrapper] INFO: STARTING STEP 7
+2019-03-05 07:34:07,305 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:07,306 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:07,328 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:07,329 [simple_agent_0_code] DEBUG: Valid actions: ['RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:07,339 [simple_agent_0_code] DEBUG: Suitable target found at (4, 5)
+2019-03-05 07:34:07,340 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.012s of thinking
+2019-03-05 07:34:07,408 [simple_agent_0_wrapper] INFO: STARTING STEP 8
+2019-03-05 07:34:07,416 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:07,417 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:07,441 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:07,442 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:07,454 [simple_agent_0_code] DEBUG: Suitable target found at (4, 5)
+2019-03-05 07:34:07,455 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.014s of thinking
+2019-03-05 07:34:07,516 [simple_agent_0_wrapper] INFO: STARTING STEP 9
+2019-03-05 07:34:07,518 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:07,518 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:07,541 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:07,542 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:07,550 [simple_agent_0_code] DEBUG: Suitable target found at (4, 5)
+2019-03-05 07:34:07,551 [simple_agent_0_wrapper] INFO: Chose action UP after 0.010s of thinking
+2019-03-05 07:34:07,612 [simple_agent_0_wrapper] INFO: STARTING STEP 10
+2019-03-05 07:34:07,612 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:07,613 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:07,636 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:07,637 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:07,649 [simple_agent_0_code] DEBUG: Suitable target found at (4, 5)
+2019-03-05 07:34:07,650 [simple_agent_0_wrapper] INFO: Chose action UP after 0.014s of thinking
+2019-03-05 07:34:07,714 [simple_agent_0_wrapper] INFO: STARTING STEP 11
+2019-03-05 07:34:07,715 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:07,715 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:07,738 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:07,739 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:07,746 [simple_agent_0_code] DEBUG: Suitable target found at (4, 5)
+2019-03-05 07:34:07,747 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.009s of thinking
+2019-03-05 07:34:07,816 [simple_agent_0_wrapper] INFO: STARTING STEP 12
+2019-03-05 07:34:07,817 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:07,818 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:07,853 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:07,854 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:07,872 [simple_agent_0_code] DEBUG: Suitable target found at (7, 4)
+2019-03-05 07:34:07,873 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.020s of thinking
+2019-03-05 07:34:07,918 [simple_agent_0_wrapper] INFO: STARTING STEP 13
+2019-03-05 07:34:07,919 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:07,919 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:07,950 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:07,951 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:07,962 [simple_agent_0_code] DEBUG: Suitable target found at (7, 5)
+2019-03-05 07:34:07,963 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.013s of thinking
+2019-03-05 07:34:08,020 [simple_agent_0_wrapper] INFO: STARTING STEP 14
+2019-03-05 07:34:08,021 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:08,021 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:08,049 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:08,050 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:08,058 [simple_agent_0_code] DEBUG: Suitable target found at (6, 5)
+2019-03-05 07:34:08,058 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.009s of thinking
+2019-03-05 07:34:08,122 [simple_agent_0_wrapper] INFO: STARTING STEP 15
+2019-03-05 07:34:08,123 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:08,124 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:08,144 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:08,146 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN']
+2019-03-05 07:34:08,155 [simple_agent_0_code] DEBUG: Suitable target found at (7, 7)
+2019-03-05 07:34:08,155 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.011s of thinking
+2019-03-05 07:34:08,224 [simple_agent_0_wrapper] INFO: STARTING STEP 16
+2019-03-05 07:34:08,225 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:08,225 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:08,253 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:08,255 [simple_agent_0_code] DEBUG: Valid actions: ['DOWN', 'WAIT']
+2019-03-05 07:34:08,261 [simple_agent_0_code] DEBUG: Suitable target found at (7, 7)
+2019-03-05 07:34:08,261 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.008s of thinking
+2019-03-05 07:34:08,326 [simple_agent_0_wrapper] INFO: STARTING STEP 17
+2019-03-05 07:34:08,327 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:08,328 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:08,349 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:08,350 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:08,359 [simple_agent_0_code] DEBUG: Suitable target found at (7, 7)
+2019-03-05 07:34:08,360 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.011s of thinking
+2019-03-05 07:34:08,435 [simple_agent_0_wrapper] INFO: STARTING STEP 18
+2019-03-05 07:34:08,436 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:08,436 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:08,470 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:08,471 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'WAIT']
+2019-03-05 07:34:08,477 [simple_agent_0_code] DEBUG: Suitable target found at (7, 7)
+2019-03-05 07:34:08,478 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.008s of thinking
+2019-03-05 07:34:08,543 [simple_agent_0_wrapper] INFO: STARTING STEP 19
+2019-03-05 07:34:08,544 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:08,544 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:08,573 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:08,574 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT']
+2019-03-05 07:34:08,581 [simple_agent_0_code] DEBUG: Suitable target found at (7, 6)
+2019-03-05 07:34:08,582 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.009s of thinking
+2019-03-05 07:34:08,647 [simple_agent_0_wrapper] INFO: STARTING STEP 20
+2019-03-05 07:34:08,651 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:08,651 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:08,676 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:08,677 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'WAIT', 'BOMB']
+2019-03-05 07:34:08,691 [simple_agent_0_code] DEBUG: Suitable target found at (7, 7)
+2019-03-05 07:34:08,692 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.016s of thinking
+2019-03-05 07:34:08,758 [simple_agent_0_wrapper] INFO: STARTING STEP 21
+2019-03-05 07:34:08,765 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:08,766 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:08,806 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:08,807 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:08,822 [simple_agent_0_code] DEBUG: Suitable target found at (6, 7)
+2019-03-05 07:34:08,822 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.016s of thinking
+2019-03-05 07:34:08,873 [simple_agent_0_wrapper] INFO: STARTING STEP 22
+2019-03-05 07:34:08,883 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:08,884 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:08,918 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:08,918 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'WAIT', 'BOMB']
+2019-03-05 07:34:08,929 [simple_agent_0_code] DEBUG: Suitable target found at (5, 7)
+2019-03-05 07:34:08,930 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.012s of thinking
+2019-03-05 07:34:08,975 [simple_agent_0_wrapper] INFO: STARTING STEP 23
+2019-03-05 07:34:08,981 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:08,982 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:09,024 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:09,026 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT']
+2019-03-05 07:34:09,044 [simple_agent_0_code] DEBUG: Suitable target found at (5, 13)
+2019-03-05 07:34:09,045 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.021s of thinking
+2019-03-05 07:34:09,082 [simple_agent_0_wrapper] INFO: STARTING STEP 24
+2019-03-05 07:34:09,094 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:09,095 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:09,127 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:09,128 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:09,134 [simple_agent_0_code] DEBUG: Suitable target found at (6, 7)
+2019-03-05 07:34:09,135 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.008s of thinking
+2019-03-05 07:34:09,179 [simple_agent_0_wrapper] INFO: STARTING STEP 25
+2019-03-05 07:34:09,180 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:09,180 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:09,211 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:09,213 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:09,223 [simple_agent_0_code] DEBUG: Suitable target found at (7, 7)
+2019-03-05 07:34:09,223 [simple_agent_0_wrapper] INFO: Chose action UP after 0.012s of thinking
+2019-03-05 07:34:09,280 [simple_agent_0_wrapper] INFO: STARTING STEP 26
+2019-03-05 07:34:09,281 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:09,281 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:09,314 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:09,315 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:09,337 [simple_agent_0_code] DEBUG: Suitable target found at (5, 13)
+2019-03-05 07:34:09,338 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.024s of thinking
+2019-03-05 07:34:09,382 [simple_agent_0_wrapper] INFO: STARTING STEP 27
+2019-03-05 07:34:09,383 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:09,383 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:09,417 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:09,418 [simple_agent_0_code] DEBUG: Valid actions: ['DOWN', 'WAIT']
+2019-03-05 07:34:09,433 [simple_agent_0_code] DEBUG: Suitable target found at (5, 13)
+2019-03-05 07:34:09,433 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.016s of thinking
+2019-03-05 07:34:09,483 [simple_agent_0_wrapper] INFO: STARTING STEP 28
+2019-03-05 07:34:09,484 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:09,485 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:09,522 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:09,523 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:09,538 [simple_agent_0_code] DEBUG: Suitable target found at (5, 13)
+2019-03-05 07:34:09,539 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.017s of thinking
+2019-03-05 07:34:09,586 [simple_agent_0_wrapper] INFO: STARTING STEP 29
+2019-03-05 07:34:09,586 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:09,587 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:09,628 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:09,629 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:09,641 [simple_agent_0_code] DEBUG: Suitable target found at (5, 13)
+2019-03-05 07:34:09,642 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.015s of thinking
+2019-03-05 07:34:09,686 [simple_agent_0_wrapper] INFO: STARTING STEP 30
+2019-03-05 07:34:09,688 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:09,688 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:09,721 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:09,722 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:09,730 [simple_agent_0_code] DEBUG: Suitable target found at (5, 13)
+2019-03-05 07:34:09,730 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.009s of thinking
+2019-03-05 07:34:09,788 [simple_agent_0_wrapper] INFO: STARTING STEP 31
+2019-03-05 07:34:09,789 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:09,789 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:09,812 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:09,813 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:09,820 [simple_agent_0_code] DEBUG: Suitable target found at (5, 13)
+2019-03-05 07:34:09,820 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.008s of thinking
+2019-03-05 07:34:09,890 [simple_agent_0_wrapper] INFO: STARTING STEP 32
+2019-03-05 07:34:09,891 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:09,891 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:09,913 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:09,914 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:09,925 [simple_agent_0_code] DEBUG: Suitable target found at (5, 10)
+2019-03-05 07:34:09,926 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.013s of thinking
+2019-03-05 07:34:09,993 [simple_agent_0_wrapper] INFO: STARTING STEP 33
+2019-03-05 07:34:09,993 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:09,994 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:10,022 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:10,024 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'DOWN']
+2019-03-05 07:34:10,029 [simple_agent_0_code] DEBUG: Suitable target found at (5, 13)
+2019-03-05 07:34:10,030 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.008s of thinking
+2019-03-05 07:34:10,094 [simple_agent_0_wrapper] INFO: STARTING STEP 34
+2019-03-05 07:34:10,094 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:10,095 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:10,119 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:10,121 [simple_agent_0_code] DEBUG: Valid actions: ['DOWN', 'WAIT']
+2019-03-05 07:34:10,128 [simple_agent_0_code] DEBUG: Suitable target found at (5, 13)
+2019-03-05 07:34:10,129 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.009s of thinking
+2019-03-05 07:34:10,195 [simple_agent_0_wrapper] INFO: STARTING STEP 35
+2019-03-05 07:34:10,196 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:10,197 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:10,225 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:10,227 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:10,241 [simple_agent_0_code] DEBUG: Suitable target found at (6, 9)
+2019-03-05 07:34:10,242 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.017s of thinking
+2019-03-05 07:34:10,298 [simple_agent_0_wrapper] INFO: STARTING STEP 36
+2019-03-05 07:34:10,299 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:10,299 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:10,329 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:10,330 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT']
+2019-03-05 07:34:10,347 [simple_agent_0_code] DEBUG: Suitable target found at (5, 9)
+2019-03-05 07:34:10,348 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.020s of thinking
+2019-03-05 07:34:10,400 [simple_agent_0_wrapper] INFO: STARTING STEP 37
+2019-03-05 07:34:10,401 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:10,401 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:10,431 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:10,434 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT']
+2019-03-05 07:34:10,442 [simple_agent_0_code] DEBUG: Suitable target found at (6, 9)
+2019-03-05 07:34:10,443 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.012s of thinking
+2019-03-05 07:34:10,503 [simple_agent_0_wrapper] INFO: STARTING STEP 38
+2019-03-05 07:34:10,504 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:10,505 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:10,538 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:10,539 [simple_agent_0_code] DEBUG: Valid actions: ['RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:10,558 [simple_agent_0_code] DEBUG: Suitable target found at (9, 15)
+2019-03-05 07:34:10,559 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.021s of thinking
+2019-03-05 07:34:10,606 [simple_agent_0_wrapper] INFO: STARTING STEP 39
+2019-03-05 07:34:10,606 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:10,607 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:10,642 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:10,643 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:10,652 [simple_agent_0_code] DEBUG: Suitable target found at (7, 10)
+2019-03-05 07:34:10,653 [simple_agent_0_wrapper] INFO: Chose action UP after 0.011s of thinking
+2019-03-05 07:34:10,708 [simple_agent_0_wrapper] INFO: STARTING STEP 40
+2019-03-05 07:34:10,708 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:10,709 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:10,742 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:10,743 [simple_agent_0_code] DEBUG: Valid actions: ['DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:10,752 [simple_agent_0_code] DEBUG: Suitable target found at (7, 11)
+2019-03-05 07:34:10,753 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.011s of thinking
+2019-03-05 07:34:10,809 [simple_agent_0_wrapper] INFO: STARTING STEP 41
+2019-03-05 07:34:10,810 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:10,810 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:10,839 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:10,841 [simple_agent_0_code] DEBUG: Valid actions: ['DOWN']
+2019-03-05 07:34:10,853 [simple_agent_0_code] DEBUG: Suitable target found at (9, 15)
+2019-03-05 07:34:10,854 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.015s of thinking
+2019-03-05 07:34:10,910 [simple_agent_0_wrapper] INFO: STARTING STEP 42
+2019-03-05 07:34:10,911 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:10,911 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:10,939 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:10,941 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'DOWN', 'WAIT']
+2019-03-05 07:34:10,950 [simple_agent_0_code] DEBUG: Suitable target found at (6, 11)
+2019-03-05 07:34:10,951 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.012s of thinking
+2019-03-05 07:34:11,017 [simple_agent_0_wrapper] INFO: STARTING STEP 43
+2019-03-05 07:34:11,018 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:11,018 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:11,048 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:11,049 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT']
+2019-03-05 07:34:11,060 [simple_agent_0_code] DEBUG: Suitable target found at (9, 15)
+2019-03-05 07:34:11,060 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.012s of thinking
+2019-03-05 07:34:11,118 [simple_agent_0_wrapper] INFO: STARTING STEP 44
+2019-03-05 07:34:11,119 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:11,120 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:11,151 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:11,152 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:11,162 [simple_agent_0_code] DEBUG: Suitable target found at (9, 15)
+2019-03-05 07:34:11,162 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.011s of thinking
+2019-03-05 07:34:11,221 [simple_agent_0_wrapper] INFO: STARTING STEP 45
+2019-03-05 07:34:11,222 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:11,222 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:11,262 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:11,263 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:11,269 [simple_agent_0_code] DEBUG: Suitable target found at (9, 15)
+2019-03-05 07:34:11,270 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.008s of thinking
+2019-03-05 07:34:11,323 [simple_agent_0_wrapper] INFO: STARTING STEP 46
+2019-03-05 07:34:11,323 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:11,324 [simple_agent_0_code] DEBUG: Encountered 3 game event(s)
+2019-03-05 07:34:11,352 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:11,353 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:11,363 [simple_agent_0_code] DEBUG: Suitable target found at (11, 14)
+2019-03-05 07:34:11,364 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.012s of thinking
+2019-03-05 07:34:11,425 [simple_agent_0_wrapper] INFO: STARTING STEP 47
+2019-03-05 07:34:11,426 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:11,427 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:11,452 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:11,453 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:11,462 [simple_agent_0_code] DEBUG: Suitable target found at (11, 14)
+2019-03-05 07:34:11,463 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.011s of thinking
+2019-03-05 07:34:11,526 [simple_agent_0_wrapper] INFO: STARTING STEP 48
+2019-03-05 07:34:11,527 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:11,528 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:11,552 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:11,553 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:11,559 [simple_agent_0_code] DEBUG: Suitable target found at (11, 14)
+2019-03-05 07:34:11,560 [simple_agent_0_wrapper] INFO: Chose action UP after 0.008s of thinking
+2019-03-05 07:34:11,627 [simple_agent_0_wrapper] INFO: STARTING STEP 49
+2019-03-05 07:34:11,628 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:11,628 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:11,654 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:11,655 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:11,673 [simple_agent_0_code] DEBUG: Suitable target found at (5, 15)
+2019-03-05 07:34:11,673 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.019s of thinking
+2019-03-05 07:34:11,729 [simple_agent_0_wrapper] INFO: STARTING STEP 50
+2019-03-05 07:34:11,730 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:11,730 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:11,753 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:11,754 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:11,764 [simple_agent_0_code] DEBUG: Suitable target found at (6, 15)
+2019-03-05 07:34:11,765 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.012s of thinking
+2019-03-05 07:34:11,831 [simple_agent_0_wrapper] INFO: STARTING STEP 51
+2019-03-05 07:34:11,832 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:11,832 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:11,855 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:11,856 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:11,863 [simple_agent_0_code] DEBUG: Suitable target found at (7, 15)
+2019-03-05 07:34:11,864 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.009s of thinking
+2019-03-05 07:34:11,933 [simple_agent_0_wrapper] INFO: STARTING STEP 52
+2019-03-05 07:34:11,934 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:11,934 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:11,956 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:11,957 [simple_agent_0_code] DEBUG: Valid actions: ['RIGHT', 'UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:11,964 [simple_agent_0_code] DEBUG: Suitable target found at (8, 15)
+2019-03-05 07:34:11,965 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.009s of thinking
+2019-03-05 07:34:12,036 [simple_agent_0_wrapper] INFO: STARTING STEP 53
+2019-03-05 07:34:12,036 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:12,037 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:12,068 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:12,070 [simple_agent_0_code] DEBUG: Valid actions: ['RIGHT', 'UP']
+2019-03-05 07:34:12,111 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:12,114 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.046s of thinking
+2019-03-05 07:34:12,154 [simple_agent_0_wrapper] INFO: STARTING STEP 54
+2019-03-05 07:34:12,157 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:12,158 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:12,211 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:12,213 [simple_agent_0_code] DEBUG: Valid actions: ['RIGHT', 'WAIT']
+2019-03-05 07:34:12,233 [simple_agent_0_code] DEBUG: Suitable target found at (7, 15)
+2019-03-05 07:34:12,234 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.023s of thinking
+2019-03-05 07:34:12,253 [simple_agent_0_wrapper] INFO: STARTING STEP 55
+2019-03-05 07:34:12,287 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:12,298 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:12,466 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:12,468 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'WAIT']
+2019-03-05 07:34:12,492 [simple_agent_0_code] DEBUG: Suitable target found at (7, 14)
+2019-03-05 07:34:12,493 [simple_agent_0_wrapper] INFO: Chose action UP after 0.027s of thinking
+2019-03-05 07:34:12,500 [simple_agent_0_wrapper] INFO: STARTING STEP 56
+2019-03-05 07:34:12,501 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:12,501 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:12,581 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:12,582 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:12,597 [simple_agent_0_code] DEBUG: Suitable target found at (7, 15)
+2019-03-05 07:34:12,598 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.017s of thinking
+2019-03-05 07:34:12,634 [simple_agent_0_wrapper] INFO: STARTING STEP 57
+2019-03-05 07:34:12,635 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:12,636 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:12,670 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:12,672 [simple_agent_0_code] DEBUG: Valid actions: ['UP']
+2019-03-05 07:34:12,707 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:12,708 [simple_agent_0_wrapper] INFO: Chose action UP after 0.038s of thinking
+2019-03-05 07:34:12,777 [simple_agent_0_wrapper] INFO: STARTING STEP 58
+2019-03-05 07:34:12,777 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:12,778 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:12,817 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:12,818 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:12,842 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:12,843 [simple_agent_0_wrapper] INFO: Chose action UP after 0.026s of thinking
+2019-03-05 07:34:12,884 [simple_agent_0_wrapper] INFO: STARTING STEP 59
+2019-03-05 07:34:12,887 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:12,888 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:12,914 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:12,915 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:12,940 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:12,941 [simple_agent_0_wrapper] INFO: Chose action UP after 0.027s of thinking
+2019-03-05 07:34:12,989 [simple_agent_0_wrapper] INFO: STARTING STEP 60
+2019-03-05 07:34:12,994 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:12,996 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:13,030 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:13,031 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:13,046 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:13,047 [simple_agent_0_wrapper] INFO: Chose action UP after 0.017s of thinking
+2019-03-05 07:34:13,100 [simple_agent_0_wrapper] INFO: STARTING STEP 61
+2019-03-05 07:34:13,101 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:13,101 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:13,123 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:13,124 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:13,141 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:13,142 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.020s of thinking
+2019-03-05 07:34:13,233 [simple_agent_0_wrapper] INFO: STARTING STEP 62
+2019-03-05 07:34:13,248 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:13,248 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:13,291 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:13,292 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:13,304 [simple_agent_0_code] DEBUG: Suitable target found at (11, 13)
+2019-03-05 07:34:13,305 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.014s of thinking
+2019-03-05 07:34:13,322 [simple_agent_0_wrapper] INFO: STARTING STEP 63
+2019-03-05 07:34:13,324 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:13,324 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:13,369 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:13,370 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:13,379 [simple_agent_0_code] DEBUG: Suitable target found at (11, 12)
+2019-03-05 07:34:13,380 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.011s of thinking
+2019-03-05 07:34:13,425 [simple_agent_0_wrapper] INFO: STARTING STEP 64
+2019-03-05 07:34:13,432 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:13,433 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:13,538 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:13,540 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP']
+2019-03-05 07:34:13,556 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:13,557 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.018s of thinking
+2019-03-05 07:34:13,565 [simple_agent_0_wrapper] INFO: STARTING STEP 65
+2019-03-05 07:34:13,566 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:13,567 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:13,601 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:13,602 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'WAIT']
+2019-03-05 07:34:13,614 [simple_agent_0_code] DEBUG: Suitable target found at (11, 13)
+2019-03-05 07:34:13,615 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.014s of thinking
+2019-03-05 07:34:13,670 [simple_agent_0_wrapper] INFO: STARTING STEP 66
+2019-03-05 07:34:13,671 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:13,672 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:13,711 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:13,713 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:13,731 [simple_agent_0_code] DEBUG: Suitable target found at (12, 13)
+2019-03-05 07:34:13,732 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.021s of thinking
+2019-03-05 07:34:13,787 [simple_agent_0_wrapper] INFO: STARTING STEP 67
+2019-03-05 07:34:13,801 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:13,801 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:13,836 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:13,839 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:13,853 [simple_agent_0_code] DEBUG: Suitable target found at (11, 13)
+2019-03-05 07:34:13,854 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.018s of thinking
+2019-03-05 07:34:13,883 [simple_agent_0_wrapper] INFO: STARTING STEP 68
+2019-03-05 07:34:13,884 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:13,885 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:13,939 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:13,940 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'DOWN', 'WAIT']
+2019-03-05 07:34:13,950 [simple_agent_0_code] DEBUG: Suitable target found at (12, 13)
+2019-03-05 07:34:13,950 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.011s of thinking
+2019-03-05 07:34:13,987 [simple_agent_0_wrapper] INFO: STARTING STEP 69
+2019-03-05 07:34:13,991 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:13,991 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:14,046 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:14,047 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'WAIT', 'BOMB']
+2019-03-05 07:34:14,059 [simple_agent_0_code] DEBUG: Suitable target found at (13, 13)
+2019-03-05 07:34:14,060 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.014s of thinking
+2019-03-05 07:34:14,097 [simple_agent_0_wrapper] INFO: STARTING STEP 70
+2019-03-05 07:34:14,098 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:14,099 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:14,132 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:14,133 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:14,144 [simple_agent_0_code] DEBUG: Suitable target found at (12, 13)
+2019-03-05 07:34:14,145 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.012s of thinking
+2019-03-05 07:34:14,216 [simple_agent_0_wrapper] INFO: STARTING STEP 71
+2019-03-05 07:34:14,217 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:14,218 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:14,255 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:14,256 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'WAIT', 'BOMB']
+2019-03-05 07:34:14,264 [simple_agent_0_code] DEBUG: Suitable target found at (11, 13)
+2019-03-05 07:34:14,265 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.010s of thinking
+2019-03-05 07:34:14,318 [simple_agent_0_wrapper] INFO: STARTING STEP 72
+2019-03-05 07:34:14,331 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:14,331 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:14,367 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:14,369 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT']
+2019-03-05 07:34:14,392 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:14,393 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.026s of thinking
+2019-03-05 07:34:14,415 [simple_agent_0_wrapper] INFO: STARTING STEP 73
+2019-03-05 07:34:14,416 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:14,416 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:14,463 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:14,464 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:14,474 [simple_agent_0_code] DEBUG: Suitable target found at (11, 14)
+2019-03-05 07:34:14,478 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.015s of thinking
+2019-03-05 07:34:14,517 [simple_agent_0_wrapper] INFO: STARTING STEP 74
+2019-03-05 07:34:14,518 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:14,519 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:14,577 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:14,578 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:14,591 [simple_agent_0_code] DEBUG: Suitable target found at (11, 15)
+2019-03-05 07:34:14,592 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.015s of thinking
+2019-03-05 07:34:14,629 [simple_agent_0_wrapper] INFO: STARTING STEP 75
+2019-03-05 07:34:14,632 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:14,633 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:14,717 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:14,718 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'WAIT']
+2019-03-05 07:34:14,736 [simple_agent_0_code] DEBUG: Suitable target found at (12, 15)
+2019-03-05 07:34:14,737 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.021s of thinking
+2019-03-05 07:34:14,743 [simple_agent_0_wrapper] INFO: STARTING STEP 76
+2019-03-05 07:34:14,744 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:14,744 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:14,796 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:14,797 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT']
+2019-03-05 07:34:14,806 [simple_agent_0_code] DEBUG: Suitable target found at (13, 15)
+2019-03-05 07:34:14,807 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.012s of thinking
+2019-03-05 07:34:14,868 [simple_agent_0_wrapper] INFO: STARTING STEP 77
+2019-03-05 07:34:14,869 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:14,870 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:15,079 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:15,080 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'WAIT']
+2019-03-05 07:34:15,091 [simple_agent_0_code] DEBUG: Suitable target found at (13, 14)
+2019-03-05 07:34:15,092 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.013s of thinking
+2019-03-05 07:34:15,105 [simple_agent_0_wrapper] INFO: STARTING STEP 78
+2019-03-05 07:34:15,108 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:15,109 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:15,166 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:15,167 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:15,177 [simple_agent_0_code] DEBUG: Suitable target found at (13, 15)
+2019-03-05 07:34:15,178 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.012s of thinking
+2019-03-05 07:34:15,214 [simple_agent_0_wrapper] INFO: STARTING STEP 79
+2019-03-05 07:34:15,219 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:15,220 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:15,287 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:15,287 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:15,294 [simple_agent_0_code] DEBUG: Suitable target found at (12, 15)
+2019-03-05 07:34:15,295 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.007s of thinking
+2019-03-05 07:34:15,318 [simple_agent_0_wrapper] INFO: STARTING STEP 80
+2019-03-05 07:34:15,331 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:15,332 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:15,400 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:15,402 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP']
+2019-03-05 07:34:15,434 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:15,435 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.035s of thinking
+2019-03-05 07:34:15,462 [simple_agent_0_wrapper] INFO: STARTING STEP 81
+2019-03-05 07:34:15,463 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:15,464 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:15,548 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:15,549 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'WAIT']
+2019-03-05 07:34:15,559 [simple_agent_0_code] DEBUG: Suitable target found at (13, 15)
+2019-03-05 07:34:15,559 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.011s of thinking
+2019-03-05 07:34:15,601 [simple_agent_0_wrapper] INFO: STARTING STEP 82
+2019-03-05 07:34:15,602 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:15,603 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:15,727 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:15,730 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'WAIT']
+2019-03-05 07:34:15,748 [simple_agent_0_code] DEBUG: Suitable target found at (13, 14)
+2019-03-05 07:34:15,749 [simple_agent_0_wrapper] INFO: Chose action UP after 0.022s of thinking
+2019-03-05 07:34:15,821 [simple_agent_0_wrapper] INFO: STARTING STEP 83
+2019-03-05 07:34:15,822 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:15,823 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:15,858 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:15,860 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:15,875 [simple_agent_0_code] DEBUG: Suitable target found at (13, 15)
+2019-03-05 07:34:15,876 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.017s of thinking
+2019-03-05 07:34:15,925 [simple_agent_0_wrapper] INFO: STARTING STEP 84
+2019-03-05 07:34:15,926 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:15,927 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:15,969 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:15,970 [simple_agent_0_code] DEBUG: Valid actions: ['UP']
+2019-03-05 07:34:16,002 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:16,002 [simple_agent_0_wrapper] INFO: Chose action UP after 0.033s of thinking
+2019-03-05 07:34:16,061 [simple_agent_0_wrapper] INFO: STARTING STEP 85
+2019-03-05 07:34:16,070 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:16,071 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:16,111 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:16,113 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:16,148 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:16,149 [simple_agent_0_wrapper] INFO: Chose action UP after 0.037s of thinking
+2019-03-05 07:34:16,167 [simple_agent_0_wrapper] INFO: STARTING STEP 86
+2019-03-05 07:34:16,201 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:16,202 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:16,287 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:16,288 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:16,320 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:16,321 [simple_agent_0_wrapper] INFO: Chose action UP after 0.034s of thinking
+2019-03-05 07:34:16,337 [simple_agent_0_wrapper] INFO: STARTING STEP 87
+2019-03-05 07:34:16,338 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:16,339 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:16,388 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:16,389 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:16,427 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:16,427 [simple_agent_0_wrapper] INFO: Chose action UP after 0.039s of thinking
+2019-03-05 07:34:16,437 [simple_agent_0_wrapper] INFO: STARTING STEP 88
+2019-03-05 07:34:16,438 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:16,439 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:16,502 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:16,506 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:16,549 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:16,550 [simple_agent_0_wrapper] INFO: Chose action UP after 0.048s of thinking
+2019-03-05 07:34:16,582 [simple_agent_0_wrapper] INFO: STARTING STEP 89
+2019-03-05 07:34:16,583 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:16,584 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:16,619 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:16,620 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:16,641 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:16,641 [simple_agent_0_wrapper] INFO: Chose action UP after 0.022s of thinking
+2019-03-05 07:34:16,684 [simple_agent_0_wrapper] INFO: STARTING STEP 90
+2019-03-05 07:34:16,686 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:16,687 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:16,722 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:16,723 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:16,744 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:16,744 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.022s of thinking
+2019-03-05 07:34:16,813 [simple_agent_0_wrapper] INFO: STARTING STEP 91
+2019-03-05 07:34:16,814 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:16,815 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:16,864 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:16,867 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:16,885 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:16,886 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.022s of thinking
+2019-03-05 07:34:16,928 [simple_agent_0_wrapper] INFO: STARTING STEP 92
+2019-03-05 07:34:16,935 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:16,936 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:16,969 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:16,969 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:16,980 [simple_agent_0_code] DEBUG: Suitable target found at (14, 9)
+2019-03-05 07:34:16,981 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.013s of thinking
+2019-03-05 07:34:17,023 [simple_agent_0_wrapper] INFO: STARTING STEP 93
+2019-03-05 07:34:17,024 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:17,024 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:17,064 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:17,065 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'WAIT', 'BOMB']
+2019-03-05 07:34:17,069 [simple_agent_0_code] DEBUG: Suitable target found at (13, 9)
+2019-03-05 07:34:17,070 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.006s of thinking
+2019-03-05 07:34:17,124 [simple_agent_0_wrapper] INFO: STARTING STEP 94
+2019-03-05 07:34:17,125 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:17,126 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:17,174 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:17,176 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT']
+2019-03-05 07:34:17,183 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:17,184 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.010s of thinking
+2019-03-05 07:34:17,227 [simple_agent_0_wrapper] INFO: STARTING STEP 95
+2019-03-05 07:34:17,228 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:17,229 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:17,292 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:17,294 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:17,300 [simple_agent_0_code] DEBUG: Suitable target found at (13, 8)
+2019-03-05 07:34:17,301 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.009s of thinking
+2019-03-05 07:34:17,328 [simple_agent_0_wrapper] INFO: STARTING STEP 96
+2019-03-05 07:34:17,329 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:17,329 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:17,360 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:17,362 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:17,373 [simple_agent_0_code] DEBUG: Suitable target found at (13, 7)
+2019-03-05 07:34:17,373 [simple_agent_0_wrapper] INFO: Chose action UP after 0.013s of thinking
+2019-03-05 07:34:17,430 [simple_agent_0_wrapper] INFO: STARTING STEP 97
+2019-03-05 07:34:17,432 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:17,432 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:17,463 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:17,465 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:17,488 [simple_agent_0_code] DEBUG: Suitable target found at (14, 7)
+2019-03-05 07:34:17,489 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.027s of thinking
+2019-03-05 07:34:17,533 [simple_agent_0_wrapper] INFO: STARTING STEP 98
+2019-03-05 07:34:17,534 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:17,535 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:17,566 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:17,568 [simple_agent_0_code] DEBUG: Valid actions: ['DOWN', 'WAIT']
+2019-03-05 07:34:17,584 [simple_agent_0_code] DEBUG: Suitable target found at (13, 7)
+2019-03-05 07:34:17,584 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.020s of thinking
+2019-03-05 07:34:17,634 [simple_agent_0_wrapper] INFO: STARTING STEP 99
+2019-03-05 07:34:17,635 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:17,635 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:17,667 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:17,667 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:17,682 [simple_agent_0_code] DEBUG: Suitable target found at (14, 7)
+2019-03-05 07:34:17,683 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.017s of thinking
+2019-03-05 07:34:17,743 [simple_agent_0_wrapper] INFO: STARTING STEP 100
+2019-03-05 07:34:17,745 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:17,745 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:17,781 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:17,784 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:17,806 [simple_agent_0_code] DEBUG: Suitable target found at (15, 7)
+2019-03-05 07:34:17,807 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.026s of thinking
+2019-03-05 07:34:17,847 [simple_agent_0_wrapper] INFO: STARTING STEP 101
+2019-03-05 07:34:17,855 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:17,856 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:17,894 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:17,894 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:17,916 [simple_agent_0_code] DEBUG: Suitable target found at (15, 8)
+2019-03-05 07:34:17,917 [simple_agent_0_wrapper] INFO: Chose action UP after 0.024s of thinking
+2019-03-05 07:34:17,958 [simple_agent_0_wrapper] INFO: STARTING STEP 102
+2019-03-05 07:34:17,965 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:17,966 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:18,000 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:18,004 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:18,038 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:18,039 [simple_agent_0_wrapper] INFO: Chose action UP after 0.039s of thinking
+2019-03-05 07:34:18,067 [simple_agent_0_wrapper] INFO: STARTING STEP 103
+2019-03-05 07:34:18,089 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:18,090 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:18,156 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:18,157 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:18,171 [simple_agent_0_code] DEBUG: Suitable target found at (14, 9)
+2019-03-05 07:34:18,172 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.017s of thinking
+2019-03-05 07:34:18,191 [simple_agent_0_wrapper] INFO: STARTING STEP 104
+2019-03-05 07:34:18,197 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:18,198 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:18,302 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:18,303 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN']
+2019-03-05 07:34:18,310 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:18,310 [simple_agent_0_wrapper] INFO: Chose action UP after 0.008s of thinking
+2019-03-05 07:34:18,363 [simple_agent_0_wrapper] INFO: STARTING STEP 105
+2019-03-05 07:34:18,364 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:18,366 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:18,413 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:18,415 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'WAIT']
+2019-03-05 07:34:18,431 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:18,432 [simple_agent_0_wrapper] INFO: Chose action UP after 0.018s of thinking
+2019-03-05 07:34:18,436 [simple_agent_0_wrapper] INFO: STARTING STEP 106
+2019-03-05 07:34:18,437 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:18,438 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:18,478 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:18,480 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:18,493 [simple_agent_0_code] DEBUG: Suitable target found at (15, 10)
+2019-03-05 07:34:18,494 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.016s of thinking
+2019-03-05 07:34:18,538 [simple_agent_0_wrapper] INFO: STARTING STEP 107
+2019-03-05 07:34:18,540 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:18,541 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:18,584 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:18,586 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT']
+2019-03-05 07:34:18,612 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:18,613 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.029s of thinking
+2019-03-05 07:34:18,662 [simple_agent_0_wrapper] INFO: STARTING STEP 108
+2019-03-05 07:34:18,664 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:18,664 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:18,777 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:18,779 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:18,789 [simple_agent_0_code] DEBUG: Suitable target found at (15, 10)
+2019-03-05 07:34:18,790 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.013s of thinking
+2019-03-05 07:34:18,819 [simple_agent_0_wrapper] INFO: STARTING STEP 109
+2019-03-05 07:34:18,820 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:18,820 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:18,899 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:18,900 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:18,910 [simple_agent_0_code] DEBUG: Suitable target found at (15, 11)
+2019-03-05 07:34:18,910 [simple_agent_0_wrapper] INFO: Chose action UP after 0.011s of thinking
+2019-03-05 07:34:18,929 [simple_agent_0_wrapper] INFO: STARTING STEP 110
+2019-03-05 07:34:18,930 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:18,931 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:18,992 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:18,993 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:19,000 [simple_agent_0_code] DEBUG: Suitable target found at (15, 10)
+2019-03-05 07:34:19,001 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.009s of thinking
+2019-03-05 07:34:19,031 [simple_agent_0_wrapper] INFO: STARTING STEP 111
+2019-03-05 07:34:19,032 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:19,033 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:19,093 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:19,093 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:19,100 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:19,101 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.008s of thinking
+2019-03-05 07:34:19,147 [simple_agent_0_wrapper] INFO: STARTING STEP 112
+2019-03-05 07:34:19,148 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:19,148 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:19,242 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:19,243 [simple_agent_0_code] DEBUG: Valid actions: ['UP']
+2019-03-05 07:34:19,249 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:19,250 [simple_agent_0_wrapper] INFO: Chose action UP after 0.008s of thinking
+2019-03-05 07:34:19,346 [simple_agent_0_wrapper] INFO: STARTING STEP 113
+2019-03-05 07:34:19,348 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:19,348 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:19,444 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:19,447 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'WAIT']
+2019-03-05 07:34:19,459 [simple_agent_0_code] DEBUG: Suitable target found at (14, 9)
+2019-03-05 07:34:19,459 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.015s of thinking
+2019-03-05 07:34:19,484 [simple_agent_0_wrapper] INFO: STARTING STEP 114
+2019-03-05 07:34:19,503 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:19,507 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:19,588 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:19,590 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT']
+2019-03-05 07:34:19,609 [simple_agent_0_code] DEBUG: Suitable target found at (13, 9)
+2019-03-05 07:34:19,610 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.027s of thinking
+2019-03-05 07:34:19,629 [simple_agent_0_wrapper] INFO: STARTING STEP 115
+2019-03-05 07:34:19,630 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:19,630 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:19,724 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:19,726 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:19,739 [simple_agent_0_code] DEBUG: Suitable target found at (13, 10)
+2019-03-05 07:34:19,740 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.016s of thinking
+2019-03-05 07:34:19,751 [simple_agent_0_wrapper] INFO: STARTING STEP 116
+2019-03-05 07:34:19,756 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:19,757 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:19,817 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:19,818 [simple_agent_0_code] DEBUG: Valid actions: ['UP']
+2019-03-05 07:34:19,823 [simple_agent_0_code] DEBUG: Suitable target found at (13, 9)
+2019-03-05 07:34:19,823 [simple_agent_0_wrapper] INFO: Chose action UP after 0.006s of thinking
+2019-03-05 07:34:19,853 [simple_agent_0_wrapper] INFO: STARTING STEP 117
+2019-03-05 07:34:19,857 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:19,857 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:19,894 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:19,897 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:19,907 [simple_agent_0_code] DEBUG: Suitable target found at (13, 10)
+2019-03-05 07:34:19,908 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.014s of thinking
+2019-03-05 07:34:20,008 [simple_agent_0_wrapper] INFO: STARTING STEP 118
+2019-03-05 07:34:20,019 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:20,020 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:20,101 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:20,112 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:20,134 [simple_agent_0_code] DEBUG: Suitable target found at (13, 11)
+2019-03-05 07:34:20,136 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.035s of thinking
+2019-03-05 07:34:20,158 [simple_agent_0_wrapper] INFO: STARTING STEP 119
+2019-03-05 07:34:20,167 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:20,168 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:20,240 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:20,242 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'WAIT']
+2019-03-05 07:34:20,251 [simple_agent_0_code] DEBUG: Suitable target found at (13, 10)
+2019-03-05 07:34:20,252 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.011s of thinking
+2019-03-05 07:34:20,261 [simple_agent_0_wrapper] INFO: STARTING STEP 120
+2019-03-05 07:34:20,262 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:20,262 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:20,334 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:20,337 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:20,342 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:20,343 [simple_agent_0_wrapper] INFO: Chose action WAIT after 0.009s of thinking
+2019-03-05 07:34:20,371 [simple_agent_0_wrapper] INFO: STARTING STEP 121
+2019-03-05 07:34:20,373 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:20,374 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:20,417 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:20,418 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:20,429 [simple_agent_0_code] DEBUG: Suitable target found at (13, 11)
+2019-03-05 07:34:20,430 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.013s of thinking
+2019-03-05 07:34:20,475 [simple_agent_0_wrapper] INFO: STARTING STEP 122
+2019-03-05 07:34:20,476 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:20,477 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:20,541 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:20,545 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'WAIT']
+2019-03-05 07:34:20,594 [simple_agent_0_code] DEBUG: Suitable target found at (13, 11)
+2019-03-05 07:34:20,597 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.056s of thinking
+2019-03-05 07:34:20,626 [simple_agent_0_wrapper] INFO: STARTING STEP 123
+2019-03-05 07:34:20,632 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:20,633 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:20,699 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:20,700 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:20,762 [simple_agent_0_code] DEBUG: Suitable target found at (13, 10)
+2019-03-05 07:34:20,763 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.064s of thinking
+2019-03-05 07:34:20,768 [simple_agent_0_wrapper] INFO: STARTING STEP 124
+2019-03-05 07:34:20,771 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:20,771 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:20,831 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:20,832 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT']
+2019-03-05 07:34:20,873 [simple_agent_0_code] DEBUG: Suitable target found at (13, 11)
+2019-03-05 07:34:20,874 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.043s of thinking
+2019-03-05 07:34:20,896 [simple_agent_0_wrapper] INFO: STARTING STEP 125
+2019-03-05 07:34:20,897 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:20,897 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:20,928 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:20,929 [simple_agent_0_code] DEBUG: Valid actions: ['RIGHT', 'WAIT', 'BOMB']
+2019-03-05 07:34:20,971 [simple_agent_0_code] DEBUG: Suitable target found at (15, 10)
+2019-03-05 07:34:20,972 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.043s of thinking
+2019-03-05 07:34:20,997 [simple_agent_0_wrapper] INFO: STARTING STEP 126
+2019-03-05 07:34:21,000 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:21,001 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:21,035 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:21,036 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:21,087 [simple_agent_0_code] DEBUG: Suitable target found at (15, 9)
+2019-03-05 07:34:21,088 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.053s of thinking
+2019-03-05 07:34:21,109 [simple_agent_0_wrapper] INFO: STARTING STEP 127
+2019-03-05 07:34:21,109 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:21,110 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:21,166 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:21,173 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP']
+2019-03-05 07:34:21,180 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:21,180 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.014s of thinking
+2019-03-05 07:34:21,220 [simple_agent_0_wrapper] INFO: STARTING STEP 128
+2019-03-05 07:34:21,222 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:21,223 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:21,272 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:21,274 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'WAIT']
+2019-03-05 07:34:21,320 [simple_agent_0_code] DEBUG: Suitable target found at (15, 10)
+2019-03-05 07:34:21,321 [simple_agent_0_wrapper] INFO: Chose action LEFT after 0.049s of thinking
+2019-03-05 07:34:21,357 [simple_agent_0_wrapper] INFO: STARTING STEP 129
+2019-03-05 07:34:21,359 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:21,359 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:21,482 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:21,484 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:21,545 [simple_agent_0_code] DEBUG: Suitable target found at (13, 11)
+2019-03-05 07:34:21,546 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.064s of thinking
+2019-03-05 07:34:21,559 [simple_agent_0_wrapper] INFO: STARTING STEP 130
+2019-03-05 07:34:21,560 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:21,561 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:21,617 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:21,619 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'WAIT']
+2019-03-05 07:34:21,662 [simple_agent_0_code] DEBUG: Suitable target found at (13, 10)
+2019-03-05 07:34:21,663 [simple_agent_0_wrapper] INFO: Chose action UP after 0.046s of thinking
+2019-03-05 07:34:21,669 [simple_agent_0_wrapper] INFO: STARTING STEP 131
+2019-03-05 07:34:21,676 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:21,677 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:21,757 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:21,758 [simple_agent_0_code] DEBUG: Valid actions: ['UP']
+2019-03-05 07:34:21,795 [simple_agent_0_code] DEBUG: Suitable target found at (13, 11)
+2019-03-05 07:34:21,795 [simple_agent_0_wrapper] INFO: Chose action UP after 0.039s of thinking
+2019-03-05 07:34:21,826 [simple_agent_0_wrapper] INFO: STARTING STEP 132
+2019-03-05 07:34:21,827 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:21,827 [simple_agent_0_code] DEBUG: Encountered 2 game event(s)
+2019-03-05 07:34:21,882 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:21,883 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:21,921 [simple_agent_0_code] DEBUG: Suitable target found at (13, 10)
+2019-03-05 07:34:21,924 [simple_agent_0_wrapper] INFO: Chose action UP after 0.042s of thinking
+2019-03-05 07:34:21,937 [simple_agent_0_wrapper] INFO: STARTING STEP 133
+2019-03-05 07:34:21,939 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:21,940 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:22,124 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:22,128 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:22,227 [simple_agent_0_code] DEBUG: Suitable target found at (13, 9)
+2019-03-05 07:34:22,228 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.109s of thinking
+2019-03-05 07:34:22,281 [simple_agent_0_wrapper] INFO: STARTING STEP 134
+2019-03-05 07:34:22,331 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:22,332 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:22,443 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:22,444 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'WAIT', 'BOMB']
+2019-03-05 07:34:22,532 [simple_agent_0_code] DEBUG: Suitable target found at (13, 8)
+2019-03-05 07:34:22,533 [simple_agent_0_wrapper] INFO: Chose action BOMB after 0.090s of thinking
+2019-03-05 07:34:22,543 [simple_agent_0_wrapper] INFO: STARTING STEP 135
+2019-03-05 07:34:22,546 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:22,547 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:22,590 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:22,592 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN']
+2019-03-05 07:34:22,639 [simple_agent_0_code] DEBUG: Suitable target found at (13, 9)
+2019-03-05 07:34:22,640 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.050s of thinking
+2019-03-05 07:34:22,647 [simple_agent_0_wrapper] INFO: STARTING STEP 136
+2019-03-05 07:34:22,648 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:22,649 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:22,789 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:22,791 [simple_agent_0_code] DEBUG: Valid actions: ['RIGHT', 'DOWN', 'WAIT']
+2019-03-05 07:34:22,901 [simple_agent_0_code] DEBUG: Suitable target found at (13, 9)
+2019-03-05 07:34:22,902 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.113s of thinking
+2019-03-05 07:34:22,912 [simple_agent_0_wrapper] INFO: STARTING STEP 137
+2019-03-05 07:34:22,913 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:22,914 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:22,963 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:22,964 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'RIGHT', 'WAIT']
+2019-03-05 07:34:22,972 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:22,973 [simple_agent_0_wrapper] INFO: Chose action RIGHT after 0.010s of thinking
+2019-03-05 07:34:23,025 [simple_agent_0_wrapper] INFO: STARTING STEP 138
+2019-03-05 07:34:23,035 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:23,035 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:23,109 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:23,111 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:23,238 [simple_agent_0_code] DEBUG: Suitable target found at (14, 9)
+2019-03-05 07:34:23,243 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.133s of thinking
+2019-03-05 07:34:23,255 [simple_agent_0_wrapper] INFO: STARTING STEP 139
+2019-03-05 07:34:23,262 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:23,263 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:23,386 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:23,390 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:23,448 [simple_agent_0_code] DEBUG: Suitable target found at (15, 10)
+2019-03-05 07:34:23,449 [simple_agent_0_wrapper] INFO: Chose action UP after 0.063s of thinking
+2019-03-05 07:34:23,481 [simple_agent_0_wrapper] INFO: STARTING STEP 140
+2019-03-05 07:34:23,482 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:23,482 [simple_agent_0_code] DEBUG: Encountered 4 game event(s)
+2019-03-05 07:34:23,523 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:23,524 [simple_agent_0_code] DEBUG: Valid actions: ['LEFT', 'UP', 'DOWN', 'WAIT']
+2019-03-05 07:34:23,531 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:23,531 [simple_agent_0_wrapper] INFO: Chose action DOWN after 0.008s of thinking
+2019-03-05 07:34:23,583 [simple_agent_0_wrapper] INFO: STARTING STEP 141
+2019-03-05 07:34:23,584 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:23,584 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:23,617 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:23,618 [simple_agent_0_code] DEBUG: Valid actions: ['DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:23,625 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:23,626 [simple_agent_0_wrapper] INFO: Chose action WAIT after 0.009s of thinking
+2019-03-05 07:34:23,730 [simple_agent_0_wrapper] INFO: STARTING STEP 142
+2019-03-05 07:34:23,732 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:23,732 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:23,796 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:23,798 [simple_agent_0_code] DEBUG: Valid actions: ['DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:23,806 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:23,808 [simple_agent_0_wrapper] INFO: Chose action WAIT after 0.011s of thinking
+2019-03-05 07:34:23,836 [simple_agent_0_wrapper] INFO: STARTING STEP 143
+2019-03-05 07:34:23,842 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:23,843 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:23,885 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:23,887 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:23,894 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:23,895 [simple_agent_0_wrapper] INFO: Chose action WAIT after 0.010s of thinking
+2019-03-05 07:34:23,935 [simple_agent_0_wrapper] INFO: STARTING STEP 144
+2019-03-05 07:34:23,936 [simple_agent_0_wrapper] INFO: Process intermediate rewards
+2019-03-05 07:34:23,937 [simple_agent_0_code] DEBUG: Encountered 1 game event(s)
+2019-03-05 07:34:23,985 [simple_agent_0_code] INFO: Picking action according to rule set
+2019-03-05 07:34:23,989 [simple_agent_0_code] DEBUG: Valid actions: ['UP', 'DOWN', 'WAIT', 'BOMB']
+2019-03-05 07:34:23,996 [simple_agent_0_code] DEBUG: All targets gone, nothing to do anymore
+2019-03-05 07:34:23,997 [simple_agent_0_wrapper] INFO: Chose action WAIT after 0.012s of thinking
+2019-03-05 07:34:24,134 [simple_agent_0_wrapper] INFO: Received exit message for round
+2019-03-05 07:34:24,134 [simple_agent_0_wrapper] INFO: Finalize agent's training
+2019-03-05 07:34:24,135 [simple_agent_0_code] DEBUG: Encountered 2 game event(s) in final step
+2019-03-05 07:34:24,136 [simple_agent_0_wrapper] INFO: Round #1 finished
+2019-03-05 07:34:33,029 [simple_agent_0_wrapper] INFO: Received global exit message
+2019-03-05 07:34:33,029 [simple_agent_0_wrapper] INFO: SHUT DOWN

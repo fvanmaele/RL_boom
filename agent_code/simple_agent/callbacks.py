@@ -3,8 +3,10 @@ import numpy as np
 from random import shuffle
 from time import time, sleep
 from collections import deque
+import pickle
 
 from settings import s
+from settings import e
 
 
 def look_for_targets(free_space, start, targets, logger=None):
@@ -202,8 +204,7 @@ def act(self):
     # Keep track of chosen action for cycle detection
     if self.next_action == 'BOMB':
         self.bomb_history.append((x,y))
-
-
+        
 def reward_update(self):
     """Called once per step to allow intermediate rewards based on game events.
 
@@ -214,7 +215,15 @@ def reward_update(self):
     contrast to act, this method has no time limit.
     """
     self.logger.debug(f'Encountered {len(self.events)} game event(s)')
-
+    current_events = self.events
+    game_state = self.game_state
+    action = self.next_action
+    
+    data = {'state':game_state, 'action':action}
+    filename = 'logs\game-data\data'+ str(self.game_state['step'])
+    file = open(filename, 'wb')
+    pickle.dump(data, file) 
+    file.close()
 
 def end_of_episode(self):
     """Called at the end of each game to hand out final rewards and do training.
@@ -224,3 +233,4 @@ def end_of_episode(self):
     final step. You should place your actual learning code in this method.
     """
     self.logger.debug(f'Encountered {len(self.events)} game event(s) in final step')
+
