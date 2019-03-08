@@ -58,26 +58,26 @@ s = namedtuple("Settings", settings.keys())(*settings.values())
 
 
 events = [
-    'MOVED_LEFT',
-    'MOVED_RIGHT',
-    'MOVED_UP',
-    'MOVED_DOWN',
-    'WAITED',
-    'INTERRUPTED',
-    'INVALID_ACTION',
+    'MOVED_LEFT',#0
+    'MOVED_RIGHT',#1
+    'MOVED_UP',#2
+    'MOVED_DOWN',#3
+    'WAITED',#4
+    'INTERRUPTED',#5
+    'INVALID_ACTION',#6
 
-    'BOMB_DROPPED',
-    'BOMB_EXPLODED',
+    'BOMB_DROPPED',#7
+    'BOMB_EXPLODED',#8
 
-    'CRATE_DESTROYED',
-    'COIN_FOUND',
-    'COIN_COLLECTED',
+    'CRATE_DESTROYED',#9
+    'COIN_FOUND',#10
+    'COIN_COLLECTED',#11
 
-    'KILLED_OPPONENT',
-    'KILLED_SELF',
+    'KILLED_OPPONENT',#12
+    'KILLED_SELF',#13
 
-    'GOT_KILLED',
-    'OPPONENT_ELIMINATED',
-    'SURVIVED_ROUND',
+    'GOT_KILLED',#14
+    'OPPONENT_ELIMINATED',#15
+    'SURVIVED_ROUND',#16
 ]
 e = namedtuple('Events', events)(*range(len(events)))
