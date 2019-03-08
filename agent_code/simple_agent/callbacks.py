@@ -215,15 +215,7 @@ def reward_update(self):
     contrast to act, this method has no time limit.
     """
     self.logger.debug(f'Encountered {len(self.events)} game event(s)')
-    current_events = self.events
-    game_state = self.game_state
-    action = self.next_action
-    
-    data = {'state':game_state, 'action':action}
-    filename = 'logs\game-data\data'+ str(self.game_state['step'])
-    file = open(filename, 'wb')
-    pickle.dump(data, file) 
-    file.close()
+
 
 def end_of_episode(self):
     """Called at the end of each game to hand out final rewards and do training.
