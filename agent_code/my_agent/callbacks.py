@@ -1,8 +1,8 @@
 
 import numpy as np
 from random import shuffle
-
 from settings import e
+
 
 def feature_extraction_tmp(self):
     coins = self.game_state['coins']
@@ -34,6 +34,15 @@ def feature_extraction(coins, arena, directions):
     #feat_coins = np.sum( np.abs( np.asarray(coins) - np.array([x,y]) ), axis = 1)
     #print(feat_coins)
     return np.asarray(feat_coins)
+
+
+
+
+
+
+
+
+##################################################################################################################
 
 def setup(self):
     np.random.seed()
