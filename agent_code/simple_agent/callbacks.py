@@ -94,7 +94,8 @@ def act(self):
 
     # Gather information about the game state
     arena = self.game_state['arena']
-    x, y, _ , bombs_left = self.game_state['self']
+    print(arena)
+    x, y, _, bombs_left = self.game_state['self']
     bombs = self.game_state['bombs']
     bomb_xys = [(x,y) for (x,y,t) in bombs]
     others = [(x,y) for (x,y,n,b) in self.game_state['others']]
