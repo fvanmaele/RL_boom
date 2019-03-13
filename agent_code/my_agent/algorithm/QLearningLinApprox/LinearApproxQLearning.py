@@ -1,5 +1,14 @@
 ﻿import numpy as np
 
+
+
+
+
+
+
+
+######################################## For Q learning ###################################################
+
 '''
 Q Learning using linear approximation, with feature selection f as a function
 for modularity 
@@ -55,5 +64,18 @@ def pred(game_state, w, f):
             best_a = a
     
     return best_a, best_q
-    
 
+
+
+def q_gd_lapprox(prev_state, prev_action, game_state, Gt, gamma, weights):
+    """ 
+    Gradient descent for Q learning with linear approximation
+
+    This implementation is based on TD(0), i.e Gt = R_t+1 + gamma * q_approx(next state & action)
+    further or maybe bether implementations would be:
+        -Gt = Total return after episode (MC)
+        -Gt = q_t^lambda  (TD(lambda))  (see Silver notes)
+    """
+        
+
+    
