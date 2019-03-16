@@ -120,4 +120,4 @@ def end_of_episode(self):
     game. self.events will contain all events that occured during your agent's
     final step. You should place your actual learning code in this method.
     """
-    pass
+    np.save('./agent_code/my_agent/models/weights.npy', self.weights)
