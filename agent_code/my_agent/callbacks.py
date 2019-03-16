@@ -1,8 +1,10 @@
 import numpy as np
-import algorithm.feature_extraction as fe
-import algorithm.linear_approximation as la
-import algorithm.policy as pol
-import algorithm.tracking as tr
+
+from agent_code.my_agent.algorithm.feature_extraction import *
+from agent_code.my_agent.algorithm.linear_approximation import *
+from agent_code.my_agent.algorithm.policy import *
+from agent_code.my_agent.algorithm.tracking import *
+from settings import e
 
 
 def setup(self):
@@ -16,6 +18,14 @@ def setup(self):
     """
     np.random.seed()
     self.reward_sequence = []
+
+    # load weights
+    try:
+        self.weights = np.load('./agent_code/my_agent/models/weights.npy')
+        print("weights loaded")
+    except:
+        self.weights = []
+        print("no weights found ---> create new weights")
 
     # We require the previous state to implement the Q-learning algorithm
     # with linear function approximation.
@@ -35,17 +45,10 @@ def act(self):
     in settings.py, execution is interrupted by the game and the current value
     of self.next_action will be used. The default value is 'WAIT'.
     """
-    np.random_seed()
-
-    # Load parameter vector w for Q-learning with function approximation.
-    if os.path.isfile('w.pickle'):
-        with open('w.pickle', 'rb') as file:
-            self.w = pickle.load(file)
-    else:
-        # Initialize w with values of 1. The size of the parameter
-        # vector depends on the amount of features in the feature
-        # extraction function f.
-        self.w = np.fill(10, 1)
+    self.logger.info('Pick action at random')
+    print("abc")
+    self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB'],
+                                         p=[.23, .23, .23, .23, .08])
 
 
 def reward_update(self):
@@ -75,7 +78,7 @@ def reward_update(self):
     # Performing an action is always punished with a small negative reward.
     reward = -1
 
-    for event in agent.game_state['events']:
+    for event in self.game_state['events']:
         if event == e.BOMB_DROPPED:
             # We give no special reward to the action of dropping a
             # bomb, to leave flexibility in the chosen strategies.
@@ -101,9 +104,8 @@ def reward_update(self):
             reward -= 2
 
     # We keep track of all intermediary rewards in the episode
-    agent.logger.info(f'Given reward of {reward}')
-    print("abcdef")
-    agent.reward_sequence.append(reward)
+    self.logger.info(f'Given reward of {reward}')
+    self.reward_sequence.append(reward)
 
     # Update the weights (feature vector) after each intermediary step
     # in the game world. This requires the "previous" action, oddly
