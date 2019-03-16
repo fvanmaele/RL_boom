@@ -58,6 +58,39 @@ SOME TEXT - Look at the en in Conclusion for some useful links
 
 \section{Explaining the Framework}
 
+\textbf{Features:}
+\begin{itemize}
+
+\item FOR STEP 1:
+\begin{itemize} 
+\item \textbf{1.)} Reward the best possible action to a coin, if it is reachable F(s,a)=1 ,  otherwise F(s,a)=0.    `BOMB' and `WAIT ' are always 0.
+\end{itemize}
+
+\item FOR STEP 1 \& 2:
+\begin {itemize}
+\item \textbf{1.)} \\  \textbf{DONE}  
+\item  \textbf{2.)} Penalize if the action follows the agent to death (F,s)=1, F(s,a)=0. otherwise.  \\ \textbf{TO BE DONE: -> FERDINAND}
+\item \textbf{3.)} Penalize if the action follows the agent into a ``save'':(Where the bomb won't at some point explode) position.  F(s,a)=1 otherwise F(s,a) = 0.  Bombs are always set to 0.
+ \\  \textbf{TO BE DONE: -> DANIEL}  
+ \item \textbf{4.)}  Reward the minimal distance that follows to safety if you are in a ``Danger zone'' (as defined in \textbf{3}.)  F(s,a)=1 otherwise F(s,a) = 0.
+ If you are not in a ``Danger zone'' then F(s,a) =  0 for all actions.  For Bombs always set F(s,a) = 0.
+  \\  \textbf{TO BE DONE: -> LILY}  
+  \item \textbf{5.)} Penalize failure action F(s,a) = 1, otherwise F(s,a) = 0 .  
+  BOMBS are always 0 and WAIT??
+ \\  \textbf{TO BE DEFINED: WAIT ??}  
+   \item \textbf{6.)} Reward when getting a coin F(s,a) = 1, otherwise F(s,a) = 0 .  
+ \\  \textbf{DONE}  
+ 
+    \item \textbf{7.)} Reward when destroying a block F(s,a) = 1, otherwise F(s,a) = 0 .  
+ \\  \textbf{TO BE DONE: DANIEL}  
+ 
+     \item \textbf{8.)} Reward (if there are no blocks anymore ? and no coins?)  the available movements F(s,a) = 1, otherwise F(s,a) = 0 .   Bombs = 0, WAIT =1 ? 
+ \\  \textbf{TO BE DEFINE AND -> DANIEL}   
+\end{itemize}
+
+
+
+\end{itemize}
 
 \subsection*{TD(0) learning}
 [TODO: some text]

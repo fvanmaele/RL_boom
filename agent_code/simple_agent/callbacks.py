@@ -112,6 +112,11 @@ def act(self):
         self.ignore_others_timer -= 1
     self.coordinate_history.append((x,y))
 
+    print("STATE:  ", self.game_state['step'])
+    print(self.game_state['explosions'])
+    print(bombs)
+    print(bomb_map)
+
     # Check which moves make sense at all
     directions = [(x,y), (x+1,y), (x-1,y), (x,y+1), (x,y-1)]
     valid_tiles, valid_actions = [], []
