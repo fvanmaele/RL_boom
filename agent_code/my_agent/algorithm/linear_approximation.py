@@ -4,7 +4,7 @@ def TDLambdaLinFApp(Lambda, state, reward, state_next, w, z, f, step_size=0.05, 
     This function implements the TD(Lambda) algorithm with linear function
     approximation. It must be called after each transition.
 
-    Input parameters:
+    Parameters:
     * state:      Array representing the last state.
     * state_next: Array representing the next state.
     * reward:     real number associated to the state transition.
@@ -15,6 +15,9 @@ def TDLambdaLinFApp(Lambda, state, reward, state_next, w, z, f, step_size=0.05, 
                   same dimension as the parameter vector.
     * step_size:  Small non-negative real numbers chosen by the user.
     * discount:   The discount factor in the MDP.
+
+    Return Value:
+    * (w', z'):   Update of the parameter vector and eligibility traces.
     """
     f_y = f(state_next)
     f_x = f(state)
@@ -24,7 +27,7 @@ def TDLambdaLinFApp(Lambda, state, reward, state_next, w, z, f, step_size=0.05, 
     z = f_x + discount*Lambda*z
     w = w + step_size*delta*z
     
-    return (w,z)
+    return (w, z)
 
 
 def QLearningLinFApp(state, action, reward, state_next, w, f, step_size=0.05, discount=1):
@@ -33,7 +36,7 @@ def QLearningLinFApp(state, action, reward, state_next, w, f, step_size=0.05, di
     This function implements the Q-learning algorithm with linear function
     approximation.  It must be called after each state transition.
 
-    Input Parameters:
+    Parameters:
     * state:       Array representing the last state s.
     * action:      Action A which occured in the state transtion from s to s'.
     * reward:      Real number r associated to the state transition.
@@ -55,8 +58,7 @@ def QLearningLinFApp(state, action, reward, state_next, w, f, step_size=0.05, di
     
     # Compute the maximum Q value for each action in the action space
     # (global parameter).
-    Q_max = 0
-    A_max = None
+    Q_max, A_max = 0, None
 
     for A in actions:
         Q = np.dot(w, f(state_next, A))
@@ -78,7 +80,7 @@ def SARSALambdaLinFApp(Lambda, state, action, reward, state_next, action_next, w
     This function implements the Sarsa(Lambda) algorithm with linear function
     approximation. It must be called after each transition.
 
-    Input Parameters:
+    Parameters:
     * Lambda:      The hyperparameter for the algorithm.
     * state:       Array representing the last state s.
     * action:      Action A which occured in the state transtion from s to s'.
@@ -90,7 +92,7 @@ def SARSALambdaLinFApp(Lambda, state, action, reward, state_next, action_next, w
     * z:           Array (d-dimensional) representing the vector of eligibility traces.
 
     Return Value:
-    * (w', z'):    Update of w and z.
+    * (w', z'):    Update of the parameter vector and eligiblity traces.
     """
     features = f(state, action)
     features_next = f(state_next, action_next)

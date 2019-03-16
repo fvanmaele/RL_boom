@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def taxi_cab_metric(p, q, numpy_substract=true):
+def taxi_cab_metric(p, q):
     """Definition of the Manhattan (or taxi-cab) metric.
 
     The taxicab metric between two vectors p, q in an n-dimensional
@@ -11,19 +11,7 @@ def taxi_cab_metric(p, q, numpy_substract=true):
 
     Note that this metric does not account for non-reachable tiles.
     """
-    n = len(p)
-    # Check if arguments are of the same size
-    if n != len(q)
-        raise ValueError("metric requires vectors of same size")
-
-    if numpy_substract:
-        sum = 0
-        for i in range(n):
-            sum += abs(p[i] - q[i])
-        return sum
-    else:
-        # Vectorized version of the algorithm using numpy.
-        return np.sum(np.absolute(np.subtract(p, q)))
+    return np.sum(np.absolute(np.subtract(p, q)))
 
 
 # Code from simple_agent for path finding.
@@ -34,7 +22,7 @@ def look_for_targets(free_space, start, targets, logger=None):
     a target is encountered.  If no target can be reached, the path
     that takes the agent closest to any target is chosen.
 
-    Args:
+    Arguments:
         free_space: Boolean numpy array. True for free tiles and False for obstacles.
         start:      Coordinate from which to begin the search.
         targets:    List or array holding the coordinates of all target tiles.

@@ -46,9 +46,9 @@ def act(self):
     of self.next_action will be used. The default value is 'WAIT'.
     """
     self.logger.info('Pick action at random')
-    print("abc")
     self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB'],
-                                         p=[.23, .23, .23, .23, .08])
+                                         p=[.15, .15, .15, .15, .40])
+    print(vectorized_feature(feature_2, self.game_state))
 
 
 def reward_update(self):

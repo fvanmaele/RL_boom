@@ -147,23 +147,26 @@ def feature_3(state, action):
     others = state['others']
     x, y, _, _ = state['self']
 
-    if action == 'INVALID_ACTION':
-        # Taking the agent into a wall is one possible invalid action.
-        return 1
-    elif action == 'UP':
-        if not tile_is_free(x, y-1, arena, bombs, others):
-            return 1
+    # Map movement to coordinates.
+    if action == 'UP':
+        x_next, y_next = x, y-1
     elif action == 'DOWN':
-        if not tile_is_free(x, y+1, arena, bombs, others):
-            return 1
+        x_next, y_next = x, y+1
     elif action == 'LEFT':
-        if not tile_is_free(x-1, y, arena, bombs, others):
-            return 1
+        x_next, y_next = x-1, y
     elif action == 'RIGHT':
-        if not tile_is_free(x+1, y, arena, bombs, others):
-            return 1
-    # No obstacle found, or the next action is not a movement action.
-    return 0
+        x_next, y_next = x+1, y
+    elif action == 'WAIT' or action == 'BOMB':
+        # TODO: As the idea behind this feature is characterizing
+        # "invalid" actions, do not penalize placing a bomb or waiting
+        # (as valid actions).
+        return 0
+
+    if not tile_is_free(x_next, y_next, arena, bombs, others):
+        return 1
+    else:
+        # No obstacle found, or the next action is not a movement action.
+        return 0
 
 
 def feature_4(state, action):
@@ -178,19 +181,30 @@ def feature_4(state, action):
 def feature_5(state, action):
     """Feature 5
 
-    Value 1: Action is most likely to destroy a crate.
+    Value 1: Action is most likely to destroy a crate. (greedy version)
     Value 0: Otherwise.
     """
     # Retrieve arena and agent information.
     arena = state['arena']
+    bombs = state['bombs']
     x, y, _, bombs_left = state['self']
 
     # Only the BOMB action allows the agent to destroy a coin.
     if action == 'BOMB' and bombs_left > 0:
-        # Check if a nearby crate is inside the blast radius
-        # of a dropped bomb. An agent drops a bomb at its
-        # current location.
-        return 1
+        # Check if the agent is in the immediate vicinity of a crate.
+        if (arena[x+1, y] == 1 or arena[x-1, y] == 1 or
+            arena[x, y+1] == 1 or arena[x, y-1] == 1):
+            # Placing a second bomb on top of an existing bomb is not
+            # allowed, and any crate may be destroyed by a single explosion.
+            for xb, yb, t in bombs:
+                if x == xb and y == yb:
+                    return 0
+            # No bomb is placed in the agent's current position.
+            return 1
+
+    # The agent is far removed from a crate, makes a movement, or has
+    # no bombs remaining.
+    return 0
 
 
 def feature_6(state, action):
@@ -205,20 +219,22 @@ def feature_6(state, action):
     coins = state['coins']
     x, y, _, _ = state['self']
 
-    # Only move actions (UP, DOWN, LEFT, RIGHT) allow the agent
-    # to collect a coin.
+    # Only move actions (UP, DOWN, LEFT, RIGHT) allow the agent to
+    # collect a coin. A tile cannot be occupied by both an obstacle
+    # and a coin; it thus suffices to compare the coin coordinates,
+    # and not explicitely check for free tiles.
     for coin in coins:
         if action == 'UP':
-            if x == coin.x and (y)+1 == coin.y:
+            if x == coin.x and y+1 == coin.y:
                 return 1
         elif action == 'DOWN':
-            if x == coin.x and (y)-1 == coin.y:
+            if x == coin.x and y-1 == coin.y:
                 return 1
         elif action == 'LEFT':
-            if y == coin.y and (x)-1 == coin.x:
+            if y == coin.y and x-1 == coin.x:
                 return 1
         elif action == 'RIGHT':
-            if y == coin.y and (x)+1 == coin.x:
+            if y == coin.y and x+1 == coin.x:
                 return 1
 
     # No coin was collected.
