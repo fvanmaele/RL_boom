@@ -4,6 +4,7 @@ import settings as game_settings
 # simplicity.
 actions = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT']
 
+
 # Function adapted from items.py.
 def get_blast_coords(x, y, arena):
     """Retrieve the blast range for a bomb.
@@ -45,7 +46,7 @@ def get_blast_coords(x, y, arena):
 
 # Function adapted from environment.py
 def tile_is_free(x, y, arena, bombs, others):
-    is_free = (arena[x,y] == 0)
+    is_free = (arena[x, y] == 0)
 
     if is_free:
         for obstacle in bombs + others:
@@ -105,15 +106,14 @@ def feature_2(state, action):
     elif action == 'BOMB' or action == 'WAIT':
         x_next, y_next = x, y
 
-    # Check if the tile reached by the next action is free. Note tha 
-    # that may be destroyed by bombs, but prevents us from moving into
-    # a free tile.
-    if tile_is_free(x_next, y_next, arena, bombs, active_agents):
-        # Set the next action as equivalent to waiting. (Performing
-        # this action will result in an invalid action, and is handled
-        # by a different feature.)
+    # Check if the tile reached by the next action is occupied by an
+    # object. This object may be destroyed by bombs, but prevents us
+    # from moving into a free tile.
+    if not tile_is_free(x_next, y_next, arena, bombs, active_agents):
+        # Set the next action as equivalent to waiting. (Such an
+        # action is invalid, as handled by a different feature.)
         x_next, y_next = x, y
-    
+
     # Check if the agent will move into the blast range of an existing
     # bomb. This information is only available when the bomb has
     # already exploded, and has to be calculated manually when not.
