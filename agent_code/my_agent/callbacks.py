@@ -2,6 +2,8 @@ import numpy as np
 from random import shuffle
 from settings import e
 #from agent_code.my_agent.algorithms import *
+import agent_code.my_agent.ftr_lily
+
 
 def compute_patch(arena, p1, p2):
     """
@@ -115,6 +117,7 @@ def act(self):
 
     # Create new feature sates
     f1 = feat_1(game_state)
+    f2 = ftr_lily.feat_dist_to_safe(game_state)
     """
     Idea would be compute more features:
     f1 = ... 
@@ -122,7 +125,7 @@ def act(self):
     ...
     f = stack ( all features) 
     """
-    feature_state = f1
+    feature_state = np.stack((f1, f2))
     self.prev_state = feature_state
     print("features computed")
 

@@ -26,7 +26,7 @@ settings = {
     'crate_density': 0.0,#0.75,
     'actions': ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT'],
     'max_agents': 4,
-    'max_steps': 400,  #400
+    'max_steps': 20,  #400
     'stop_if_not_training': False,
     'bomb_power': 3,
     'bomb_timer': 4,
