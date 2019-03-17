@@ -1,17 +1,16 @@
 import numpy as np
 from settings import s
+from random import shuffle
 import copy
+
 
 
 ##################### HELPING FUNCTIONS
 
 def look_for_targets(free_space, start, targets, logger=None):
-<<<<<<< HEAD
+
     """
     Find direction of closest target that can be reached via free tiles.
-=======
-    """Find direction of closest target that can be reached via free tiles.
->>>>>>> 952b93d3d79ffa90d75349e92499f764098dc629
     Performs a breadth-first search of the reachable free tiles until a target is encountered.
     If no target can be reached, the path that takes the agent closest to any target is chosen.
     Args:
@@ -150,17 +149,6 @@ def feature4(game_state):
             res = res.astype(int)
      
     return res
-<<<<<<< HEAD
 
-=======
-    
-        '''
-        TO WRITE
-        '''
-        print(new_dist_to_safe, dist_to_safe)
-        res[np.where(new_dist_to_safe-dist_to_safe<0)] = 1
-        
-    return res
->>>>>>> 952b93d3d79ffa90d75349e92499f764098dc629
     
 

@@ -1,92 +1,47 @@
 import numpy as np
 from random import shuffle
 from settings import e
-from agent_code.my_agent.feature4 import feature4
+from settings import s
+from agent_code.my_agent.algorithms import *
+from agent_code.my_agent.feature4 import *
 
 
-def compute_patch(arena, p1, p2):
-    """
-    this function computes the patch of the arena between the points p1 and p2
-    """
-    patch = arena[min(p1[1], p2[1]):max(p1[1], p2[1])+1,  min(p1[0], p2[0]):max(p1[0], p2[0])+1] 
-    return patch
-
-def feat_1(game_state):
-    """
-        Feature extraction for coin detection
-    """
-    coins = game_state['coins']
+def feature2(game_state, bomb_map):
     x, y, _, bombs_left = game_state['self']
-    directions = [(x,y), (x+1,y), (x-1,y), (x,y+1), (x,y-1)] # define directions
+    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
+    bombs = game_state['bombs']
+    others = [(x,y) for (x,y,n,b) in game_state['others']]
+    bomb_xys = [(x,y) for (x,y,t) in bombs]
+    explosions = game_state['explosions'] 
     arena = game_state['arena']
+    #explosion_map = game_state[
 
-    feature = [] # Desired feature
+    feature = []
 
     for d in directions:
-        f = []  # array that helps building the features 
-        if arena[d] != 0:
-            d = directions[0]   # Don't move if it is an invalid action
+        # if invalid action agent should wait
+        if ((arena[d] == 0) and
+            (not d in others) and
+            (not d in bomb_xys)):
+            d = (x,y)
 
-        diff2coins = np.abs( np.asarray(coins) - np.array([d[0],d[1]]) )
-        sum_diff2coins = np.sum(diff2coins, axis=1)
+        if ((bomb_map[d] <= 1) and
+            (explosions[d] <= 1)):
+            feature.append(1) 
+        else:
+            feature.append(0)
+    
+    # For BOMB 
+    feature.append(feature[-1])
 
-        # min distance along x & y axis and 'global min distance'
-        diffmin_xy = np.min(diff2coins, axis=0)  # min difference of distances
-        min_coin, dist2min_coin = np.argmin(sum_diff2coins), np.min(sum_diff2coins)
-        
-        list_mincoins = list(np.where(sum_diff2coins == dist2min_coin)[0])
-        
-        # find how many walls are in between (finding the patches between the agent and coin)
-        patches = [] 
-        for m in list_mincoins:
-            p = compute_patch(arena, coins[m], d)
-            patches.append(p)
-
-        # not necesary any more because we are computing all the patches
-        patch_coinagent = compute_patch(arena, coins[min_coin], d)
-        
-        # look if there is a fast path to the closes coin
-        FAST_PATH = False 
-        for patch in patches:
-            if patch.shape[0] == 1 or patch.shape[1] == 1:
-                if np.count_nonzero(patch) == 0:
-                    FAST_PATH=True
-                    break
-            else:
-                FAST_PATH=True
-                break
-        if not FAST_PATH:
-            dist2min_coin += 2
-
-        # fill features
-        """
-        other posible features
-        f.append(diffmin_xy[0])
-        f.append(diffmin_xy[1])
-        f.append(np.count_nonzero(patch_coinagent))
-        f.append(patch_coinagent.shape[0]* patch_coinagent.shape[1] - np.count_nonzero(patch_coinagent))
-        """
-        f.append(28- dist2min_coin)
-        
-        feature.append(f)
-
-    feature = np.asarray(feature) 
-
-    # because this feature doesn't take in consideration using bombs
-    f_bomb = np.expand_dims(np.zeros(feature.shape[1]), axis=0)
-    feature = np.concatenate((feature,f_bomb), axis=0)
-
-    return feature
-
-
-
-
+    return np.asarray(feature)
+    
 
 
 ##################################################################################################################
 
 def setup(self):
-    
+     
     # load weights
     try:
         self.weights = np.load('./agent_code/my_agent/models/weights.npy')
@@ -98,57 +53,75 @@ def setup(self):
     # Define Rewards
     self.total_R = 0
 
-    # Define possible actions
-    self.actions = ['WAIT','RIGHT', 'LEFT', 'DOWN', 'UP'] #Bomb
-    
     # Step size or gradient descent 
     self.alpha = 0.2 
     self.gamma = 0.9
+    self.EPSILON = 0.2
+
+
+#    # While this timer is positive, agent will not hunt/attack opponents
+#    self.ignore_others_timer = 0
 
 def act(self):
 
     """
-    For the moment only trying to solve the coin detection problem
-    actions and  order: 'WAIT','RIGHT', 'LEFT', 'DOWN', 'UP', 'BOMB'  (SEE: setup)
+    actions order: 'UP', 'DOWN', LEFT', 'RIGHT', 'BOMB', 'WAIT'    
     """
 
+    # load state 
     game_state = self.game_state  # isn't it memory waste calling in each feature extraction for coins, self, arena?
-
-    # Create new feature sates
-    f1 = feat_1(game_state)
-    f4 = feature4(game_state)
-    """
-    Idea would be compute more features:
-    f1 = ... 
-    ...
-    ...
-    f = stack ( all features) 
-    """
-    feature_state = np.stack((f1, f4))
+    
+    # create BOMB-MAP 
+    bombs = game_state['bombs']
+    arena = game_state['arena']
+    bomb_xys = [(x,y) for (x,y,t) in bombs]
+    bomb_map = np.ones(arena.shape) * 5
+    for xb,yb,t in bombs:
+        for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
+            if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):
+                bomb_map[i,j] = min(bomb_map[i,j], t)
+    
+    # Compute features state 
+    f0 = np.ones(6)  # for bias
+    f1 = feature1(game_state) # reward good action
+    f2 = feature2(game_state, bomb_map) # penalization bad action
+    f4 = feature4(game_state) #reward going towards safe locations
+    f7 = feature7(game_state) # penalize bad action    !!!! NOCH MAL SCHAUEN
+    f8 = feature8(game_state) # rewards good action
+    feature_state = np.vstack((f0,f1,f2,f7,f8)).T
     self.prev_state = feature_state
-    print("features computed")
-
+    print(self.game_state['step']) 
+    print(f2)
+    
+    
+    #weights = np.array([1,1,-1,-1,1])   #initial guess 
     # later no necessary
-    if self.weights == []:
+    if len(self.weights) == 0:
+        print(feature_state.shape[0])
         weights = np.ones(feature_state.shape[1])  
         self.weights = weights
     else:
         weights = self.weights
 
-    # TODO:  implement with shuffle for equally best actions ??
-    q_approx = linapprox_q(feature_state, weights)
-    q_next_action = self.actions[np.argmax(q_approx)] #GREEDY POLICY
+    self.logger.info('Pick action')
+    
+    # Linear approximation approach
+    greedy = np.random.choice([0,1], p=[self.EPSILON, 1-self.EPSILON)
+    if greedy:
+    
+        q_approx = linapprox_q(feature_state, weights)
+        best_actions = np.where(q_approx == np.max(q_approx))[0] 
+        shuffle(best_actions)
+        q_next_action = s.actions[best_actions[0]] #GREEDY POLICY
+        self.next_action = q_next_action
+        print(" q action picked  ", q_next_action)
 
-    self.logger.info('Pick action ')
-#    self.next_action = np.random.choice(['WAIT','RIGHT', 'LEFT', 'DOWN', 'UP'], p=[0.2, .20, .20, .20, .20])
-#    print(game_state['arena'])
 
-    self.next_action = q_next_action
-    print("action", q_next_action)
-     
-        
-    print(self.weights)
-
+    else:
+        random_action = np.random.choice(['WAIT','RIGHT', 'LEFT', 'DOWN', 'UP','BOMB'], p=[0.15, .15, 0.15, .15, 0.15, 0.25])
+        self.next_action = random_action
+        print(" random action picked  ", random_action)
+    
 def reward_update(self):
 
     '''
@@ -188,7 +161,7 @@ def reward_update(self):
         so wie vorhin und mit stack, vlt, machen wir eine Function die alles auf einmal stack
         """
         prev_state = self.prev_state
-        prev_state_a = prev_state[self.actions.index(self.next_action),:]
+        prev_state_a = prev_state[s.actions.index(self.next_action),:]
 
         alpha = self.alpha
         gamma = self.gamma
