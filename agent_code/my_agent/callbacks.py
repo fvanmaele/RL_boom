@@ -88,10 +88,12 @@ def act(self):
     f4 = feature4(game_state) #reward going towards safe locations
     f7 = feature7(game_state) # penalize bad action    !!!! NOCH MAL SCHAUEN
     f8 = feature8(game_state) # rewards good action
-    feature_state = np.vstack((f0,f1,f2,f7,f8)).T
+    feature_state = np.vstack((f0,f1,f2,f4,f7,f8)).T
     self.prev_state = feature_state
+    
+    print(self.weights)
     print(self.game_state['step']) 
-    print(f2)
+    print(feature_state)
     
     
     #weights = np.array([1,1,-1,-1,1])   #initial guess 
@@ -105,8 +107,8 @@ def act(self):
 
     self.logger.info('Pick action')
     
-    # Linear approximation approach
-    greedy = np.random.choice([0,1], p=[self.EPSILON, 1-self.EPSILON)
+    # Linear approximation approach with epsilon-greedy
+    greedy = np.random.choice([0,1], p=[self.EPSILON, 1-self.EPSILON])
     if greedy:
     
         q_approx = linapprox_q(feature_state, weights)

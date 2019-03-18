@@ -23,10 +23,10 @@ settings = {
     'cols': 17,
     'rows': 17,
     'grid_size': 30,
-    'crate_density': 0.0,#0.75,
+    'crate_density': 0.10,#0.75,
     'actions': ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT'],
     'max_agents': 4,
-    'max_steps': 20,  #400
+    'max_steps': 100,  #400
     'stop_if_not_training': False,
     'bomb_power': 3,
     'bomb_timer': 4,
