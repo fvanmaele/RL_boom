@@ -3,10 +3,9 @@ from random import shuffle
 from settings import e
 from settings import s
 from agent_code.my_agent.algorithms import *
-from agent_code.my_agent.feature4 import *
 
 
-##################################################################################################################
+#########################################################################
 
 def setup(self):
      
@@ -29,36 +28,40 @@ def setup(self):
 
 #    # While this timer is positive, agent will not hunt/attack opponents
 #    self.ignore_others_timer = 0
+#########################################################################
 
 def act(self):
 
     """
     actions order: 'UP', 'DOWN', LEFT', 'RIGHT', 'BOMB', 'WAIT'    
     """
-
+    print("############################")
     # load state 
     game_state = self.game_state  # isn't it memory waste calling in each feature extraction for coins, self, arena?
     
     # create BOMB-MAP 
-    bombs = game_state['bombs']
-    arena = game_state['arena']
-    bomb_xys = [(x,y) for (x,y,t) in bombs]
-    bomb_map = np.ones(arena.shape) * 5
-    for xb,yb,t in bombs:
-        for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
-            if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):
-                bomb_map[i,j] = min(bomb_map[i,j], t)
+    #ombs = game_state['bombs']
+    #arena = game_state['arena']
+    #bomb_xys = [(x,y) for (x,y,t) in bombs]
+    #bomb_map = np.ones(arena.shape) * 5
+    #for xb,yb,t in bombs:
+    #    for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) #for h in range(-3,4)]:
+    #        if (0 < i < bomb_map.shape[0]) and (0 < j < #bomb_map.shape[1]):
+    #            bomb_map[i,j] = min(bomb_map[i,j], t)
     
     # Compute features state 
     f0 = np.ones(6)  # for bias
     f1 = feature1(game_state) # reward good action
-    f2 = feature2(game_state, bomb_map) # penalization bad action
-    f4 = feature4(game_state) #reward going towards safe locations
-    f5 = feature5(game_state) # penalize bac action
-    f6 = feature6(game_state) # reward action
-    f7 = feature7(game_state) # penalize bad action    !!!! NOCH MAL SCHAUEN
+    f2 = feature2(game_state) # penalization bad action
+    f4 = feature4(game_state) # reward good action
+    f5 = feature5(game_state)  # penalize bad action
+    f6 = feature6(game_state)  # reward good action
+    f7 = feature7(game_state) # reward action
     f8 = feature8(game_state) # rewards good action
-    feature_state = np.vstack((f0,f1,f2,f4,f5,f6,f7,f8)).T
+    f9 = feature9(game_state) # rewards good action
+    f10 = feature10(game_state) # rewards good action
+    feature_state = np.vstack((f0,f1,f2,f4,f5,f6,f7,f8,f9,f10)).T
+   
     self.prev_state = feature_state
     
     print(self.weights)
@@ -71,7 +74,7 @@ def act(self):
     #later no necessary
     if len(self.weights) == 0:
         print('no weights, init weights')
-        self.weights = np.array([1,1,-7,7,-0.5,1.5,2,0.5]) 
+        self.weights = np.array([1,1,-7,4,-0.5,1.5,2,0.5,0.5,0.5])
         #self.weights = np.ones(feature_state.shape[1])  
         #self.weights = weights
     #else:
@@ -139,16 +142,17 @@ def reward_update(self):
                     
                     
         # Berechene alle features
-        #next_state = feat_1(self.game_state)
         f0 = np.ones(6)  # for bias
         f1 = feature1(self.game_state) # reward good action
-        f2 = feature2(self.game_state, bomb_map) # penalization bad action
-        f4 = feature4(self.game_state) #reward going towards safe locations
-        f5 = feature5(self.game_state) # penalize bac action
-        f6 = feature6(self.game_state) # reward action
-        f7 = feature7(self.game_state) # penalize bad action    !!!! NOCH MAL SCHAUEN
+        f2 = feature2(self.game_state) # penalization bad action
+        f4 = feature4(self.game_state) # reward good action
+        f5 = feature5(self.game_state)  # penalize bad action
+        f6 = feature6(self.game_state)  # reward good action
+        f7 = feature7(self.game_state) # reward action
         f8 = feature8(self.game_state) # rewards good action
-        next_state = np.vstack((f0,f1,f2,f4,f5,f6,f7,f8)).T
+        f9 = feature9(self.game_state) # rewards good action
+        f10 = feature10(self.game_state) # rewards good action
+        next_state = np.vstack((f0,f1,f2,f4,f5,f6,f7,f8,f9,f10)).T
         
         """
         so wie vorhin und mit stack, vlt, machen wir eine Function die alles auf einmal stack

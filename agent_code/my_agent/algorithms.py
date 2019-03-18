@@ -42,7 +42,7 @@ def compute_blast_coords(arena, bomb):
     """
     bomb_power = s.bomb_power
     x, y = bomb[0], bomb[1] 
-    blast_coords = []
+    blast_coords = [(x,y)]
 
     for i in range(1, bomb_power+1):
         if arena[x+i, y] == -1: break
@@ -53,7 +53,6 @@ def compute_blast_coords(arena, bomb):
     for i in range(1, bomb_power+1):
         if arena[x, y+i] != 0: break 
         blast_coords.append((x, y+i))
-    # moving to the right direction (like the song XD )
     for i in range(1, bomb_power+1):
         if arena[x, y-i] != 0: break 
         blast_coords.append((x, y-i))
@@ -205,23 +204,22 @@ def look_for_targets(free_space, start, targets, logger=None):
 
 def get_blast_coords(bomb, arena, arr):
     x, y = bomb[0], bomb[1]
-    bomb_power = s.bomb_power
     if len(arr)== 0:
-       arr = np.array([[x,y]])
+       arr = [(x,y)]
        #np.append(a, [[0,1]], axis=0)
     
-    for i in range(1, bomb_power+1):
+    for i in range(1, 3+1):
         if arena[x+i,y] == -1: break
-        arr = np.append(arr,[[x+i,y]], axis=0)
-    for i in range(1, bomb_power+1):
+        arr.append((x+i,y))
+    for i in range(1, 3+1):
         if arena[x-i,y] == -1: break
-        arr = np.append(arr,[[x-i,y]], axis=0)            
-    for i in range(1, bomb_power+1):
+        arr.append((x-i,y))           
+    for i in range(1, 3+1):
         if arena[x,y+i] == -1: break
-        arr = np.append(arr,[[x,y+i]], axis=0)            
-    for i in range(1, bomb_power+1):
+        arr.append((x,y+i))            
+    for i in range(1, 3+1):
         if arena[x,y-i] == -1: break
-        arr = np.append(arr,[[x,y-i]], axis=0)
+        arr.append((x,y-i))
     return arr
 
 ############# FEATURES ##############
@@ -259,7 +257,7 @@ def feature1(game_state):
     return np.asarray(feature)
 
 
-def feature2(game_state, bomb_map):
+def feature2(game_state):
     """
     Penalize if the action follows the agent to death (F,s)=1, F(s,a)=0. otherwise.
     it could be maybe get better
@@ -275,6 +273,12 @@ def feature2(game_state, bomb_map):
     blast_coords = bombs_xy 
     feature = []
     
+    bomb_map = np.ones(arena.shape) * 5
+    for xb,yb,t in bombs:
+        for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
+            if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):
+                bomb_map[i,j] = min(bomb_map[i,j], t)
+
     danger_zone = [] 
     if len(bombs) != 0:
         '''
@@ -285,7 +289,7 @@ def feature2(game_state, bomb_map):
         '''
         for b in bombs_xy:
             danger_zone += compute_blast_coords(arena, b)
-    danger_zone += bombs_xy
+    #danger_zone += bombs_xy
 
     for d in directions:
         if ((arena[d] != 0) or 
@@ -304,73 +308,52 @@ def feature2(game_state, bomb_map):
     return np.asarray(feature)
 
 
-def feature4(game_state):
-    '''
-    This feature rewards the action that minimizes the distance to safety
-    should the agent be in the danger zone(where explosions will be).
-        F(s,a) = 1, should a reduces distance to safety
-        F(s,a) = 0, otherwise
-    F(s,a) returns 0 if we are not in the danger zone   
-    
-    We begin by extracting all relevant information from game_state
-    '''
-    agent = game_state['self']
-    arena = game_state['arena']
-    bombs = game_state['bombs']
-    '''
-    and initializing the resulting vector
-    '''
-    res = np.zeros(6, dtype=np.int8)
-    if len(bombs) != 0:
-        '''
-        If there are bombs on the game board, we map all the explosions
-        that will be caused by the bombs. For this, we use the help function
-        get_blast_coords. This is an adjusted version of the function with the
-        same name from item.py of the original framework
-        '''
-        danger_zone = []
-        for b in bombs:
-            danger_zone= get_blast_coords(b, arena, danger_zone)
+def feature4(state):
+    """Reward the agent for moving in the shortest direction outside
+    the blast range of (all) bombs in the game.
+    """
+    bombs = state['bombs']
+    bombs_xy = [(x,y) for (x,y,t) in bombs]
+    arena = state['arena']
+    others = state['others']    
+    x, y, _, _ = state['self']
 
-        '''
-        We then check if the agent is in the danger zone
-        If agent is not in the danger zone, we return 0.
-        Otherwise we calculate the distance/direction of safety.
-        '''
-        if agent[0] in danger_zone[:,0] and agent[1] in danger_zone[:,1]:
-            
-            '''
-            we then mark these explosions on our map. here we deep-copy
-            the arena, so that in the case that the arena is needed for
-            other features, it remains unchanged
-            '''
-            map_ = copy.deepcopy(arena)
-            map_[danger_zone[:,0], danger_zone[:,1]] = 2
-            '''
-            '''
-            safe_loc = np.argwhere(map_==0)
-            free_space = abs(map_) != 1
-            d = look_for_targets(free_space, (agent[0], agent[1]), safe_loc)
-            '''
-            we then calculate the minimum distance of our agent to any of these safe locations.
-            For simplicity, only Manhattan distance is used to calculate distance in this
-            feature extraction. However, this doesn't always represent the true distance in the 
-            game because of the walls.(Possible point of improvement?)
- 
-            Then, we calculate the positions of our agent after taking all possible actions.
-            '''
-            
-            actions_loc = np.array([(agent[0], agent[1]-1), #up
-                                    (agent[0], agent[1]+1), #down
-                                    (agent[0]-1, agent[1]), #left
-                                    (agent[0]+1, agent[1]), #right
-                                    (agent[0], agent[1]),   #bomb
-                                    (agent[0], agent[1])])  #wait
-            
-            res = (actions_loc[:,0] == d[0]) & (actions_loc[:,1] == d[1])
-            res = res.astype(int)
-     
-    return res
+    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
+    feature = []
+
+
+    # Compute the blast range of all bombs in the game ('danger zone')
+    danger_zone = []
+    for b in bombs_xy:
+        danger_zone += compute_blast_coords(arena, b)
+    #danger_zone += bombs_xy
+
+    if len(bombs) == 0 or (x,y) not in danger_zone:
+        return np.zeros(6)
+
+    # The agent can use any free tile in the arena to escape from a
+    # bomb (which may not immediately explode).
+    free_tiles = arena == 0 # boolean np.ndarray
+
+    # the 'safe zone' is the complement of the free tiles and the
+    # 'danger zone'. Use deepcopy to preserve free_tiles.
+    targets = [(x,y) for x in range(1,16) for y in range(1,16) if (arena[x, y] == 0) and (x,y) not in danger_zone]
+
+    # def look_for_targets(free_space, start, targets, logger=None):
+    safety_direction = look_for_targets(free_tiles, (x, y), targets)
+
+    # check if next action moves agent towards safety
+    for d in directions:
+        if d == safety_direction:
+            feature.append(1)
+        else:
+            feature.append(0)
+
+    # Do not reward placing a bomb at this stage.
+    feature.append(feature[-1])
+    feature[-2] = 0
+
+    return feature
 
 def feature5(game_state):
     """
@@ -482,3 +465,71 @@ def feature8(game_state):
     feature.append(1)
 
     return np.asarray(feature)
+
+def feature9(game_state):
+    """
+    Reward going into dead-ends (from simple agent)
+    """
+
+    x, y, _, bombs_left = game_state['self']
+    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
+    bombs = game_state['bombs']
+    bombs_xy = [(x,y) for (x,y,t) in bombs]
+    others = [(x,y) for (x,y,n,b) in game_state['others']]
+    arena = game_state['arena']
+
+    dead_ends = [(x,y) for x in range(1,16) for y in range(1,16) if (arena[x,y] == 0)
+                    and ([arena[x+1,y], arena[x-1,y], arena[x,y+1], arena[x,y-1]].count(0) == 1)]
+
+    # construct the free_space Boolean numpy_array
+    free_space = arena == 0
+    best_coord = look_for_targets(free_space, (x,y), dead_ends)
+
+    feature = []
+    if best_coord is None:
+        return np.zeros(6)
+    for d in directions:
+        if d != best_coord:
+            feature.append(0)
+        else:
+            feature.append(1)
+    
+    # for 'BOMB' and 'WAIT'
+    feature.append(feature[-1])
+    feature[-2] = 0
+
+    return feature
+
+
+
+def feature10(game_state):
+    """
+    Reward going to crates 
+    """
+
+    x, y, _, bombs_left = game_state['self']
+    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
+    bombs = game_state['bombs']
+    bombs_xy = [(x,y) for (x,y,t) in bombs]
+    others = [(x,y) for (x,y,n,b) in game_state['others']]
+    arena = game_state['arena']
+    crates = [(x,y) for x in range(1,16) for y in range(1,16) if (arena[x,y] == 1)]
+
+    # construct the free_space Boolean numpy_array
+    free_space = arena == 0
+    best_coord = look_for_targets(free_space, (x,y), crates)
+
+    feature = []
+    if best_coord is None:
+        return np.zeros(6)
+    for d in directions:
+        if d != best_coord:
+            feature.append(0)
+        else:
+            feature.append(1)
+    
+    # for 'BOMB' and 'WAIT'
+    feature.append(feature[-1])
+    feature[-2] = 0
+
+    return feature

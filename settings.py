@@ -13,7 +13,7 @@ settings = {
     'fps': 15,
 
     # Main loop
-    'update_interval': 0.01, # 0.33,
+    'update_interval': 0.001, # 0.33,
     'turn_based': False,
     'n_rounds': 400,
     'save_replay': False,
@@ -26,7 +26,7 @@ settings = {
     'crate_density': 0.75,#0.75,
     'actions': ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT'],
     'max_agents': 4,
-    'max_steps': 1000,  #400
+    'max_steps': 400,  #400
     'stop_if_not_training': False,
     'bomb_power': 3,
     'bomb_timer': 4,
