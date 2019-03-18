@@ -82,6 +82,7 @@ def get_blast_coords(bomb, arena, arr):
 ########################## FEATURE EXTRACTION FUNCTION 
 
 def feature4(game_state):
+    print('####################################')
     '''
     This feature rewards the action that minimizes the distance to safety
     should the agent be in the danger zone(where explosions will be).
@@ -94,6 +95,7 @@ def feature4(game_state):
     agent = game_state['self']
     arena = game_state['arena']
     bombs = game_state['bombs']
+    print(agent)
     '''
     and initializing the resulting vector
     '''
@@ -128,7 +130,9 @@ def feature4(game_state):
                 if arena[coord] == 0:
                     arena[coord]  = 2
             for b in bombs:
-                arena[b[0], b[1]] = -1
+                print(b)
+                if (b[0],b[1]) == (agent[0],agent[1]):
+                    arena[b[0], b[1]] = -1
                 
             #map_[danger_zone[:,0], danger_zone[:,1]] = 2
             '''
@@ -153,7 +157,7 @@ def feature4(game_state):
                                     (agent[0], agent[1]),   #bomb
                                     (agent[0], agent[1])])  #wait
                                     
-            '''                        
+                                    
             print(free_space[(agent[0], agent[1]-1)], 
                   free_space[(agent[0], agent[1]+1)], 
                   free_space[(agent[0]-1, agent[1])], 
@@ -163,11 +167,11 @@ def feature4(game_state):
                   arena[(agent[0], agent[1]+1)], 
                   arena[(agent[0]-1, agent[1])], 
                   arena[(agent[0]+1, agent[1])])      
-            '''      
+            #'''      
                 
             res = (actions_loc[:,0] == d[0]) & (actions_loc[:,1] == d[1])
             res = res.astype(int)
-     
+              
     return res
 
     
