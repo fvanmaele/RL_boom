@@ -4,41 +4,48 @@ from random import shuffle
 from settings import e
 from settings import s
 from agent_code.my_agent.algorithms import *
+#from agent_code.my_agent.features import *
+#from agent_code.my_agent.functions import *
 
-def feature2(game_state, bomb_map):
+def tmp_feature4(game_state):
+    '''
+    This feature rewards the action that minimizes the distance to safety
+    should the agent be in the danger zone(where explosions will be).
+        F(s,a) = 1, should a reduces distance to safety
+        F(s,a) = 0, otherwise
+    F(s,a) returns 0 if we are not in the danger zone   
+    
+    We begin by extracting all relevant information from game_state
+    '''
     x, y, _, bombs_left = game_state['self']
-    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
-    bombs = game_state['bombs']
-    others = [(x,y) for (x,y,n,b) in game_state['others']]
-    bomb_xys = [(x,y) for (x,y,t) in bombs]
-    explosions = game_state['explosions'] 
     arena = game_state['arena']
-    #explosion_map = game_state[
+    bombs = game_state['bombs']
+    bombs_xy = [(x,y) for (x,y,t) in bombs]
+    others = [(x,y) for (x,y,n,b) in game_state['others']]
+    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
 
-    feature = []
+    '''
+    and initializing the resulting vector
+    '''
+    features = []
+
+    danger_zone = [] 
+    if len(bombs) != 0:
+        for b in bombs_xy:
+            danger_zone += compute_blast_coords(arena, b)
+    else:
+        return np.array([0,0,0,0,0,0])
+
+    danger_zone += bombs_xy
 
     for d in directions:
-        # if invalid action agent should wait
-        if ((arena[d] == 0) and
-            (not d in others) and
-            (not d in bomb_xys)):
+        if ((arena[d] != 0) or (d in others) or (d in bombs_xy)):
             d = (x,y)
-
-        if ((bomb_map[d] <= 1) and
-            (explosions[d] <= 1)):
-            feature.append(1) 
-        else:
-            feature.append(0)
-    
-    # For BOMB 
-    feature.append(feature[-1])
-
-    return np.asarray(feature)
-    
-
-
-##################################################################################################################
-
+        if d in danger_zone:
+            j
+        arena[danger_zone] = 5       
+        target = np.argwhere(arena==0)
+    #d = look_for_targets(free_space, (agent[0], agent[1]), safe_loc)
 def setup(self):
      
     # load weights
@@ -57,10 +64,6 @@ def setup(self):
     self.gamma = 0.9
     self.EPSILON = 0.2
 
-
-#    # While this timer is positive, agent will not hunt/attack opponents
-#    self.ignore_others_timer = 0
-
 def act(self):
 
     """
@@ -69,7 +72,8 @@ def act(self):
 
     # load state 
     game_state = self.game_state  # isn't it memory waste calling in each feature extraction for coins, self, arena?
-    
+    print("\n", game_state['step'])
+
     # create BOMB-MAP 
     bombs = game_state['bombs']
     arena = game_state['arena']
@@ -82,15 +86,34 @@ def act(self):
     
     # Compute features state 
     f0 = np.ones(6)  # for bias
+    print("f0 ", f0)
     f1 = feature1(game_state) # reward good action
-    f2 = feature2(game_state, bomb_map) # penalization bad action
-    f7 = feature7(game_state) # penalize bad action    !!!! NOCH MAL SCHAUEN
+    print("f1 ", f1)
+    f2 = feature2(game_state) # penalization bad action
+    print("f2 ", f2)
+    f4 =feature4(game_state) # reward good action
+    print("f4 ", f4)
+    f5 = feature5(game_state)  # penalize bad action
+    print("f5 ", f5)
+    f6 = feature6(game_state)  # reward good action
+    print("f6 ", f6)
+    f7 = feature7(game_state) # reward action
+    print("f7 ", f7)
     f8 = feature8(game_state) # rewards good action
-    feature_state = np.vstack((f0,f1,f2,f7,f8)).T
+    print("f8 ", f8)
+    f9 = feature9(game_state) # rewards good action
+    print("f9 ", f9)
+    f10 = feature10(game_state) # rewards good action
+    print("f10 ", f10)
+    feature_state = np.vstack((f0,f1,f2,f4,f5,f6,f7,f8,f9,f10)).T
+
+    #feature9(game_state) # rewards good action
+    #print("f9 ", f9)
+
     self.prev_state = feature_state
-    print(self.game_state['step'])
-    print(f2)
-#    weights = np.array([1,1,-1,-1,1])   #initial guess 
+    weights = np.array([1,1,-7,4,-0.5,1.5,2,0.5,0.5,0.5])   #initial guess 
+    #weights = np.array([1,1,-5,4,-0.5,1,1])   #initial guess 
+    print("weights", weights)
 #    # later no necessary
 #    if self.weights == []:
 #        print(feature_state.shape[0])
@@ -101,16 +124,20 @@ def act(self):
 #
 
     # Linear approximation approach
-#    q_approx = linapprox_q(feature_state, weights)
-#    best_actions = np.where(q_approx == np.max(q_approx))[0] 
-#    shuffle(best_actions)
-#    q_next_action = s.actions[best_actions[0]] #GREEDY POLICY
+    q_approx = linapprox_q(feature_state, weights)
+    print("q", q_approx)
+    best_actions = np.where(q_approx == np.max(q_approx))[0] 
+    shuffle(best_actions)
+    q_next_action = s.actions[best_actions[0]] #GREEDY POLICY
 #
 #    # Pick action
 #    self.logger.info('Pick action')
-    self.next_action = np.random.choice(['WAIT','RIGHT', 'LEFT', 'DOWN', 'UP','BOMB'], p=[0.15, .15, 0.15, .15, 0.15, 0.25])
-    #print("action picked  ", q_next_action)
-    #self.next_action = q_next_action
+
+#    self.next_action = np.random.choice(['WAIT','RIGHT', 'LEFT', 'DOWN', 'UP','BOMB'], p=[0.15, .15, 0.15, .15, 0.15, 0.25])
+
+#    print("action picked  ", q_next_action)
+    self.next_action = q_next_action
+    print(self.next_action)
 
 def reward_update(self):
 
@@ -144,7 +171,7 @@ def reward_update(self):
         weights = self.weights
 
         # learning 
-
+    
         # Berechene alle features
         next_state = feat_1(self.game_state)
         """
