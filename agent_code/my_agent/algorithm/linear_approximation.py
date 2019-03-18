@@ -1,3 +1,5 @@
+## Prediction functions
+
 def TDLambdaLinFApp(Lambda, state, reward, state_next, w, z, f, step_size=0.05, discount=1):
     """TD(Lambda) with function approximation.
 
@@ -102,3 +104,24 @@ def SARSALambdaLinFApp(Lambda, state, action, reward, state_next, action_next, w
     z = features + discount * Lambda * z
 
     return w + (step_size * delta * z), z
+
+
+## Policy functions
+
+# TODO: Check description (Koethe lecture etc.)
+def QLearningGreedyPolicy(state, actions, f, w):
+    """Greedy policy for Q learning
+
+    This function implements a greedy policy based on the highest
+    Q-value. This policy can be used as one of the possible policies
+    in to update the parameter vector (exploration), or as an optimal
+    policy if the parameter vector is trained.
+
+    Input Parameters:
+    * state:    Array representing the last state s.
+    * actions:  List representing the action space A.
+    * w:  array (d-dimensional) for the parameter vector of the
+          linear function approximation.
+    * f:  callable for the feature extraction function.
+    """
+    
