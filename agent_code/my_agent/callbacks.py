@@ -1,10 +1,50 @@
 import numpy as np
 
-from agent_code.my_agent.algorithm.feature_extraction import *
+from agent_code.my_agent.algorithm.feature import *
 from agent_code.my_agent.algorithm.linear_approximation import *
 from agent_code.my_agent.algorithm.policy import *
-from agent_code.my_agent.algorithm.tracking import *
 from settings import e
+
+
+def move_to_coords(x, y, action):
+    """Return updated coordinates of the agent after a move.
+
+    Note that this action does not take obstacles into account (a
+    wall, crate, bomb, or opposing agent).
+
+    Parameters:
+    * x, y:   Coordinates of the agent.
+    * action: The next action the agent will take.
+
+    Return Value:
+    * x', y': Coordinates of the agent in the next state.
+    """
+    move_dict = {
+        'UP'  : (x, y-1), 'DOWN' : (x, y+1),
+        'LEFT': (x-1, y), 'RIGHT': (x+1, y),
+        'BOMB': (x, y),   'WAIT' : (x, y)
+    }
+
+    if action in move_dict:
+        return move_dict[action]
+
+
+def vectorized_feature(feature, state):
+    """Return a vector containg a feature for each available action.
+
+    Parameters:
+    * feature:  Callable representing a feature vector F(s, a).
+    * state:    Array representing the state s.
+
+    Return Value:
+    * results:  np.array containing a feature for each action.
+    """
+    actions = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT']
+    results = []
+
+    for a in actions:
+        results.append(feature(state, action))
+    return np.asarray(results)
 
 
 def setup(self):
@@ -17,39 +57,19 @@ def setup(self):
     file for debugging (see https://docs.python.org/3.7/library/logging.html).
     """
     np.random.seed()
-    self.reward_sequence = []
+    self.replay_buffer = []
 
     # load weights
     try:
         self.weights = np.load('./agent_code/my_agent/models/weights.npy')
         print("weights loaded")
     except:
+        # TODO: Use estimate from Q-learning with simple agent policy
         self.weights = []
         print("no weights found ---> create new weights")
 
-    # We require the previous state to implement the Q-learning algorithm
-    # with linear function approximation.
-    self.prev_state = self.game_state
-
-
-def act(self):
-    """Called each game step to determine the agent's next action.
-
-    You can find out about the state of the game environment via self.game_state,
-    which is a dictionary. Consult 'get_state_for_agent' in environment.py to see
-    what it contains.
-
-    Set the action you wish to perform by assigning the relevant string to
-    self.next_action. You can assign to this variable multiple times during
-    your computations. If this method takes longer than the time limit specified
-    in settings.py, execution is interrupted by the game and the current value
-    of self.next_action will be used. The default value is 'WAIT'.
-    """
-    self.logger.info('Pick action at random')
-    self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB'],
-                                         p=[.15, .15, .15, .15, .40])
-    print(vectorized_feature(feature_2, self.game_state))
-
+    self.reward = 0
+    
 
 def reward_update(self):
     """Called once per step to allow intermediate rewards based on game events.
@@ -75,42 +95,76 @@ def reward_update(self):
     In order to maximize the total reward intake, the agent should learn not to
     die, and kill as many opponents and break most crates with its bombs.
     """
-    # Performing an action is always punished with a small negative reward.
-    reward = -1
+    # We need to perform at least one action before computing an
+    # intermediary reward.
+    if self.game_state['step'] == 1:
+        return None
 
-    for event in self.game_state['events']:
+    # An action is always punished with a small negative reward due to
+    # time constraints on the game.
+    self.reward = -1
+
+    for event in self.events:
+        print("ewfwefwef")
         if event == e.BOMB_DROPPED:
             # We give no special reward to the action of dropping a
             # bomb, to leave flexibility in the chosen strategies.
-            reward += 0
+            self.reward += 0
         elif event == e.COIN_COLLECTED:
             # Collecting coins is the secondary goal of the game.
-            reward += 100
+            self.reward += 100
         elif event == e.KILLED_SELF:
             # Killing ourselves through bomb placement is something we
             # wish to avoid.
-            reward -= 100
+            self.reward -= 100
         elif event == e.KILLED_OPPONENT:
             # Killing opponents is the primary goal of the game.
-            reward += 300
+            self.reward += 300
         elif event == e.GOT_KILLED:
             # Dying at the hands of an opponent is classified worse as
             # death by self.
-            reward -= 300
+            self.reward -= 300
         elif event == e.WAITED or event == e.INVALID_ACTION:
             # An invalid action (such as bumping into a wall) is
             # equivalent to performing no action at all. Punish both
             # with a small negative reward.
-            reward -= 2
+            self.reward -= 2
 
     # We keep track of all intermediary rewards in the episode
     self.logger.info(f'Given reward of {reward}')
-    self.reward_sequence.append(reward)
 
-    # Update the weights (feature vector) after each intermediary step
-    # in the game world. This requires the "previous" action, oddly
-    # named next_action in the bomberman framework.
-    prev_action = self.next_action
+    # Get action performed in last step.
+    self.prev_action = self.next_action # self.prev_state
+
+    # TODO: update weights either per step, or every "mini batch"
+    self.weights = QLearningLinFApp(self.prev_state, self.prev_action, self.reward,
+                                    self.game_state, self.weights, feature, 0.05, 1)
+
+
+def act(self):
+    """Called each game step to determine the agent's next action.
+
+    You can find out about the state of the game environment via self.game_state,
+    which is a dictionary. Consult 'get_state_for_agent' in environment.py to see
+    what it contains.
+
+    Set the action you wish to perform by assigning the relevant string to
+    self.next_action. You can assign to this variable multiple times during
+    your computations. If this method takes longer than the time limit specified
+    in settings.py, execution is interrupted by the game and the current value
+    of self.next_action will be used. The default value is 'WAIT'.
+    """
+    # Save previous state for Q-learning in reward_update.
+    self.prev_state = self.game_state
+
+    self.logger.info('Pick action at random')
+    #self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB'],
+    #                                     p=[.15, .15, .15, .15, .40])
+    self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN'], p=[.25, .25, .25, .25])
+    #print(vectorized_feature(feature_2, self.game_state))
+    x, y, _, _ = self.game_state['self']
+    print(self.next_action, x, y, move_to_coords(x, y, self.next_action))
+    # TODO: Implement Q-policy here
 
 
 def end_of_episode(self):
