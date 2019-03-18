@@ -114,7 +114,7 @@ def feature4(game_state):
         If agent is not in the danger zone, we return 0.
         Otherwise we calculate the distance/direction of safety.
         '''
-        if (agent[0], agent[1]):
+        if (agent[0], agent[1]) in danger_zone:
             
             '''
             we then mark these explosions on our map. here we deep-copy
@@ -125,7 +125,11 @@ def feature4(game_state):
             #[ arena[a[0],a[1]] for a in arr]
             
             for coord in danger_zone:
-                arena[coord]  = 2
+                if arena[coord] == 0:
+                    arena[coord]  = 2
+            for b in bombs:
+                arena[b[0], b[1]] = -1
+                
             #map_[danger_zone[:,0], danger_zone[:,1]] = 2
             '''
             '''
@@ -148,7 +152,19 @@ def feature4(game_state):
                                     (agent[0]+1, agent[1]), #right
                                     (agent[0], agent[1]),   #bomb
                                     (agent[0], agent[1])])  #wait
-            
+                                    
+            '''                        
+            print(free_space[(agent[0], agent[1]-1)], 
+                  free_space[(agent[0], agent[1]+1)], 
+                  free_space[(agent[0]-1, agent[1])], 
+                  free_space[(agent[0]+1, agent[1])])
+                  
+            print(arena[(agent[0], agent[1]-1)], 
+                  arena[(agent[0], agent[1]+1)], 
+                  arena[(agent[0]-1, agent[1])], 
+                  arena[(agent[0]+1, agent[1])])      
+            '''      
+                
             res = (actions_loc[:,0] == d[0]) & (actions_loc[:,1] == d[1])
             res = res.astype(int)
      

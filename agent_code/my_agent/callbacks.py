@@ -6,38 +6,6 @@ from agent_code.my_agent.algorithms import *
 from agent_code.my_agent.feature4 import *
 
 
-def feature2(game_state, bomb_map):
-    x, y, _, bombs_left = game_state['self']
-    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
-    bombs = game_state['bombs']
-    others = [(x,y) for (x,y,n,b) in game_state['others']]
-    bomb_xys = [(x,y) for (x,y,t) in bombs]
-    explosions = game_state['explosions'] 
-    arena = game_state['arena']
-    #explosion_map = game_state[
-
-    feature = []
-
-    for d in directions:
-        # if invalid action agent should wait
-        if ((arena[d] == 0) and
-            (not d in others) and
-            (not d in bomb_xys)):
-            d = (x,y)
-
-        if ((bomb_map[d] <= 1) and
-            (explosions[d] <= 1)):
-            feature.append(1) 
-        else:
-            feature.append(0)
-    
-    # For BOMB 
-    feature.append(feature[-1])
-
-    return np.asarray(feature)
-    
-
-
 ##################################################################################################################
 
 def setup(self):
@@ -86,9 +54,11 @@ def act(self):
     f1 = feature1(game_state) # reward good action
     f2 = feature2(game_state, bomb_map) # penalization bad action
     f4 = feature4(game_state) #reward going towards safe locations
+    f5 = feature5(game_state) # penalize bac action
+    f6 = feature6(game_state) # reward action
     f7 = feature7(game_state) # penalize bad action    !!!! NOCH MAL SCHAUEN
     f8 = feature8(game_state) # rewards good action
-    feature_state = np.vstack((f0,f1,f2,f4,f7,f8)).T
+    feature_state = np.vstack((f0,f1,f2,f4,f5,f6,f7,f8)).T
     self.prev_state = feature_state
     
     print(self.weights)
@@ -97,32 +67,34 @@ def act(self):
     
     
     #weights = np.array([1,1,-1,-1,1])   #initial guess 
-    # later no necessary
+    #weights = np.array([1,1,-7,5,-0.5,1.5,2,0.5]) 
+    #later no necessary
     if len(self.weights) == 0:
-        print(feature_state.shape[0])
-        weights = np.ones(feature_state.shape[1])  
-        self.weights = weights
-    else:
-        weights = self.weights
+        print('no weights, init weights')
+        self.weights = np.array([1,1,-7,7,-0.5,1.5,2,0.5]) 
+        #self.weights = np.ones(feature_state.shape[1])  
+        #self.weights = weights
+    #else:
+    #    weights = self.weights
 
     self.logger.info('Pick action')
     
     # Linear approximation approach with epsilon-greedy
-    greedy = np.random.choice([0,1], p=[self.EPSILON, 1-self.EPSILON])
-    if greedy:
+    #greedy = np.random.choice([0,1], p=[self.EPSILON, 1-self.EPSILON])
+    #if greedy:
     
-        q_approx = linapprox_q(feature_state, weights)
-        best_actions = np.where(q_approx == np.max(q_approx))[0] 
-        shuffle(best_actions)
-        q_next_action = s.actions[best_actions[0]] #GREEDY POLICY
-        self.next_action = q_next_action
-        print(" q action picked  ", q_next_action)
+    q_approx = linapprox_q(feature_state, self.weights)
+    best_actions = np.where(q_approx == np.max(q_approx))[0] 
+    shuffle(best_actions)
+    q_next_action = s.actions[best_actions[0]] #GREEDY POLICY
+    self.next_action = q_next_action
+    print("q action picked  ", q_next_action)
 
 
-    else:
-        random_action = np.random.choice(['WAIT','RIGHT', 'LEFT', 'DOWN', 'UP','BOMB'], p=[0.15, .15, 0.15#, .15, 0.15, 0.25])
-        self.next_action = random_action
-        print(" random action picked  ", random_action)
+    #else:
+        #self.next_action = np.random.choice(['WAIT','RIGHT', 'LEFT', 'DOWN', 'UP','BOMB'], p=[0.15, .15, 0.15#, .15, 0.15, 0.25])
+        #self.next_action = random_action
+        #print("random action picked ", self.next_action)
     
 def reward_update(self):
 
@@ -156,9 +128,28 @@ def reward_update(self):
         weights = self.weights
 
         # learning 
-
+        bombs = self.game_state['bombs']
+        arena = self.game_state['arena']
+        bomb_xys = [(x,y) for (x,y,t) in bombs]
+        bomb_map = np.ones(arena.shape) * 5
+        for xb,yb,t in bombs:
+            for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
+                if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):
+                    bomb_map[i,j] = min(bomb_map[i,j], t)
+                    
+                    
         # Berechene alle features
-        next_state = feat_1(self.game_state)
+        #next_state = feat_1(self.game_state)
+        f0 = np.ones(6)  # for bias
+        f1 = feature1(self.game_state) # reward good action
+        f2 = feature2(self.game_state, bomb_map) # penalization bad action
+        f4 = feature4(self.game_state) #reward going towards safe locations
+        f5 = feature5(self.game_state) # penalize bac action
+        f6 = feature6(self.game_state) # reward action
+        f7 = feature7(self.game_state) # penalize bad action    !!!! NOCH MAL SCHAUEN
+        f8 = feature8(self.game_state) # rewards good action
+        next_state = np.vstack((f0,f1,f2,f4,f5,f6,f7,f8)).T
+        
         """
         so wie vorhin und mit stack, vlt, machen wir eine Function die alles auf einmal stack
         """
@@ -169,7 +160,8 @@ def reward_update(self):
         gamma = self.gamma
         # update weights
         weights = q_gd_linapprox(next_state, prev_state_a, reward, weights, alpha, gamma)        
-
+        print('weights: ', weights)
+        print('weights updated')
         self.weights = weights
         self.alpha = 1/self.game_state['step']
         self.gamma = self.gamma ** self.game_state['step']
@@ -180,6 +172,7 @@ def end_of_episode(self):
     
 
 def linapprox_q(state, weights):
+    print('shape_state', state.shape, 'shape_weights', weights.shape)
     q_approx = np.dot(state, weights)
     return q_approx
 
