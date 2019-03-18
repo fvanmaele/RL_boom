@@ -62,21 +62,21 @@ def look_for_targets(free_space, start, targets, logger=None):
 def get_blast_coords(bomb, arena, arr):
     x, y = bomb[0], bomb[1]
     if len(arr)== 0:
-       arr = np.array([[x,y]])
+       arr = [(x,y)]
        #np.append(a, [[0,1]], axis=0)
     
     for i in range(1, 3+1):
         if arena[x+i,y] == -1: break
-        arr = np.append(arr,[[x+i,y]], axis=0)
+        arr.append((x+i,y))
     for i in range(1, 3+1):
         if arena[x-i,y] == -1: break
-        arr = np.append(arr,[[x-i,y]], axis=0)            
+        arr.append((x-i,y))           
     for i in range(1, 3+1):
         if arena[x,y+i] == -1: break
-        arr = np.append(arr,[[x,y+i]], axis=0)            
+        arr.append((x,y+i))            
     for i in range(1, 3+1):
         if arena[x,y-i] == -1: break
-        arr = np.append(arr,[[x,y-i]], axis=0)
+        arr.append((x,y-i))
     return arr
 
 ########################## FEATURE EXTRACTION FUNCTION 
@@ -114,19 +114,23 @@ def feature4(game_state):
         If agent is not in the danger zone, we return 0.
         Otherwise we calculate the distance/direction of safety.
         '''
-        if agent[0] in danger_zone[:,0] and agent[1] in danger_zone[:,1]:
+        if (agent[0], agent[1]):
             
             '''
             we then mark these explosions on our map. here we deep-copy
             the arena, so that in the case that the arena is needed for
             other features, it remains unchanged
             '''
-            map_ = copy.deepcopy(arena)
-            map_[danger_zone[:,0], danger_zone[:,1]] = 2
+            #map_ = copy.deepcopy(arena)
+            #[ arena[a[0],a[1]] for a in arr]
+            
+            for coord in danger_zone:
+                arena[coord]  = 2
+            #map_[danger_zone[:,0], danger_zone[:,1]] = 2
             '''
             '''
-            safe_loc = np.argwhere(map_==0)
-            free_space = abs(map_) != 1
+            safe_loc = np.argwhere(arena==0)
+            free_space = abs(arena) != 1
             d = look_for_targets(free_space, (agent[0], agent[1]), safe_loc)
             print(d)
             '''

@@ -120,7 +120,7 @@ def act(self):
 
 
     else:
-        random_action = np.random.choice(['WAIT','RIGHT', 'LEFT', 'DOWN', 'UP','BOMB'], p=[0.15, .15, 0.15, .15, 0.15, 0.25])
+        random_action = np.random.choice(['WAIT','RIGHT', 'LEFT', 'DOWN', 'UP','BOMB'], p=[0.15, .15, 0.15#, .15, 0.15, 0.25])
         self.next_action = random_action
         print(" random action picked  ", random_action)
     
