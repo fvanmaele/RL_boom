@@ -11,20 +11,20 @@ from settings import e
 
 ############# USEFUL FUNCTIONS ##############
 
-def compute_blast_coords(arena, bomb):
-    """
-    !! This function may be good for computations, as it takes to much time :/
-    to compute
-    Retrieve the blast of all bombs acording a given stage.
+def get_blast_coords(arena, bomb):
+    """Retrieve the blast range for a bomb.
+
     The maximal power of the bomb (maximum range in each direction) is
     imported directly from the game settings. The blast range is
-    adjusted according to walls, other agents and crates (immutable obstacles).
-    Parameters:
-    * game_state
-    Return Value:
-    * Array containing blast range coordinates of all bombs (list of tuples).
+    adjusted according to walls (immutable obstacles) in the game
+    arena.
 
-    May be useful for feature 2
+    Parameters:
+    * arena:  2-dimensional array describing the game arena.
+    * bomb:   Coordinates of the bomb.
+
+    Return Value:
+    * Array containing each coordinate of the bomb's blast range.
     """
     bomb_power = s.bomb_power
     x, y = bomb[0], bomb[1] 
@@ -184,8 +184,7 @@ def feature2(game_state):
         same name from item.py of the original framework
         '''
         for b in bombs_xy:
-            danger_zone += compute_blast_coords(arena, b)
-    #danger_zone += bombs_xy
+            danger_zone += get_blast_coords(arena, b)
 
     for d in directions:
         if ((arena[d] != 0) or 
@@ -225,8 +224,7 @@ def feature3(game_state):
         same name from item.py of the original framework
         '''
         for b in bombs_xy:
-            danger_zone += compute_blast_coords(arena, b)
-    #danger_zone += bombs_xy
+            danger_zone += get_blast_coords(arena, b)
 
     for d in directions:
         if ((arena[d] != 0) or 
@@ -262,8 +260,7 @@ def feature4(state):
     # Compute the blast range of all bombs in the game ('danger zone')
     danger_zone = []
     for b in bombs_xy:
-        danger_zone += compute_blast_coords(arena, b)
-    #danger_zone += bombs_xy
+        danger_zone += get_blast_coords(arena, b)
 
     if len(bombs) == 0 or (x,y) not in danger_zone:
         return np.zeros(6)
