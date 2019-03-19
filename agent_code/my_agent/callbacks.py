@@ -11,7 +11,7 @@ def setup(self):
      
     # load weights
     try:
-        self.weights = np.load('./agent_code/my_agent/models/weights_initx')
+        self.weights = np.load('./agent_code/my_agent/models/weights_init1.npy')
         print("weights loaded")
     except:
         self.weights = []
@@ -19,13 +19,14 @@ def setup(self):
 
     # Define Rewards
     self.total_R = 0
-
+    
     # Step size or gradient descent 
     self.alpha = 0.2 
     self.gamma = 0.9
     self.EPSILON = 0.2
-
-
+    self.round = 1
+    
+    print("############# {} round: {} ###############".format('init with 1s', self.round))
 #    # While this timer is positive, agent will not hunt/attack opponents
 #    self.ignore_others_timer = 0
 #########################################################################
@@ -35,7 +36,7 @@ def act(self):
     """
     actions order: 'UP', 'DOWN', LEFT', 'RIGHT', 'BOMB', 'WAIT'    
     """
-    print("############################")
+
     # load state 
     game_state = self.game_state  # isn't it memory waste calling in each feature extraction for coins, self, arena?
     
@@ -69,8 +70,8 @@ def act(self):
     #later no necessary
     if len(self.weights) == 0:
         #print('no weights, init weights')
-        self.weights = np.array([1,1,-7,4,-0.5,1.5,2,0.5,0.5,0.5])
-        #self.weights = np.ones(feature_state.shape[1])  
+        #self.weights = np.array([1,1,-7,4,-0.5,1.5,2,0.5,0.5,0.5])
+        self.weights = np.ones(feature_state.shape[1])  
         #self.weights = weights
     
     print(self.weights)
@@ -86,6 +87,7 @@ def act(self):
     q_approx = linapprox_q(feature_state, self.weights)
     best_actions = np.where(q_approx == np.max(q_approx))[0] 
     shuffle(best_actions)
+    
     q_next_action = s.actions[best_actions[0]] #GREEDY POLICY
     self.next_action = q_next_action
     print("q action picked  ", q_next_action)
@@ -93,7 +95,6 @@ def act(self):
 
     #else:
         #self.next_action = np.random.choice(['WAIT','RIGHT', 'LEFT', 'DOWN', 'UP','BOMB'], p=[0.15, .15, 0.15#, .15, 0.15, 0.25])
-        #self.next_action = random_action
         #print("random action picked ", self.next_action)
     
 def reward_update(self):
@@ -118,7 +119,7 @@ def reward_update(self):
             elif event == e.COIN_COLLECTED:
                 reward += 100
             elif event == e.WAITED:
-                reward -= 10 
+                reward -= 100
             else:
                 reward -= 1
         
@@ -169,7 +170,8 @@ def reward_update(self):
         
 
 def end_of_episode(self):
-    np.save('./agent_code/my_agent/models/weights_initx', self.weights)
+    self.round += 1
+    np.save('./agent_code/my_agent/models/weights_init1.npy', self.weights)
     
 
 def linapprox_q(state, weights):
