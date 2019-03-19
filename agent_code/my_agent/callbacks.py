@@ -91,6 +91,8 @@ def act(self):
     print("f1 ", f1)
     f2 = feature2(game_state) # penalization bad action
     print("f2 ", f2)
+    f3 = feature3(game_state)
+    print("f3 ", f3)
     f4 =feature4(game_state) # reward good action
     print("f4 ", f4)
     f5 = feature5(game_state)  # penalize bad action
@@ -105,13 +107,13 @@ def act(self):
     print("f9 ", f9)
     f10 = feature10(game_state) # rewards good action
     print("f10 ", f10)
-    feature_state = np.vstack((f0,f1,f2,f4,f5,f6,f7,f8,f9,f10)).T
+    feature_state = np.vstack((f0,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10)).T
 
     #feature9(game_state) # rewards good action
     #print("f9 ", f9)
 
     self.prev_state = feature_state
-    weights = np.array([1,1,-7,4,-0.5,1.5,2,0.5,0.5,0.5])   #initial guess 
+    weights = np.array([1,1,-7,-0.5,4,-0.5,1.5,2,0.5,0.5,0.5])   #initial guess 
     #weights = np.array([1,1,-5,4,-0.5,1,1])   #initial guess 
     print("weights", weights)
 #    # later no necessary

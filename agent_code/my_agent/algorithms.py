@@ -308,6 +308,47 @@ def feature2(game_state):
     return np.asarray(feature)
 
 
+def feature3(game_state):
+    """
+    Penalize the agent for going into an area threatened by a bomb.
+    """
+    x, y, _, bombs_left = game_state['self']
+    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
+    bombs = game_state['bombs']
+    others = [(x,y) for (x,y,n,b) in game_state['others']]
+    bombs_xy = [(x,y) for (x,y,t) in bombs]
+    arena = game_state['arena']
+    feature = []
+    danger_zone = []
+
+    if len(bombs) != 0:
+        '''
+        If there are bombs on the game board, we map all the explosions
+        that will be caused by the bombs. For this, we use the help function
+        get_blast_coords. This is an adjusted version of the function with the
+        same name from item.py of the original framework
+        '''
+        for b in bombs_xy:
+            danger_zone += compute_blast_coords(arena, b)
+    #danger_zone += bombs_xy
+
+    for d in directions:
+        if ((arena[d] != 0) or 
+            (d in others) or 
+            (d in bombs_xy)):
+            d = (x,y)
+
+        if d in danger_zone:
+            feature.append(1) 
+        else:
+            feature.append(0)
+    
+    # BOMB actions should be same as WAIT action
+    feature.append(feature[-1])
+
+    return np.asarray(feature)
+
+
 def feature4(state):
     """Reward the agent for moving in the shortest direction outside
     the blast range of (all) bombs in the game.
