@@ -2,3 +2,4 @@
 *logs/
 *.log
 
+/agent_code/simple_agent/__pycache__
