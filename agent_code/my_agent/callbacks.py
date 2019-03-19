@@ -11,7 +11,7 @@ def setup(self):
      
     # load weights
     try:
-        self.weights = np.load('./agent_code/my_agent/models/weights.npy')
+        self.weights = np.load('./agent_code/my_agent/models/weights_initx')
         print("weights loaded")
     except:
         self.weights = []
@@ -64,21 +64,18 @@ def act(self):
    
     self.prev_state = feature_state
     
-    print(self.weights)
-    print(self.game_state['step']) 
-    print(feature_state)
-    
-    
     #weights = np.array([1,1,-1,-1,1])   #initial guess 
     #weights = np.array([1,1,-7,5,-0.5,1.5,2,0.5]) 
     #later no necessary
     if len(self.weights) == 0:
-        print('no weights, init weights')
+        #print('no weights, init weights')
         self.weights = np.array([1,1,-7,4,-0.5,1.5,2,0.5,0.5,0.5])
         #self.weights = np.ones(feature_state.shape[1])  
         #self.weights = weights
-    #else:
-    #    weights = self.weights
+    
+    print(self.weights)
+    #print(self.game_state['step']) 
+    #print(feature_state)
 
     self.logger.info('Pick action')
     
@@ -164,19 +161,19 @@ def reward_update(self):
         gamma = self.gamma
         # update weights
         weights = q_gd_linapprox(next_state, prev_state_a, reward, weights, alpha, gamma)        
-        print('weights: ', weights)
-        print('weights updated')
+        #print('weights: ', weights)
+        #print('weights updated')
         self.weights = weights
         self.alpha = 1/self.game_state['step']
         self.gamma = self.gamma ** self.game_state['step']
         
 
 def end_of_episode(self):
-    np.save('./agent_code/my_agent/models/weights.npy', self.weights)
+    np.save('./agent_code/my_agent/models/weights_initx', self.weights)
     
 
 def linapprox_q(state, weights):
-    print('shape_state', state.shape, 'shape_weights', weights.shape)
+    #print('shape_state', state.shape, 'shape_weights', weights.shape)
     q_approx = np.dot(state, weights)
     return q_approx
 
