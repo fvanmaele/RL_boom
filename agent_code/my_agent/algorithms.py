@@ -154,9 +154,12 @@ def feature1(game_state):
 
 
 def feature2(game_state):
-    """
-    Penalize if the action follows the agent to death (F,s)=1, F(s,a)=0. otherwise.
-    it could be maybe get better
+    """Penalize taking an action causing the agent to die.
+
+    Return Value:
+    * np.array, where each component represents a feature
+      F_i(s,a). The component F_i has value 1 if a causes the agent to
+      die, and value 0 otherwise.
     """
     x, y, _, bombs_left = game_state['self']
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
@@ -168,36 +171,45 @@ def feature2(game_state):
     bomb_power = s.bomb_power
     blast_coords = bombs_xy 
     feature = []
-    
+
+    # bomb_map gives the maximum blast range of a bomb, if walls are
+    # not taken into account. The values in this array are set to the
+    # timer for each bomb.
     bomb_map = np.ones(arena.shape) * 5
-    for xb,yb,t in bombs:
+    for xb, yb, t in bombs:
         for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
             if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):
                 bomb_map[i,j] = min(bomb_map[i,j], t)
 
+    # The actual (discounted for walls) blast range of a bomb is only
+    # available if a bomb has already exploded. We thus compute it
+    # manually with 'get_blast_coords'.
     danger_zone = [] 
     if len(bombs) != 0:
-        '''
-        If there are bombs on the game board, we map all the explosions
-        that will be caused by the bombs. For this, we use the help function
-        get_blast_coords. This is an adjusted version of the function with the
-        same name from item.py of the original framework
-        '''
         for b in bombs_xy:
             danger_zone += get_blast_coords(arena, b)
 
     for d in directions:
+        # Check if the tile reached by the next action is occupied by an
+        # object. (Opposing agents may wait, thus we should check them
+        # even if they can move away.) This object may be destroyed by bombs,
+        # but prevents us from moving into a free tile.
         if ((arena[d] != 0) or 
             (d in others) or 
             (d in bombs_xy)):
             d = (x,y)
-            
-        if ((d in danger_zone) and  bomb_map[d] == 0) or explosions[d] >1:
+
+        # We first check if the agent moves into the blast range of a
+        # bomb which will explode directly after. The second condition
+        # checks if the agent moves into an ongoing explosion. In both
+        # cases, such a movement causes certain death for the agent
+        # (that is, we set F_i(s, a) = 1).
+        if ((d in danger_zone) and bomb_map[d] == 0) or explosions[d] >1:
             feature.append(1) 
         else:
             feature.append(0)
     
-    # BOMB actions should be same as WAIT action
+    # BOMB actions should be same as WAIT action.
     feature.append(feature[-1])
 
     return np.asarray(feature)
