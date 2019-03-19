@@ -121,34 +121,34 @@ def get_blast_coords(bomb, arena, arr):
 ############# FEATURES ##############
 
 def feature1(game_state):
-    """
-    Reward the best possible action to a coin, if it is reachable F(s,a)=1,  otherwise F(s,a)=0.    
-    `BOMB' and `WAIT ' are always 0
+    """Reward the agent to move in a direction towards a coin.
+    
+    By definiton, only move actions can be rewarded by this feature.
     """
     coins = game_state['coins']
     x, y, _, bombs_left = game_state['self']
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
     arena = game_state['arena']
-
     feature = [] # Desired feature
     
-    # construct the free_space Boolean numpy_array
+    # Check the arena (np.array) for free tiles, and include the
+    # comparison result as a boolean np.array.
     free_space = arena == 0
-    best_coord = look_for_targets(free_space, (x,y), coins)
-
+    best_direction = look_for_targets(free_space, (x,y), coins)
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
 
-    if best_coord is None:
+    if best_direction is None:
+        # No coins are available in the arena.
         return np.zeros(6)
     for d in directions:
-        if d != best_coord:
+        if d != best_direction:
             feature.append(0)
         else:
             feature.append(1)
     
-   # for 'BOMB' and 'WAIT'
-    feature.append(0)
-    feature.append(0)
+    # Only move actions allow the agent to collect a coin.
+    feature.append(0) # 'BOMB'
+    feature.append(0) # 'WAIT'
     
     return np.asarray(feature)
 
@@ -228,13 +228,10 @@ def feature3(game_state):
     feature = []
     danger_zone = []
 
+    # The logic used in this feature is very similar to feature2. The
+    # main difference is that we consider any bomb present in the
+    # arena, not only those that will explode in the next step.
     if len(bombs) != 0:
-        '''
-        If there are bombs on the game board, we map all the explosions
-        that will be caused by the bombs. For this, we use the help function
-        get_blast_coords. This is an adjusted version of the function with the
-        same name from item.py of the original framework
-        '''
         for b in bombs_xy:
             danger_zone += get_blast_coords(arena, b)
 
@@ -268,7 +265,6 @@ def feature4(state):
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
     feature = []
 
-
     # Compute the blast range of all bombs in the game ('danger zone')
     danger_zone = []
     for b in bombs_xy:
@@ -279,16 +275,13 @@ def feature4(state):
 
     # The agent can use any free tile in the arena to escape from a
     # bomb (which may not immediately explode).
-    free_tiles = arena == 0 # boolean np.ndarray
+    free_tiles = arena == 0
 
-    # the 'safe zone' is the complement of the free tiles and the
-    # 'danger zone'. Use deepcopy to preserve free_tiles.
-    targets = [(x,y) for x in range(1,16) for y in range(1,16) if (arena[x, y] == 0) and (x,y) not in danger_zone]
-
-    # def look_for_targets(free_space, start, targets, logger=None):
+    targets = [(x,y) for x in range(1,16) for y in range(1,16) if
+               (arena[x, y] == 0) and (x,y) not in danger_zone]
     safety_direction = look_for_targets(free_tiles, (x, y), targets)
 
-    # check if next action moves agent towards safety
+    # Check if next action moves agent towards safety.
     for d in directions:
         if d == safety_direction:
             feature.append(1)
@@ -301,9 +294,11 @@ def feature4(state):
 
     return feature
 
+
 def feature5(game_state):
-    """
-    Penalize invalid actions.  F(s,a) = 1, otherwise F(s,a) = 0.  
+    """Penalize the agent taking an invalid action.  
+
+    The return value is an F(s,a) = 1, otherwise F(s,a) = 0.  
     """
     x, y, _, bombs_left = game_state['self']
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
@@ -333,6 +328,7 @@ def feature5(game_state):
 
     return np.asarray(feature)
 
+
 def feature6(game_state):
     """
     Reward when getting a coin F(s,a) = 1, otherwise F(s,a) = 0
@@ -359,6 +355,7 @@ def feature6(game_state):
 
     return np.asarray(feature)
 
+
 def feature7(game_state):
     """
     Reward putting a bomb next to a block. 
@@ -377,7 +374,7 @@ def feature7(game_state):
         if arena[d] == 1:
             CHECK_FOR_CRATE = True 
             break
-    if CHECK_FOR_CRATE:
+    if CHECK_FOR_CRATE and bombs_left > 0:
         feature.append(1)
     else:
         feature.append(0)
@@ -412,13 +409,14 @@ def feature8(game_state):
 
     return np.asarray(feature)
 
+
 def feature9(game_state):
     """
     Reward going into dead-ends (from simple agent)
     """
 
     x, y, _, bombs_left = game_state['self']
-    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
+    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
     bombs = game_state['bombs']
     bombs_xy = [(x,y) for (x,y,t) in bombs]
     others = [(x,y) for (x,y,n,b) in game_state['others']]
@@ -429,32 +427,32 @@ def feature9(game_state):
 
     # construct the free_space Boolean numpy_array
     free_space = arena == 0
-    best_coord = look_for_targets(free_space, (x,y), dead_ends)
+    best_direction = look_for_targets(free_space, (x,y), dead_ends)
+
+    if (x, y) in dead_ends:
+        return np.zeros(6)
 
     feature = []
-    if best_coord is None:
+    if best_direction is None:
         return np.zeros(6)
     for d in directions:
-        if d != best_coord:
+        if d != best_direction:
             feature.append(0)
         else:
             feature.append(1)
     
-    # for 'BOMB' and 'WAIT'
-    feature.append(feature[-1])
-    feature[-2] = 0
+    # Only a move action can move the agent into a dead end.
+    feature += [0, 0]
 
     return feature
-
 
 
 def feature10(game_state):
     """
     Reward going to crates 
     """
-
     x, y, _, bombs_left = game_state['self']
-    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
+    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
     bombs = game_state['bombs']
     bombs_xy = [(x,y) for (x,y,t) in bombs]
     others = [(x,y) for (x,y,n,b) in game_state['others']]
@@ -463,19 +461,26 @@ def feature10(game_state):
 
     # construct the free_space Boolean numpy_array
     free_space = arena == 0
-    best_coord = look_for_targets(free_space, (x,y), crates)
-
+    best_direction = look_for_targets(free_space, (x,y), crates)
     feature = []
-    if best_coord is None:
+
+    # Check if crates are available in the game.
+    if best_direction is None:
         return np.zeros(6)
+
+    # If we are directly next to a create, look_for_targets will
+    # return the tile where the agent is located in, rewarding an
+    # (unnecessary) wait action.
+    if best_direction == (x, y):
+        return np.zeros(6)
+
     for d in directions:
-        if d != best_coord:
+        if d != best_direction:
             feature.append(0)
         else:
             feature.append(1)
-    
+
     # for 'BOMB' and 'WAIT'
-    feature.append(feature[-1])
-    feature[-2] = 0
+    feature += [0, 0]
 
     return feature
