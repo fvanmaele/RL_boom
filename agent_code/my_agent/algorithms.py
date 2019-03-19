@@ -11,20 +11,6 @@ from settings import e
 
 ############# USEFUL FUNCTIONS ##############
 
-def estimate_blast_coords(arena,bombs):
-    """
-    is only an idea on how the bomb blast ranges may be computed
-    """
-    for bomb in bombs_xy:
-        # compute patches in posible directions
-        # up
-        if bomb[1]-bomb_power <1:
-            #patch = arena[1:bomb[1]+1,bomb[0]]
-            patch = arena[bomb[0], 1:bomb[1]+1]
-        else:
-            #patch = arena[bomb[1]-bomb_power:bomb[1]+1, bomb[0]]
-            patch = arena[bomb[0], bomb[1]-bomb_power:bomb[1]+1]
-
 def compute_blast_coords(arena, bomb):
     """
     !! This function may be good for computations, as it takes to much time :/
@@ -48,13 +34,13 @@ def compute_blast_coords(arena, bomb):
         if arena[x+i, y] == -1: break
         blast_coords.append((x+i,y))
     for i in range(1, bomb_power+1):
-        if arena[x-i, y] != 0: break 
+        if arena[x-i, y] == -1: break 
         blast_coords.append((x-i, y))
     for i in range(1, bomb_power+1):
-        if arena[x, y+i] != 0: break 
+        if arena[x, y+i] == -1: break 
         blast_coords.append((x, y+i))
     for i in range(1, bomb_power+1):
-        if arena[x, y-i] != 0: break 
+        if arena[x, y-i] == -1: break 
         blast_coords.append((x, y-i))
 
     return blast_coords
