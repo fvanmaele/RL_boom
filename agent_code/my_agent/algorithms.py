@@ -8,7 +8,6 @@ import copy
 from settings import s
 from settings import e
 
-
 ############# USEFUL FUNCTIONS ##############
 
 def get_blast_coords(arena, bomb):
@@ -116,6 +115,11 @@ def look_for_targets(free_space, start, targets, logger=None):
 
 
 ############# FEATURES ##############
+
+"""
+In all of the next features, the following action order is assumed:
+  'UP', 'DOWN', LEFT', 'RIGHT', 'BOMB', 'WAIT'
+"""
 
 def feature1(game_state):
     """Reward the agent to move in a direction towards a coin.
