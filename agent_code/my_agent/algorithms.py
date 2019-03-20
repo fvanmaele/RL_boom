@@ -46,11 +46,12 @@ def get_blast_coords(arena, bomb):
     return blast_coords
 
 
-def look_for_targets(free_space, start, targets, logger=None):
+def look_for_targets_path(free_space, start, targets, logger=None):
     """Find direction of closest target that can be reached via free tiles.
 
-    Performs a breadth-first search of the reachable free tiles until a target is encountered.
-    If no target can be reached, the path that takes the agent closest to any target is chosen.
+    Performs a breadth-first search of the reachable free tiles until
+    a target is encountered.  If no target can be reached, the path
+    that takes the agent closest to any target is chosen.
 
     Args:
         free_space: Boolean numpy array. True for free tiles and False for obstacles.
@@ -58,11 +59,11 @@ def look_for_targets(free_space, start, targets, logger=None):
         targets: list or array holding the coordinates of all target tiles.
         logger: optional logger object for debugging.
     Returns:
-        coordinate of first step towards closest target or towards tile closest to any target.
-
-    USEFUL FOR feature1
+        the path towards closest target or towards tile closest to any
+        target, beginning at the next step.
     """
-    if len(targets) == 0: return None
+    if len(targets) == 0:
+        return []
 
     frontier = [start]
     parent_dict = {start: start}
@@ -81,6 +82,7 @@ def look_for_targets(free_space, start, targets, logger=None):
             # Found path to a target's exact position, mission accomplished!
             best = current
             break
+
         # Add unexplored free neighboring tiles to the queue in a random order
         x, y = current
         neighbors = [(x,y) for (x,y) in [(x+1,y), (x-1,y), (x,y+1), (x,y-1)] if free_space[x,y]]
@@ -90,33 +92,28 @@ def look_for_targets(free_space, start, targets, logger=None):
                 frontier.append(neighbor)
                 parent_dict[neighbor] = current
                 dist_so_far[neighbor] = dist_so_far[current] + 1
-    if logger: logger.debug(f'Suitable target found at {best}')
-    # Determine the first step towards the best found target tile
+    if logger:
+        logger.debug(f'Suitable target found at {best}')
+
+    # Determine the path towards the best found target tile, start not included
     current = best
+    path = []
     while True:
-        if parent_dict[current] == start: return current
+        path.insert(0, current)
+        if parent_dict[current] == start:
+            return path
         current = parent_dict[current]
 
 
-def get_blast_coords(bomb, arena, arr):
-    x, y = bomb[0], bomb[1]
-    if len(arr)== 0:
-       arr = [(x,y)]
-       #np.append(a, [[0,1]], axis=0)
-    
-    for i in range(1, 3+1):
-        if arena[x+i,y] == -1: break
-        arr.append((x+i,y))
-    for i in range(1, 3+1):
-        if arena[x-i,y] == -1: break
-        arr.append((x-i,y))           
-    for i in range(1, 3+1):
-        if arena[x,y+i] == -1: break
-        arr.append((x,y+i))            
-    for i in range(1, 3+1):
-        if arena[x,y-i] == -1: break
-        arr.append((x,y-i))
-    return arr
+def look_for_targets(free_space, start, targets, logger=None):
+    """Returns the coordinate of first step towards closest target, or
+    towards tile closest to any target.
+    """
+    path = look_for_targets_path(free_space, start, targets, logger=None)
+
+    if len(path):
+        return path[0]
+
 
 ############# FEATURES ##############
 
@@ -126,6 +123,7 @@ def feature1(game_state):
     By definiton, only move actions can be rewarded by this feature.
     """
     coins = game_state['coins']
+    bombs = game_state['bombs']
     x, y, _, bombs_left = game_state['self']
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
     arena = game_state['arena']
@@ -134,6 +132,11 @@ def feature1(game_state):
     # Check the arena (np.array) for free tiles, and include the
     # comparison result as a boolean np.array.
     free_space = arena == 0
+    # We do not include agents as obstacles, as they are likely to
+    # move in the next round.
+    # for xb, yb, _ in bombs:
+    #     free_space[xb, yb] = False
+
     best_direction = look_for_targets(free_space, (x,y), coins)
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
 
@@ -217,7 +220,8 @@ def feature2(game_state):
 
 def feature3(game_state):
     """
-    Penalize the agent for going into an area threatened by a bomb.
+    Penalize the agent for going or remaining into an area threatened
+    by a bomb.
     """
     x, y, _, bombs_left = game_state['self']
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
@@ -226,11 +230,11 @@ def feature3(game_state):
     bombs_xy = [(x,y) for (x,y,t) in bombs]
     arena = game_state['arena']
     feature = []
-    danger_zone = []
 
     # The logic used in this feature is very similar to feature2. The
     # main difference is that we consider any bomb present in the
     # arena, not only those that will explode in the next step.
+    danger_zone = []
     if len(bombs) != 0:
         for b in bombs_xy:
             danger_zone += get_blast_coords(arena, b)
@@ -265,7 +269,8 @@ def feature4(state):
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y), (x,y)]
     feature = []
 
-    # Compute the blast range of all bombs in the game ('danger zone')
+    # Compute the range of all bombs in the game and their blast
+    # radius ('danger zone')
     danger_zone = []
     for b in bombs_xy:
         danger_zone += get_blast_coords(arena, b)
@@ -275,11 +280,19 @@ def feature4(state):
 
     # The agent can use any free tile in the arena to escape from a
     # bomb (which may not immediately explode).
-    free_tiles = arena == 0
+    free_space = arena == 0
+    # We do not include agents as obstacles, as they are likely to
+    # move in the next round.
+    # for xb, yb in bombs_xy:
+    #     free_space[xb, yb] = False
 
     targets = [(x,y) for x in range(1,16) for y in range(1,16) if
                (arena[x, y] == 0) and (x,y) not in danger_zone]
-    safety_direction = look_for_targets(free_tiles, (x, y), targets)
+    safety_direction = look_for_targets(free_space, (x, y), targets)
+
+    # optional
+    if safety_direction is None:
+        return np.zeros(6)
 
     # Check if next action moves agent towards safety.
     for d in directions:
@@ -344,7 +357,7 @@ def feature6(game_state):
     feature = [] # Desired feature
 
     for d in directions:
-        if (x,y) in coins:
+        if d in coins:
             feature.append(1)
         else:
             feature.append(0)
@@ -358,8 +371,8 @@ def feature6(game_state):
 
 def feature7(game_state):
     """
-    Reward putting a bomb next to a block. 
-    F(s,a) = 0 for all actions and F(s,a) = 1 for a 'BOMB' if we are next to a block.
+    Reward putting a bomb next to a crate.  F(s,a) = 0 for all actions
+    and F(s,a) = 1 for a 'BOMB' if we are next to a crate.
     """
     x, y, _, bombs_left = game_state['self']
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
@@ -385,31 +398,6 @@ def feature7(game_state):
     return np.asarray(feature)
 
 
-def feature8(game_state):
-    """
-    Reward (if there are no blocks anymore ? and no coins?)  the available movements F(s,a) = 1, 
-    otherwise F(s,a) = 0 .   Bombs = 0, WAIT =1 ? 
-    """
-
-    x, y, _, bombs_left = game_state['self']
-    directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
-    arena = game_state['arena']
-    
-    feature = [] # Desired feature
-
-    for d in directions:
-        if arena[d] == 0:
-            feature.append(1)
-        else:
-            feature.append(0)
-
-    # for 'BOMB' and 'WAIT'
-    feature.append(0)
-    feature.append(1)
-
-    return np.asarray(feature)
-
-
 def feature9(game_state):
     """
     Reward going into dead-ends (from simple agent)
@@ -427,8 +415,12 @@ def feature9(game_state):
 
     # construct the free_space Boolean numpy_array
     free_space = arena == 0
+    # TODO: take timer of bomb into account?
+    # for xb, yb, t in bombs:
+    #     free_space[xb, yb] = False
     best_direction = look_for_targets(free_space, (x,y), dead_ends)
 
+    # Do not reward if the agent is already in a dead-end.
     if (x, y) in dead_ends:
         return np.zeros(6)
 
@@ -449,7 +441,7 @@ def feature9(game_state):
 
 def feature10(game_state):
     """
-    Reward going to crates 
+    Reward going to crates.
     """
     x, y, _, bombs_left = game_state['self']
     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
@@ -461,26 +453,45 @@ def feature10(game_state):
 
     # construct the free_space Boolean numpy_array
     free_space = arena == 0
+    # We do not include agents as obstacles, as they are likely to
+    # move in the next round.
+    # for xb, yb in bombs_xy:
+    #     free_space[xb, yb] = False
+
+    # Observation: look_for_targets requires that any targets are
+    # considered free space.
+    # for xc, yc in crates:
+    #     free_space[xc, yc] = True
+
     best_direction = look_for_targets(free_space, (x,y), crates)
     feature = []
-
+    
     # Check if crates are available in the game.
-    if best_direction is None:
+    if best_direction is None: # len(crates) == 0
         return np.zeros(6)
 
     # If we are directly next to a create, look_for_targets will
     # return the tile where the agent is located in, rewarding an
     # (unnecessary) wait action.
-    if best_direction == (x, y):
-        return np.zeros(6)
+    # if best_direction == (x,y):
+    #     return np.zeros(6)
+
+    # We are only concerned in being next to a crate in order to blow
+    # it up. A-priori, blowing up one crate is not better than blowing
+    # up another; therefore, return 0 for every action if the agent is
+    # next to a crate.
+    for d in directions:
+        if d in crates:
+            return np.zeros(6)
 
     for d in directions:
-        if d != best_direction:
-            feature.append(0)
-        else:
+        if d == best_direction:
             feature.append(1)
+        else:
+            feature.append(0)
 
     # for 'BOMB' and 'WAIT'
+    # feature.append(feature[-1])
     feature += [0, 0]
 
     return feature
