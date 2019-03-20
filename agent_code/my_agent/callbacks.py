@@ -33,16 +33,6 @@ def act(self):
     game_state = self.game_state  # isn't it memory waste calling in each feature extraction for coins, self, arena?
     print("\n", game_state['step'])
 
-    # create BOMB-MAP 
-    bombs = game_state['bombs']
-    arena = game_state['arena']
-    bomb_xys = [(x,y) for (x,y,t) in bombs]
-    bomb_map = np.ones(arena.shape) * 5
-    for xb,yb,t in bombs:
-        for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
-            if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):
-                bomb_map[i,j] = min(bomb_map[i,j], t)
-    
     # Compute features state 
     f0 = np.ones(6)  # for bias
     print("f0 ", f0)
