@@ -11,8 +11,8 @@ def setup(self):
      
     # load weights
     try:
-        self.weights = np.load('./agent_code/my_agent/models/weights_initX.npy')
-        self.training_weights = np.load('train_weights_initX_GreedA0.npy')
+        self.weights = np.load('./agent_code/my_agent/models/weights_initRandGreedEps.npy')
+        self.training_weights = np.load('train_weights_initRand_GreedEps025A02Y095.npy')
         print("weights loaded")
     except:
         self.weights = []
@@ -77,9 +77,9 @@ def act(self):
     #later no necessary
     if len(self.weights) == 0:
         print('no weights, init weights')
-        self.weights = np.array([1,1,-7,-1,4,-0.5,1.5,2,0.5,0.5,-7,1.5,3,2,-1])   #initial 
+        #self.weights = np.array([1,1,-7,-1,4,-0.5,1.5,2,0.5,0.5,-7,1.5,3,2,-1])   #initial 
         #self.weights = np.ones(feature_state.shape[1])  
-        #self.weights = np.random.rand(feature_state.shape[1])
+        self.weights = np.random.rand(feature_state.shape[1])
         #self.training_weights.append(self.weights)
         #self.weights = weights
     
@@ -89,7 +89,7 @@ def act(self):
 
     self.logger.info('Pick action')
     
-    #'''
+    '''
     
     # Linear approximation approach
     q_approx = np.dot(feature_state, self.weights)    
@@ -99,10 +99,10 @@ def act(self):
     q_next_action = s.actions[best_actions[0]] #GREEDY POLICY
     self.next_action = q_next_action
     print("q action picked  ", q_next_action)
-    #'''
+    '''
     
     ####### EPSILON GREEDY (TRAINING) #########################
-    '''
+    #'''
     greedy = np.random.choice([0,1], p=[self.EPSILON, 1-self.EPSILON])
     if greedy:
     
@@ -117,7 +117,7 @@ def act(self):
     else:
         self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB'], p=[.23, .23, .23, .23, .08])
         print("random action picked ", self.next_action)
-    '''
+    #'''
     
     
     
@@ -199,7 +199,6 @@ def reward_update(self):
         # update weights
         weights = q_gd_linapprox(next_state, prev_state_a, reward, self.weights, self.alpha, self.gamma)      
         self.weights = weights        
-        self.training_weights.append(self.weights)
         
         # update alpha and gamma for convergence
         self.alpha = 1/self.game_state['step']
@@ -209,9 +208,9 @@ def reward_update(self):
 
 def end_of_episode(self):
     self.round += 1
-    np.save('./agent_code/my_agent/models/weights_initX.npy', self.weights)
+    np.save('./agent_code/my_agent/models/weights_initRandGreedEps.npy', self.weights)
     self.training_weights = np.append(self.training_weights, self.weights)
-    np.save('train_weights_initX_GreedA0.npy', self.training_weights)
+    np.save('train_weights_initRand_GreedEps025A02Y095.npy', self.training_weights)
     
 def q_gd_linapprox(next_state, prev_state_a, reward, weights, alpha, gamma):
     next_state_a = next_state[np.argmax(np.dot(next_state, weights)), :]
