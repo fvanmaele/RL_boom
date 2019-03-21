@@ -50,17 +50,29 @@ def act(self):
     print("f6 ", f6)
     f7 = feature7(game_state) # reward action
     print("f7 ", f7)
-    # f8 = feature8(game_state)
-    # print("f8 ", f8)
+#    f8 = feature8(game_state) # rewards good action
+#    print("f8 ", f8)
     f9 = feature9(game_state) # rewards good action
     print("f9 ", f9)
     f10 = feature10(game_state) # rewards good action
     print("f10 ", f10)
-    feature_state = np.vstack((f0,f1,f2,f3,f4,f5,f6,f7,f9,f10)).T
+    f11 = feature11(game_state) # penalize bad action
+    print("f11 ", f11)
+    f12 = feature12(game_state) # penalize bad action
+    print("f12 ", f12)
+    f13 = feature13(game_state) # penalize bad action
+    print("f13 ", f13)
+    f14 = feature14(game_state) # penalize bad action
+    print("f14 ", f14)
+    f15 = feature15(game_state) # penalize bad action
+    print("f15 ", f15)
 
+    #feature_state = np.vstack((f0,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10)).T
+    feature_state = np.vstack((f0,f1,f2,f3,f4,f5,f6,f7,f9,f10,f11,f12,f13,f14,f15)).T
 
     self.prev_state = feature_state
-    weights = np.array([1,1,-7,-1,4,-0.5,1.5,2,0.5,0.5])   #initial guess 
+    weights = np.array([1,1,-7,-1,4,-0.5,1.5,2,0.5,0.5,-7,1.5,3,2,-1])   #initial guess 
+    #weights = np.array([1,1,-5,4,-0.5,1,1])   #initial guess 
     print("weights", weights)
 #    # later no necessary
 #    if self.weights == []:
