@@ -1,50 +1,8 @@
 import numpy as np
 
-from agent_code.my_agent.algorithm.feature import *
-from agent_code.my_agent.algorithm.linear_approximation import *
-from agent_code.my_agent.algorithm.policy import *
+from agent_code.my_agent.feature_extraction import *
+from agent_code.my_agent.learning_methods import *
 from settings import e
-
-
-def move_to_coords(x, y, action):
-    """Return updated coordinates of the agent after a move.
-
-    Note that this action does not take obstacles into account (a
-    wall, crate, bomb, or opposing agent).
-
-    Parameters:
-    * x, y:   Coordinates of the agent.
-    * action: The next action the agent will take.
-
-    Return Value:
-    * x', y': Coordinates of the agent in the next state.
-    """
-    move_dict = {
-        'UP'  : (x, y-1), 'DOWN' : (x, y+1),
-        'LEFT': (x-1, y), 'RIGHT': (x+1, y),
-        'BOMB': (x, y),   'WAIT' : (x, y)
-    }
-
-    if action in move_dict:
-        return move_dict[action]
-
-
-def vectorized_feature(feature, state):
-    """Return a vector containg a feature for each available action.
-
-    Parameters:
-    * feature:  Callable representing a feature vector F(s, a).
-    * state:    Array representing the state s.
-
-    Return Value:
-    * results:  np.array containing a feature for each action.
-    """
-    actions = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT']
-    results = []
-
-    for a in actions:
-        results.append(feature(state, action))
-    return np.asarray(results)
 
 
 def setup(self):
