@@ -11,6 +11,7 @@ def setup(self):
      
     # load weights
     try:
+
         self.weights = np.load('./agent_code/my_agent/models/weights_initRand')
         self.training_weights = np.load('train_weights_initRand_GreedA02Y095.npy')
         print("weights loaded")
@@ -204,10 +205,10 @@ def reward_update(self):
 
 def end_of_episode(self):
     self.round += 1
-    np.save('./agent_code/my_agent/models/weights_initRand.npy', self.weights)
+    #np.save('./agent_code/my_agent/models/weights_initRand.npy', self.weights)
     self.training_weights = np.append(self.training_weights, self.weights)
     print(len(self.training_weights))
-    np.save('train_weights_initRand_GreedA02Y095.npy', self.training_weights)
+    #np.save('train_weights_initRand_GreedA02Y095.npy', self.training_weights)
     
 def q_gd_linapprox(next_state, prev_state_a, reward, weights, alpha, gamma):
     next_state_a = next_state[np.argmax(np.dot(next_state, weights)), :]
