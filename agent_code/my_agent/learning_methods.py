@@ -2,7 +2,7 @@ import numpy as np
 
 
 """
-Different approaches to compute the learning parameter alpha.
+Learning schedules (compute time steps for iterative methods)
 """
 def learning_schedule_1(time_step, c=1.0, eta=0.5):
     return c / pow(time_step, eta)
@@ -22,59 +22,54 @@ def learning_schedule_4(time_step, max_steps=400)
         return 0.01
 
 
-def QMaxLFA(feature_matrix, weights):
-    """Compute the maximum Q-value for all given actions using linear function
-    approximation.
-
-    In feature_matrix, each column represents a feature vector F_i(S,A), and each
-    row represents an action. The maximum Q-value may be used to update weights
-    during training, or to implement a greedy policy.
+"""
+Learning methods (Q-Learning, SARSA)
+"""
+def UpdateWeightsLFA(X, A, R, Y, weights, alpha=0.1, discount=0.95):
+    """Update the weight vector w for Q-learning with semi-gradient descent.
+    
+    The features X and Y are assumed to have state_action(action) and
+    max_q(weights) methods available. See feature_extraction.py for details.
     """
-    # Compute the dot product (w, F_i(S,A)) for every action.
-    Q_lfa = np.dot(weights, feature_next)
-    Q_max = np.max(Q_next)
+    X_A = X.state_action[A]
+    Q_max, A_max = Y.max_q(weights)
+    TD_error = R + (discount * Q_max) - np.dot(weights, X_A)
 
-    # Multiple actions may give the same (optimal) reward. To avoid bias towards a
-    # particular action, shuffle the resulting array before return it.
-    A_max = np.where(Q_lfa == Q_max)[0]
-    A_max = shuffle(A_max)
-
-    return Q_max, A_max
+    return weights + (alpha * TD_error * X_A)
 
 
-def UpdateWeightsLFA(state_action, reward, state_next, weights, alpha=0.1, discount=0.95):
-    """Update the weight vector w using Q-learning with semi-gradient descent.
-
-    state_action represents the feature vector F(S, A) with S the current
-    state. state_next represents a matrix where every column is a feature F(S', A),
-    with S' the next state of the agent.
+def UpdateWeightsLFA_DoubleQ(X, A, R, Y, weights1, weights2, alpha=0.1, discount=0.95):
     """
-    Q_max, _ = QMaxLFA(state_next, weights)
-    TD_error = reward + discount * Q_max - np.dot(weights, state_action)
+    Update the weight vectors w1, w2 for Double Q-learning.
+    """
+    Q_choice = np.random_choice(['tails', 'heads'])
+    X_A = X.state_action[A]
 
-    return w + alpha * TD_error * state_action
+    if Q_choice == 'heads':
+        # update weights1 on heads, use weights2 for approximation
+        Q2 = np.dot(weights2, Y.max_q(weights1))
+        TD_error = R + (discount * Q2) - np.dot(weights1, X_A)
+
+        return weights1 + (alpha * TD_error * X_A), weights2
+    else:
+        # update weights2 on tails, use weights1 for approximation
+        Q1 = np.dot(weights1, Y.max_q(weights2))
+        TD_error = R + (discount * Q1) - np.dot(weights2, X_A)
+
+        return weights1, weights2 + (alpha * TD_error * X_A)
 
 
-def UpdateWeightsLFA_SARSA(state_action, reward, state_action_next, weights, traces,
-                           Lambda=1, alpha=0.1, discount=0.95):
+def UpdateWeightsLFA_SARSA(X, A, R, Y, B, weights, traces, Lambda=1,
+                           alpha=0.1, discount=0.95):
     """Update the weight vector w using SARSA.
 
-    state_action and state_action_next represent the feature vector F(S, A) and
-    F(S', A), where S and S' are the current and next state, respectively.
+    The features X and Y are assumed to have state_action(action) and
+    max_q(weights) methods available. See feature_extraction.py for details.
     """
-    TD_error = reward + discount * np.dot(weights, state_action_next) - np.dot(weights, state_action)
-    traces_n = state_action + discount * Lambda * eligibility_traces
+    X_A = X.state_action[A]
+    Y_B = Y.state_action[B]    
+
+    TD_error = R + discount * np.dot(weights, Y_B) - np.dot(weights, X_A)
+    traces_n = X_A + discount * Lambda * eligibility_traces
 
     return weights + alpha * TD_error * traces_n, traces_n
-
-
-# TODO: Check description (Koethe lecture etc.)
-def QLearningGreedyPolicy(state, actions, f, w):
-    """Greedy policy for Q learning
-
-    This function implements a greedy policy based on the highest
-    Q-value. This policy can be used as one of the possible policies
-    in to update the parameter vector (exploration), or as an optimal
-    policy if the parameter vector is trained.
-    """
-    
