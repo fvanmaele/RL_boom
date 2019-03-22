@@ -2,8 +2,6 @@ import numpy as np
 from random import shuffle
 
 from agent_code.my_agent.arena import *
-from settings import s
-from settings import e
 
 
 class RLFeatureExtraction:
@@ -108,7 +106,9 @@ class RLFeatureExtraction:
              self.feature8(coin_limit, crate_limit),
              self.feature9(),
              self.feature10(),
-             self.feature11(coin_limit, crate_limit))).T
+             self.feature11(coin_limit, crate_limit)))
+        # test
+        print(self.feature)
 
 
     def state(self):
@@ -116,7 +116,7 @@ class RLFeatureExtraction:
         Return the feature matrix F, where every column represents an
         a feature F_i(S,A), and rows represent actions A.
         """
-        return feature
+        return self.feature.T
 
 
     def state_action(self, action):
@@ -124,7 +124,7 @@ class RLFeatureExtraction:
         Return the column vector for the feature:
            F(S, A) = F_1(S,A) ... F_n(S,A)
         """
-        return feature[self.actions.index(action)]
+        return self.feature.T[self.actions.index(action)]
 
 
     def max_q(self, weights):
@@ -135,13 +135,13 @@ class RLFeatureExtraction:
         taken as a parameter.
         """
         # Compute the dot product (w, F_i(S,A)) for every action.
-        Q_lfa = np.dot(weights, self.feature)            
+        Q_lfa = np.dot(weights, self.feature)
         Q_max = np.max(Q_lfa)
 
         # Multiple actions may give the same (optimal) reward. To avoid bias towards
-        # a particular action, shuffle the resulting index array before return it.
+        # a particular action, shuffle the action index array before returning it.
         A_max = np.where(Q_lfa == Q_max)[0]
-        A_max = shuffle(A_max)
+        shuffle(A_max) # in-place sort
 
         return Q_max, [self.actions[a] for a in A_max]
 

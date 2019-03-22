@@ -13,7 +13,7 @@ def learning_schedule_2(time_step):
 def learning_schedule_3(time_step):
     return 0.1
 
-def learning_schedule_4(time_step, max_steps=400)
+def learning_schedule_4(time_step, max_steps=400):
     if (1 <= time_step < max_steps/4):
         return 0.1
     elif (max_steps/4 <= time_step < max_steps/2):

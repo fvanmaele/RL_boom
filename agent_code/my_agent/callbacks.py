@@ -19,13 +19,17 @@ def setup(self):
     self.reward = 0 # reward for single transition
     self.replay_buffer = [] # tuples (S,A,R,S') for later sampling
 
-    try:
-        # load weights
-        self.weights = np.load('./agent_code/my_agent/models/weights.npy')
-        print("weights loaded")
-    except:
-        # Initial guess
-        self.weights = np.array([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5])
+    # try:
+    #     # load weights
+    #     self.weights = np.load('./agent_code/my_agent/models/weights.npy')
+    #     print("weights loaded")
+    # except:
+    #     # Initial guess
+    #     self.weights = np.array([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5])
+
+    self.weights = np.array([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5])
+    # Keep copy of loaded weights for optimization problem (see lecture).
+    self.weights_episode = self.weights
 
 
 def reward_update(self):
@@ -96,18 +100,22 @@ def reward_update(self):
             # equivalent to performing no action at all. Punish both
             # with a small negative reward.
             self.reward -= 2
-    
+
+    # Get action performed in last step. This variable was set in the
+    # previous 'act' step, and is thus called 'next_action'.
+    self.prev_action = self.next_action
+
     # We keep track of all experiences in the episode
     self.logger.info(f'Given reward of {reward}')
     self.accumulated_reward += reward
-    self.replay_buffer += (self.prev_state, self.
-    
-    # Get action performed in last step.
-    self.prev_action = self.next_action # self.prev_state
+    self.replay_buffer += (self.prev_state, self.prev_action,
+                           self.reward, self.game_state)
 
+    # Update temporary weights used for behavior policy in each step.
+    #self.weights_episode = 
     # TODO: update weights either per step, or every "mini batch"
-    self.weights = QLearningLinFApp(self.prev_state, self.prev_action, self.reward,
-                                    self.game_state, self.weights, feature, 0.05, 1)
+    #self.weights = QLearningLinFApp(self.prev_state, self.prev_action, self.reward,
+    #                                self.game_state, self.weights, feature, 0.05, 1)
 
 
 def act(self):
@@ -123,12 +131,17 @@ def act(self):
     in settings.py, execution is interrupted by the game and the current value
     of self.next_action will be used. The default value is 'WAIT'.
     """
-    # Save previous state for Q-learning in reward_update.
+    # Save previous state (which is updated/replaced in reward_update)
+    # to allow Q-learning.
     self.prev_state = self.game_state
 
     #self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN'], p=[.25, .25, .25, .25])
 
-    # TODO: Implement Q-policy here
+    F = RLFeatureExtraction(self.game_state, 2, 6)
+    Q_max, A_max = F.max_q(self.weights)
+
+    # 1. greedy policy
+    self.next_action = A_max[0] # shuffled
 
 
 def end_of_episode(self):

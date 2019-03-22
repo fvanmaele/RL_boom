@@ -100,7 +100,7 @@ def act(self):
     others = [(x,y) for (x,y,n,b) in self.game_state['others']]
     coins = self.game_state['coins']
     bomb_map = np.ones(arena.shape) * 5
-    print(arena)
+
     for xb,yb,t in bombs:
         for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
             if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):

@@ -1,3 +1,10 @@
+import numpy as np
+from random import shuffle
+
+from settings import s
+from settings import e
+
+
 # Function modified from items.py
 def get_blast_coords(arena, x, y):
     """Retrieve the blast range for a bomb.
@@ -77,6 +84,7 @@ def look_for_targets_path(free_space, start, targets, logger=None):
         x, y = current
         neighbors = [(x,y) for (x,y) in [(x+1,y), (x-1,y), (x,y+1), (x,y-1)] if free_space[x,y]]
         shuffle(neighbors)
+
         for neighbor in neighbors:
             if neighbor not in parent_dict:
                 frontier.append(neighbor)
