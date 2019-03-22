@@ -10,11 +10,11 @@ from agent_code.my_agent.algorithms import *
 
 def setup(self):
     
-    self.action = [ 'UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT' ]
-
+    self.actions = [ 'UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT' ]
+    self.init_mode = 'initX'
     # load weights
     try:
-        self.weights = np.load('./agent_code/my_agent/models/.npy')
+        self.weights = np.load('./agent_code/my_agent/models/NONE.npy')
         print("weights loaded")
     except:
         self.weights = []
@@ -27,7 +27,6 @@ def setup(self):
     self.alpha = 0.2 
     self.gamma = 0.95
     self.EPSILON = 0.2
-    self.round = 1
 
 #####################################################################
 
@@ -87,7 +86,7 @@ def act(self):
         self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB'], p=[.23, .23, .23, .23, .08])
         print("random action picked ", self.next_action)
     '''
-
+#####################################################################
 def reward_update(self):
 
     self.logger.info('IN TRAINING MODE ')
@@ -112,7 +111,7 @@ def reward_update(self):
         self.alpha *= 1/self.game_state['step']
         #self.gamma = self.gamma ** self.game_state['step']
         
-
+#####################################################################
 def end_of_episode(self):
 
     ## calculate new weights for last step
@@ -129,5 +128,5 @@ def end_of_episode(self):
     self.weights = weights 
 
     ############## SAVING LEARNING FROM ONE EPISODE 
-    #np.save('./agent_code/my_agent/models/weights_{}_{}.npy'.format(self.train_mode, self.init_mode))
+    np.save('./agent_code/my_agent/models/NONE.npy', self.weights)
 
