@@ -844,3 +844,51 @@ def feature15(game_state):
     feature += [0,0]
 
     return feature
+
+def feature_extraction(game_state):
+
+    f0 = np.ones(6)  # for bias
+    f1 = feature1(game_state) # reward good action
+    f2 = feature2(game_state) # penalization bad action
+    f3 = feature3(game_state)
+    f4 = feature4(game_state) # reward good action
+    f5 = feature5(game_state)  # penalize bad action
+    f6 = feature6(game_state)  # reward good action
+    f7 = feature7(game_state) # reward action
+    f9 = feature9(game_state) # rewards good action
+    f10 = feature10(game_state) # rewards good action
+    f11 = feature11(game_state) # penalize bad action
+    f12 = feature12(game_state) # penalize bad action
+    f13 = feature13(game_state) # penalize bad action
+    f14 = feature14(game_state) # penalize bad action
+    f15 = feature15(game_state) # penalize bad action
+
+    return np.vstack((f0,f1,f2,f3,f4,f5,f6,f7,f9,f10,f11,f12,f13,f14,f15)).T
+
+def new_reward(events):
+    reward = -1
+    for event in events:
+        if event == e.BOMB_DROPPED:
+            reward += 1
+        elif event == e.COIN_COLLECTED:
+            reward += 200
+        elif event == e.KILLED_SELF:
+            reward -= 100
+        elif event == e.CRATE_DESTROYED:
+            reward += 10
+        elif event == e.COIN_FOUND:
+            reward += 100
+        elif event == e.KILLED_OPPONENT:
+            reward += 300
+        elif event == e.GOT_KILLED:
+            reward -= 300
+        elif event == e.SURVIVED_ROUND:
+            reward += 100
+        elif event == e.INVALID_ACTION:
+            reward -= 2
+    return reward
+
+def q_gd_linapprox(next_state, prev_state_a, reward, weights, alpha, gamma):
+    next_state_a = next_state[np.argmax(np.dot(next_state, weights)), :]
+    weights += alpha * (reward + gamma * np.dot(next_state_a,weights) - np.dot(prev_state_a,weights)) * prev_state_a 
+    return weights
