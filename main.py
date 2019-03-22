@@ -41,12 +41,11 @@ def main():
 
     # Initialize environment and agents
     world = BombeRLeWorld([
-        ('my_agent', False),
-        ('simple_agent', False),
-        ('simple_agent', False),
-        ('simple_agent', False),
-        #('my_agent', True),
-       ])
+            ('my_agent', False),
+            ('simple_agent', False),
+            ('simple_agent', False),
+            ('simple_agent', False)
+        ])
     # world = ReplayWorld('Replay 2019-01-30 16:57:42')
     user_inputs = []
 
