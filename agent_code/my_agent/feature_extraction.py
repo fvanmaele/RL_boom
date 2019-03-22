@@ -12,13 +12,11 @@ class RLFeatureExtraction:
         Extract relevant properties from the environment for feature
         extraction.
         """
-        # The actions set here determine the order of the columns in the feature
-        # matrix.  TODO: Pass this list as an argument (although it may be modified
-        # for each class object)
+        # The actions set here determine the order of the columns in the returned
+        # feature matrix. (Take as an argument?)
         self.actions = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT']
-
-        # Set the amount of features
-        self.dim = 10
+        # Set the amount of features / weights
+        self.dim = 12
 
         # Collect commonly used data from the environment.
         self.arena = game_state['arena']
@@ -94,40 +92,58 @@ class RLFeatureExtraction:
         for xb, yb, t in self.bombs:
             for (i, j) in [(xb+h, yb) for h in range(-3, 4)] + [(xb, yb+h) for h in range(-3, 4)]:
                 if (0 < i < self.bomb_map.shape[0]) and (0 < j < self.bomb_map.shape[1]):
-q                    self.bomb_map[i, j] = min(self.bomb_map[i, j], t)
+                    self.bomb_map[i, j] = min(self.bomb_map[i, j], t)                    
 
-        # Compute the features F_i(S,A) for each action A (row vector).
-        self.f0 = [1] * len(self.actions) # bias
-        self.f1 = self.feature1()
-        self.f2 = self.feature2()
-        self.f3 = self.feature3()
-        self.f4 = self.feature4()
-        self.f5 = self.feature5()
-        self.f6 = self.feature6()
-        self.f7 = self.feature7()
-        self.f8 = self.feature8(coin_limit, crate_limit)
-        self.f9 = self.feature9()
-        self.f10 = self.feature10()
-        self.f11 = self.feature11(coin_limit, crate_limit)
-        
+        # Compute the feature matrix with columns F_i(S, A) and rows ordered by the
+        # actions defined in self.actions.
+        self.feature = np.vstack(
+            ([1] * len(self.actions),
+             self.feature1(),
+             self.feature2(),
+             self.feature3(),
+             self.feature4(),
+             self.feature5(),
+             self.feature6(),
+             self.feature7(),
+             self.feature8(coin_limit, crate_limit),
+             self.feature9(),
+             self.feature10(),
+             self.feature11(coin_limit, crate_limit))).T
 
-    def __call__(self):
+
+    def state(self):
         """
         Return the feature matrix F, where every column represents an
-        a feature F_i(S,A). Rows represents all possible actions A.
+        a feature F_i(S,A), and rows represent actions A.
         """
-        return np.vstack((self.f0,  self.f1, self.f2, self.f3, self.f4,
-                          self.f5,  self.f6, self.f7, self.f8, self.f9,
-                          self.f10, self.f11)).T
+        return feature
 
 
     def state_action(self, action):
         """
-        Return the column vector for the feature F(S, A) = F_1(S,A) ... F_n(S,A)
+        Return the column vector for the feature:
+           F(S, A) = F_1(S,A) ... F_n(S,A)
         """
-        return np.vstack((self.f0,  self.f1, self.f2, self.f3, self.f4,
-                          self.f5,  self.f6, self.f7, self.f8, self.f9,
-                          self.f10, self.f11)).T[self.actions.index(action)]
+        return feature[self.actions.index(action)]
+
+
+    def max_q(self, weights):
+        """
+        Return the maximum Q-value for all possible actions, and the corresponding
+        action to this maximum. It may be used to update weights during training, or
+        to implement a greedy policy. The required weights are assumed known, and
+        taken as a parameter.
+        """
+        # Compute the dot product (w, F_i(S,A)) for every action.
+        Q_lfa = np.dot(weights, self.feature)            
+        Q_max = np.max(Q_lfa)
+
+        # Multiple actions may give the same (optimal) reward. To avoid bias towards
+        # a particular action, shuffle the resulting index array before return it.
+        A_max = np.where(Q_lfa == Q_max)[0]
+        A_max = shuffle(A_max)
+
+        return Q_max, [self.actions[a] for a in A_max]
 
 
     def feature1(self):
@@ -334,10 +350,12 @@ q                    self.bomb_map[i, j] = min(self.bomb_map[i, j], t)
             if action == 'BOMB' and self.bombs_left > 0:
                 CHECK_FOR_OTHERS = False
                 for d in self.directions.values():
-                    if d == self.agent: continue
+                    if d == self.agent:
+                        continue
                     if d in self.others_xy:
                         CHECK_FOR_OTHERS = True
                         break
+
                 if CHECK_FOR_OTHERS:
                     feature.append(1)
                 else:
