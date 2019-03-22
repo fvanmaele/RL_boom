@@ -1,134 +1,20 @@
 import numpy as np
 from random import shuffle
-from time import time, sleep
-from collections import deque
-import pickle
-import copy
 
+from agent_code.my_agent.arena import *
 from settings import s
 from settings import e
 
-# Function modified from items.py
-def get_blast_coords(arena, x, y):
-    """Retrieve the blast range for a bomb.
-
-    The maximal power of the bomb (maximum range in each direction) is
-    imported directly from the game settings. The blast range is
-    adjusted according to walls (immutable obstacles) in the game
-    arena.
-
-    Parameters:
-    * arena:  2-dimensional array describing the game arena.
-    * x, y:   Coordinates of the bomb.
-
-    Return Value:
-    * Array containing each coordinate of the bomb's blast range.
-    """
-    bomb_power = s.bomb_power
-    blast_coords = [(x, y)]
-
-    for i in range(1, bomb_power+1):
-        if arena[x+i, y] == -1: break
-        blast_coords.append((x+i, y))
-    for i in range(1, bomb_power+1):
-        if arena[x-i, y] == -1: break
-        blast_coords.append((x-i, y))
-    for i in range(1, bomb_power+1):
-        if arena[x, y+i] == -1: break
-        blast_coords.append((x, y+i))
-    for i in range(1, bomb_power+1):
-        if arena[x, y-i] == -1: break
-        blast_coords.append((x, y-i))
-
-    return blast_coords
-
-
-# Function modified from simple_agent to return the path towards a
-# target, instead of only the first step.
-def look_for_targets_path(free_space, start, targets, logger=None):
-    """Find direction of closest target that can be reached via free tiles.
-
-    Performs a breadth-first search of the reachable free tiles until
-    a target is encountered.  If no target can be reached, the path
-    that takes the agent closest to any target is chosen.
-
-    Args:
-        free_space: Boolean numpy array. True for free tiles and False for obstacles.
-        start: the coordinate from which to begin the search.
-        targets: list or array holding the coordinates of all target tiles.
-        logger: optional logger object for debugging.
-    Returns:
-        the path towards closest target or towards tile closest to any
-        target, beginning at the next step.
-    """
-    if len(targets) == 0:
-        return []
-
-    frontier = [start]
-    parent_dict = {start: start}
-    dist_so_far = {start: 0}
-    best = start
-    best_dist = np.sum(np.abs(np.subtract(targets, start)), axis=1).min()
-
-    while len(frontier) > 0:
-        current = frontier.pop(0)
-
-        # Find distance from current position to all targets, track closest
-        d = np.sum(np.abs(np.subtract(targets, current)), axis=1).min()
-        if d + dist_so_far[current] <= best_dist:
-            best = current
-            best_dist = d + dist_so_far[current]
-        if d == 0:
-            # Found path to a target's exact position, mission accomplished!
-            best = current
-            break
-
-        # Add unexplored free neighboring tiles to the queue in a random order
-        x, y = current
-        neighbors = [(x,y) for (x,y) in [(x+1,y), (x-1,y), (x,y+1), (x,y-1)] if free_space[x,y]]
-        shuffle(neighbors)
-        for neighbor in neighbors:
-            if neighbor not in parent_dict:
-                frontier.append(neighbor)
-                parent_dict[neighbor] = current
-                dist_so_far[neighbor] = dist_so_far[current] + 1
-
-    if logger:
-        logger.debug(f'Suitable target found at {best}')
-
-    # Determine the path towards the best found target tile, start not included
-    current = best
-    path = []
-    while True:
-        path.insert(0, current)
-        if parent_dict[current] == start:
-            return path
-        current = parent_dict[current]
-
-
-def look_for_targets(free_space, start, targets, logger=None):
-    """Returns the coordinate of first step towards closest target, or
-    towards tile closest to any target.
-    """
-    path = look_for_targets_path(free_space, start, targets, logger=None)
-
-    if len(path):
-        return path[0]
-    else:
-        return None
-
-
-############# FEATURES ##############
 
 class RLFeatureExtraction:
-    def __init__(self, game_state):
+    def __init__(self, game_state, coin_limit=2, crate_limit=6):
         """
         Extract relevant properties from the environment for feature
         extraction.
         """
-        # The actions set here determine the order of the columns in
-        # the feature matrix.
-        # TODO: Pass this list as an argument
+        # The actions set here determine the order of the columns in the feature
+        # matrix.  TODO: Pass this list as an argument (although it may be modified
+        # for each class object)
         self.actions = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT']
 
         # Set the amount of features
@@ -208,44 +94,40 @@ class RLFeatureExtraction:
         for xb, yb, t in self.bombs:
             for (i, j) in [(xb+h, yb) for h in range(-3, 4)] + [(xb, yb+h) for h in range(-3, 4)]:
                 if (0 < i < self.bomb_map.shape[0]) and (0 < j < self.bomb_map.shape[1]):
-                    self.bomb_map[i, j] = min(self.bomb_map[i, j], t)
+q                    self.bomb_map[i, j] = min(self.bomb_map[i, j], t)
 
+        # Compute the features F_i(S,A) for each action A (row vector).
+        self.f0 = [1] * len(self.actions) # bias
+        self.f1 = self.feature1()
+        self.f2 = self.feature2()
+        self.f3 = self.feature3()
+        self.f4 = self.feature4()
+        self.f5 = self.feature5()
+        self.f6 = self.feature6()
+        self.f7 = self.feature7()
+        self.f8 = self.feature8(coin_limit, crate_limit)
+        self.f9 = self.feature9()
+        self.f10 = self.feature10()
+        self.f11 = self.feature11(coin_limit, crate_limit)
+        
 
     def __call__(self):
         """
-        Compute the feature matrix F, where every column represents an
-        action A, and every row a feature F_i(S, A).
+        Return the feature matrix F, where every column represents an
+        a feature F_i(S,A). Rows represents all possible actions A.
         """
-        # TODO: Cache results for later calls
-        f0 = np.ones(6) # for bias
-        print("f0 ", f0)
-        f1 = self.feature1()
-        print("f1 ", f1)
-        f2 = self.feature2()
-        print("f2 ", f2)
-        f3 = self.feature3()
-        print("f3 ", f3)
-        f4 = self.feature4()
-        print("f4 ", f4)
-        f5 = self.feature5()
-        print("f5 ", f5)
-        f6 = self.feature6()
-        print("f6 ", f6)
-        f7 = self.feature7()
-        print("f7 ", f7)
-        # TODO: Set crate limits depending on crate density!
-        f8 = self.feature8(3, 8)
-        print("f8 ", f8)
-        f9 = self.feature9()
-        print("f9 ", f9)
-        f10 = self.feature10()
-        print("f10 ", f10)
-        f11 = self.feature11(3, 8)
-        print("f11 ", f11)
-        # f12 = self.feature12()
-        # print("f12 ", f12)
+        return np.vstack((self.f0,  self.f1, self.f2, self.f3, self.f4,
+                          self.f5,  self.f6, self.f7, self.f8, self.f9,
+                          self.f10, self.f11)).T
 
-        return np.vstack((f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11)).T
+
+    def state_action(self, action):
+        """
+        Return the column vector for the feature F(S, A) = F_1(S,A) ... F_n(S,A)
+        """
+        return np.vstack((self.f0,  self.f1, self.f2, self.f3, self.f4,
+                          self.f5,  self.f6, self.f7, self.f8, self.f9,
+                          self.f10, self.f11)).T[self.actions.index(action)]
 
 
     def feature1(self):
@@ -422,10 +304,12 @@ class RLFeatureExtraction:
             if action == 'BOMB' and self.bombs_left > 0:
                 CHECK_FOR_CRATE = False
                 for d in self.directions.values():
-                    if d == self.agent: continue
+                    if d == self.agent:
+                        continue
                     if self.arena[d] == 1:
                         CHECK_FOR_CRATE = True
                         break
+
                 if CHECK_FOR_CRATE:
                     feature.append(1)
                 else:
@@ -462,6 +346,7 @@ class RLFeatureExtraction:
                 feature.append(0)
 
         return feature
+
 
     # TODO: Rearding moving towards a dead end might encourage the agent to walk
     # into a trap by other agents...
@@ -568,3 +453,4 @@ class RLFeatureExtraction:
                     feature.append(0)
 
         return feature
+
