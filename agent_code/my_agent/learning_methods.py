@@ -1,112 +1,72 @@
-## Prediction functions
+import numpy as np
 
-def TDLambdaLinFApp(Lambda, state, reward, state_next, w, z, f, step_size=0.05, discount=1):
-    """TD(Lambda) with function approximation.
 
-    This function implements the TD(Lambda) algorithm with linear function
-    approximation. It must be called after each transition.
+"""
+Different approaches to compute the learning parameter alpha.
+"""
+def learning_schedule_1(time_step, c=1.0, eta=0.5):
+    return c / pow(time_step, eta)
 
-    Parameters:
-    * state:      Array representing the last state.
-    * state_next: Array representing the next state.
-    * reward:     real number associated to the state transition.
-    * w:          Array (d-dimensional) representing the parameter vector
-                  of the linear function approximation.
-    * z:          Array storing the (approximated) eligibility traces.
-    * f:          Callable representing a feature extraction method. It should have the
-                  same dimension as the parameter vector.
-    * step_size:  Small non-negative real numbers chosen by the user.
-    * discount:   The discount factor in the MDP.
+def learning_schedule_2(time_step):
+    return 10.0 / (9.0 + time_step)
 
-    Return Value:
-    * (w', z'):   Update of the parameter vector and eligibility traces.
+def learning_schedule_3(time_step):
+    return 0.1
+
+def learning_schedule_4(time_step, max_steps=400)
+    if (1 <= time_step < max_steps/4):
+        return 0.1
+    elif (max_steps/4 <= time_step < max_steps/2):
+        return 0.05
+    elif (max_steps/2 <= time_step <= max_steps/4):
+        return 0.01
+
+
+def QMaxLFA(feature_matrix, weights):
+    """Compute the maximum Q-value for all given actions using linear function
+    approximation.
+
+    In feature_matrix, each column represents a feature vector F_i(S,A), and each
+    row represents an action. The maximum Q-value may be used to update weights
+    during training, or to implement a greedy policy.
     """
-    f_y = f(state_next)
-    f_x = f(state)
-    delta = reward + discount*np.dot(w, f_y) - np.dot(w, f_x)
-    
-    # update elegibility traces and parameter
-    z = f_x + discount*Lambda*z
-    w = w + step_size*delta*z
-    
-    return (w, z)
+    # Compute the dot product (w, F_i(S,A)) for every action.
+    Q_lfa = np.dot(weights, feature_next)
+    Q_max = np.max(Q_next)
+
+    # Multiple actions may give the same (optimal) reward. To avoid bias towards a
+    # particular action, shuffle the resulting array before return it.
+    A_max = np.where(Q_lfa == Q_max)[0]
+    A_max = shuffle(A_max)
+
+    return Q_max, A_max
 
 
-def QLearningLinFApp(state, action, reward, state_next, w, f, step_size=0.05, discount=1):
-    """Q-learning with linear function approximation
+def UpdateWeightsLFA(state_action, reward, state_next, weights, alpha=0.1, discount=0.95):
+    """Update the weight vector w using Q-learning with semi-gradient descent.
 
-    This function implements the Q-learning algorithm with linear function
-    approximation.  It must be called after each state transition.
-
-    Parameters:
-    * state:       Array representing the last state s.
-    * action:      Action A which occured in the state transtion from s to s'.
-    * reward:      Real number r associated to the state transition.
-    * state_next:  Array representing the next state s'.
-    * w:           Array (d-dimensional) representing the parameter vector of the
-                   linear function approximation.
-    * f:           Callable representing the feature extraction function.
-    * step_size:   Small non-negative real numbers chosen by the user. For an optimal
-                   choice of step size, see [Szepesvári 2009, p.20). 
-                   (Example: c/sqrt(t), with the current step and c>0)
-    * discount:    The discount factor in the MDP. In an episodic MDP (an MDP with
-                   terminal states), we often consider discount=1.
-  
-    Return Value:
-    * w':          Update of the parameter vector w using gradient descent.
+    state_action represents the feature vector F(S, A) with S the current
+    state. state_next represents a matrix where every column is a feature F(S', A),
+    with S' the next state of the agent.
     """
-    # Compute the feature approximation for the last state s and action a.
-    features = f(state, action)
-    
-    # Compute the maximum Q value for each action in the action space
-    # (global parameter).
-    Q_max, A_max = 0, None
+    Q_max, _ = QMaxLFA(state_next, weights)
+    TD_error = reward + discount * Q_max - np.dot(weights, state_action)
 
-    for A in actions:
-        Q = np.dot(w, f(state_next, A))
-        if Q > Q_max:
-            Q_max, A_max = Q, A
-
-    # Update intermediary values
-    delta = reward + (discount * Q_max) - np.dot(w, features)
-
-    # Return updated parameter vector
-    return w + (step_size * delta * features)
+    return w + alpha * TD_error * state_action
 
 
-def SARSALambdaLinFApp(Lambda, state, action, reward, state_next, action_next, w, z, f,
-                       step_size=0.05, discount=1):
+def UpdateWeightsLFA_SARSA(state_action, reward, state_action_next, weights, traces,
+                           Lambda=1, alpha=0.1, discount=0.95):
+    """Update the weight vector w using SARSA.
 
-    """SARSA(Lambda) algorithm with linear function approximation
-
-    This function implements the Sarsa(Lambda) algorithm with linear function
-    approximation. It must be called after each transition.
-
-    Parameters:
-    * Lambda:      The hyperparameter for the algorithm.
-    * state:       Array representing the last state s.
-    * action:      Action A which occured in the state transtion from s to s'.
-    * reward:      Real number r associated to the state transition.
-    * state_next:  Array representing the next state s'.
-    * action_next: Action A' chosen for the next state transition from s'.
-    * w:           Array (d-dimensional) representing the parameter vector of the
-                   linear function approximation.
-    * z:           Array (d-dimensional) representing the vector of eligibility traces.
-
-    Return Value:
-    * (w', z'):    Update of the parameter vector and eligiblity traces.
+    state_action and state_action_next represent the feature vector F(S, A) and
+    F(S', A), where S and S' are the current and next state, respectively.
     """
-    features = f(state, action)
-    features_next = f(state_next, action_next)
+    TD_error = reward + discount * np.dot(weights, state_action_next) - np.dot(weights, state_action)
+    traces_n = state_action + discount * Lambda * eligibility_traces
 
-    # Compute eligibility traces.
-    delta = reward + discount * np.dot(w, features_next) - np.dot(w, features)
-    z = features + discount * Lambda * z
+    return weights + alpha * TD_error * traces_n, traces_n
 
-    return w + (step_size * delta * z), z
-
-
-## Policy functions
 
 # TODO: Check description (Koethe lecture etc.)
 def QLearningGreedyPolicy(state, actions, f, w):
@@ -116,12 +76,5 @@ def QLearningGreedyPolicy(state, actions, f, w):
     Q-value. This policy can be used as one of the possible policies
     in to update the parameter vector (exploration), or as an optimal
     policy if the parameter vector is trained.
-
-    Input Parameters:
-    * state:    Array representing the last state s.
-    * actions:  List representing the action space A.
-    * w:  array (d-dimensional) for the parameter vector of the
-          linear function approximation.
-    * f:  callable for the feature extraction function.
     """
     

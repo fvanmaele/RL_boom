@@ -15,19 +15,18 @@ def setup(self):
     file for debugging (see https://docs.python.org/3.7/library/logging.html).
     """
     np.random.seed()
-    self.replay_buffer = []
+    self.accumulated_reward = 0 # reward for full game (10 rounds)
+    self.reward = 0 # reward for single transition
+    self.replay_buffer = [] # tuples (S,A,R,S') for later sampling
 
-    # load weights
     try:
+        # load weights
         self.weights = np.load('./agent_code/my_agent/models/weights.npy')
         print("weights loaded")
     except:
-        # TODO: Use estimate from Q-learning with simple agent policy
-        self.weights = []
-        print("no weights found ---> create new weights")
+        # Initial guess
+        self.weights = np.array([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5])
 
-    self.reward = 0
-    
 
 def reward_update(self):
     """Called once per step to allow intermediate rewards based on game events.
@@ -63,11 +62,10 @@ def reward_update(self):
     self.reward = -1
 
     for event in self.events:
-        print("ewfwefwef")
         if event == e.BOMB_DROPPED:
             # We give no special reward to the action of dropping a
             # bomb, to leave flexibility in the chosen strategies.
-            self.reward += 0
+            self.reward += 1
         elif event == e.COIN_COLLECTED:
             # Collecting coins is the secondary goal of the game.
             self.reward += 100
@@ -75,6 +73,14 @@ def reward_update(self):
             # Killing ourselves through bomb placement is something we
             # wish to avoid.
             self.reward -= 100
+        elif event == e.CRATE_DESTROYED:
+            # A bomb may destroy many crates simulatenously; adjust
+            # the reward for destroying a single crate accordingly.
+            self.reward += 10
+        elif event == e.COIN_FOUND:
+            # Give a partial reward for destroying a crate which
+            # contains a coin.
+            self.reward += 30
         elif event == e.KILLED_OPPONENT:
             # Killing opponents is the primary goal of the game.
             self.reward += 300
@@ -82,15 +88,20 @@ def reward_update(self):
             # Dying at the hands of an opponent is classified worse as
             # death by self.
             self.reward -= 300
-        elif event == e.WAITED or event == e.INVALID_ACTION:
+        elif event == e.SURVIVED_ROUND:
+            # TODO: Change this to 50?
+            self.reward += 100
+        elif event == e.WAITED or e.INVALID_ACTION:
             # An invalid action (such as bumping into a wall) is
             # equivalent to performing no action at all. Punish both
             # with a small negative reward.
             self.reward -= 2
-
-    # We keep track of all intermediary rewards in the episode
+    
+    # We keep track of all experiences in the episode
     self.logger.info(f'Given reward of {reward}')
-
+    self.accumulated_reward += reward
+    self.replay_buffer += (self.prev_state, self.
+    
     # Get action performed in last step.
     self.prev_action = self.next_action # self.prev_state
 
@@ -115,13 +126,8 @@ def act(self):
     # Save previous state for Q-learning in reward_update.
     self.prev_state = self.game_state
 
-    self.logger.info('Pick action at random')
-    #self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB'],
-    #                                     p=[.15, .15, .15, .15, .40])
-    self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN'], p=[.25, .25, .25, .25])
-    #print(vectorized_feature(feature_2, self.game_state))
-    x, y, _, _ = self.game_state['self']
-    print(self.next_action, x, y, move_to_coords(x, y, self.next_action))
+    #self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN'], p=[.25, .25, .25, .25])
+
     # TODO: Implement Q-policy here
 
 

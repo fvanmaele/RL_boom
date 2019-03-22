@@ -3,9 +3,9 @@ import numpy as np
 from random import shuffle
 from settings import e
 from settings import s
-from agent_code.my_agent.algorithms import *
-#from agent_code.my_agent.features import *
-#from agent_code.my_agent.functions import *
+from agent_code.my_agent.feature_extraction import *
+#from agent_code.my_agent.learning_methods import *
+
 
 def setup(self):
     # Assumed order for features (algorithms.py)
@@ -33,34 +33,11 @@ def act(self):
     game_state = self.game_state  # isn't it memory waste calling in each feature extraction for coins, self, arena?
     print("\n", game_state['step'])
 
-    # Compute features state 
-    f0 = np.ones(6)  # for bias
-    print("f0 ", f0)
-    f1 = feature1(game_state) # reward good action
-    print("f1 ", f1)
-    f2 = feature2(game_state) # penalization bad action
-    print("f2 ", f2)
-    f3 = feature3(game_state)
-    print("f3 ", f3)
-    f4 =feature4(game_state) # reward good action
-    print("f4 ", f4)
-    f5 = feature5(game_state)  # penalize bad action
-    print("f5 ", f5)
-    f6 = feature6(game_state)  # reward good action
-    print("f6 ", f6)
-    f7 = feature7(game_state) # reward action
-    print("f7 ", f7)
-    # f8 = feature8(game_state)
-    # print("f8 ", f8)
-    f9 = feature9(game_state) # rewards good action
-    print("f9 ", f9)
-    f10 = feature10(game_state) # rewards good action
-    print("f10 ", f10)
-    feature_state = np.vstack((f0,f1,f2,f3,f4,f5,f6,f7,f9,f10)).T
-
+    F = RLFeatureExtraction(game_state)
+    feature_state = F()
 
     self.prev_state = feature_state
-    weights = np.array([1,1,-7,-1,4,-0.5,1.5,2,0.5,0.5])   #initial guess 
+    weights = np.array([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5])   #initial guess 
     print("weights", weights)
 #    # later no necessary
 #    if self.weights == []:

@@ -33,3 +33,35 @@ def feature12(self):
             feature.append(0)
 
     return feature
+
+
+# TODO: This is a somewhat risky move which may cause the agent to blow itself up...
+def feature13(self, coins_limit, crates_limit, radius=3):
+    """Hunting mode
+
+    Place a bomb depending on distance and amount of agents in the vicinity of
+    the agent.
+    """
+    feature = []
+    target_agents = 0
+
+    if len(self.coins) > coins_limit or len(self.crates) > crates_limit:
+        return [0] * len(self.actions)
+
+    for other in self.others_xy:
+        # The amount of steps the agent has to take for reaching the current
+        # opposing agent.
+        path_to_other = look_for_targets_path(self.free_space, self.agent, self.others_xy)
+        print("PATH TO AGENT", path_to_other, sep=" ")
+
+        if len(path_to_other) <= radius:
+            target_agents += 1
+
+    for action in self.actions:
+        if action == 'BOMB':
+            feature.append(target_agents)
+        else:
+            feature.append(0)
+
+    return feature
+                    
