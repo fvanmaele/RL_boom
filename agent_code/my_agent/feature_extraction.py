@@ -1,5 +1,4 @@
 import numpy as np
-from random import shuffle
 
 from agent_code.my_agent.arena import *
 
@@ -107,8 +106,6 @@ class RLFeatureExtraction:
              self.feature9(),
              self.feature10(),
              self.feature11(coin_limit, crate_limit)))
-        # test
-        print(self.feature)
 
 
     def state(self):
@@ -137,11 +134,7 @@ class RLFeatureExtraction:
         # Compute the dot product (w, F_i(S,A)) for every action.
         Q_lfa = np.dot(weights, self.feature)
         Q_max = np.max(Q_lfa)
-
-        # Multiple actions may give the same (optimal) reward. To avoid bias towards
-        # a particular action, shuffle the action index array before returning it.
         A_max = np.where(Q_lfa == Q_max)[0]
-        shuffle(A_max) # in-place sort
 
         return Q_max, [self.actions[a] for a in A_max]
 
@@ -375,7 +368,6 @@ class RLFeatureExtraction:
         """
         feature = []
         best_direction = look_for_targets(self.free_space, self.agent, self.dead_ends)
-        print("PATH TO DEAD END", look_for_targets_path(self.free_space, self.agent, self.dead_ends), sep=" ")
 
         # Do not reward if the agent is already in a dead-end, or if there
         # are none in the arena.
