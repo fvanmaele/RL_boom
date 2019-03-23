@@ -24,7 +24,8 @@ def setup(self):
     
     # load weights
     try:
-        self.weights = np.load('./training_res/test_2.npy')
+        #self.weights = np.load('training_res/weights_Greed_init1_decr0.1.npy')
+        self.weights = np.load('NONE.npy')
         print("weights loaded")
     except:
         self.weights = []
@@ -44,60 +45,33 @@ def act(self):
     #'''
     F = RLFeatureExtraction(self.game_state)
     feature_state1 = F.state()
-    #self.prev_state = feature_state1
-    #'''
-    #'''
-    feature_state = feature_extraction(self.game_state)
-    self.prev_state = feature_state
-    #'''
-    
-    
+    self.prev_state = feature_state1
+    #'''  
     
     #different initial guesses can be defined here: 
     if len(self.weights) == 0:
         print('no weights, init weights')
         if self.init_mode == 'initX':
-            self.weights = np.array([1,1,-7,-1,4,-0.5,1.5,2,0.5,0.5,-7,1.5,3,2,-1])
-            #self.weights = np.array([1,1,-7,-1,4,-0.5,1.5,2,0.5,0.5,-7,1.5,3])            
+            #self.weights = np.array([1,-7,-1,4,-0.5,1.5,2,0.5,0.5,-7,1.5,3,2,-1])
+            #self.weights = np.array([1,-7,-1,4,-0.5,1.5,2,0.5,0.5,-7,1.5,3,2,-1])
+            self.weights = np.array([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5,1,-1])
         elif self.init_mode == 'init1':
-            self.weights = np.ones(feature_state.shape[1])  
+            self.weights = np.ones(feature_state1.shape[1])  
         elif self.init_mode == 'initRand':
-            self.weights = np.random.rand(self.prev_state.shape[1])
+            self.weights = np.random.rand(feature_state1.shape[1])
     
     print(self.weights)
-    print("alpha: ",self.alpha)
-    print('feature_state_1',feature_state1)
-    print('feature_state_0',feature_state)
+    print(self.alpha)
     self.logger.info('Pick action')
     
     #'''
     # Linear approximation approach
-    q_approx = np.dot(feature_state, self.weights)    
+    q_approx = np.dot(feature_state1, self.weights)    
     best_actions = np.where(q_approx == np.max(q_approx))[0] 
     shuffle(best_actions)
-    print(best_actions)
     q_next_action = self.actions[best_actions[0]] #GREEDY POLICY
     self.next_action = q_next_action
-    print("q action picked  ", self.next_action)
-    #'''
     
-    ####### EPSILON GREEDY (TRAINING) #########################
-    '''
-    greedy = np.random.choice([0,1], p=[self.EPSILON, 1-self.EPSILON])
-    if greedy:
-    
-        q_approx = np.dot(feature_state, self.weights)
-        best_actions = np.where(q_approx == np.max(q_approx))[0] 
-        shuffle(best_actions)
-        
-        q_next_action = s.actions[best_actions[0]] #GREEDY POLICY
-        self.next_action = q_next_action
-        print("q action picked  ", q_next_action)
-
-    else:
-        self.next_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB'], p=[.23, .23, .23, .23, .08])
-        print("random action picked ", self.next_action)
-    '''
 #####################################################################
 def reward_update(self):
 
@@ -109,12 +83,10 @@ def reward_update(self):
     print('Rewards: {}'.format(reward))
     self.total_R += reward        
     
-    '''
+    #'''
     F = RLFeatureExtraction(self.game_state)
     next_state = F.state()
-    '''
-    
-    next_state = feature_extraction(self.game_state)
+    #'''
     
     if self.game_state['step'] > 1:
 
@@ -125,7 +97,7 @@ def reward_update(self):
         self.weights = weights        
         
         # update alpha and gamma for convergence
-        self.alpha = 0.2/self.game_state['step']
+        self.alpha *= 1/self.game_state['step']
         #self.gamma = self.gamma ** self.game_state['step']
         
 #####################################################################

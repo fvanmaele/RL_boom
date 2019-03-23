@@ -863,7 +863,7 @@ def feature_extraction(game_state):
     f14 = feature14(game_state) # penalize bad action
     f15 = feature15(game_state) # penalize bad action
 
-    return np.vstack((f0,f1,f2,f3,f4,f5,f6,f7,f9,f10,f11,f12,f13,f14,f15)).T
+    return np.vstack((f1,f2,f3,f4,f5,f6,f7,f9,f10,f11,f12,f13,f14,f15)).T
 
 def new_reward(events):
     reward = -1
