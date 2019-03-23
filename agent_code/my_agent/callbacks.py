@@ -8,34 +8,132 @@ from settings import e
 from settings import s
 
 ## TRAINING PARAMETERS
+
 # Allow to check various combinations of training methods in parallel
 # through multiple agent processes by taking values from the
 # environment.
-# TODO: only enable in training mode (move to reward_update)
-t_batch_size = os.environ.get('MRBOMBASTIC_BATCH_SIZE')
-t_learning_algorithm = os.environ.get('MRBOMBASTIC_LEARNING')
+
+# TODO: only enable in training mode (move to reward_update?)
 t_learning_schedule = os.environ.get('MRBOMBASTIC_ALPHA')
 t_policy = os.environ.get('MRBOMBASTIC_POLICY')
 t_policy_eps = os.environ.get('MRBOMBASTIC_POLICY_EPS')
 t_weight_begin = os.environ.get('MRBOMBASTIC_WEIGHTS_BEGIN')
 
 # Default values for training.
-if t_batch_size == None: t_batch_size = 1
-if t_learning_algorithm == None: t_learning_algorithm = 'qlearning'
-if t_learning_schedule == None: t_learning_schedule = 'quotient1'
-if t_policy == None: t_policy = 'epsgreedy'
-if t_policy_eps == None: t_policy_eps = 0.2
-if t_weight_begin == None: t_weight_begin = 'random'
+if t_learning_schedule == None: t_learning_schedule = 'fixed'
+if t_policy == None: t_policy = 'greedy'
+if t_policy_eps == None: t_policy_eps = 0.1
+if t_weight_begin == None: t_weight_begin = 'bestguess'
 
 # Construct unique id for naming of persistent data.
 # TODO: include eps?
-t_training_id = "N{}_{}_{}_{}_{}".format(t_batch_size, t_learning_algorithm,
-                                         t_learning_schedule,
-                                         t_policy, t_weight_begin)
-print("TRAINING ID:", t_training_id)
+t_training_id = "{}_{}_{}".format(t_learning_schedule, t_policy, t_weight_begin)
 
 # Save weights to file
+print("TRAINING ID:", t_training_id)
 weights_file = "weights_{}.npy".format(t_training_id)
+
+
+## REWARDS AND POLICY
+
+def initialize_weights(method, dim):
+    if method == 'bestguess':
+        return np.asarray([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5, 1, -1])
+    elif method == 'ones':
+        return np.ones(dim)
+    elif method == 'zero':
+        return np.zeros(dim)
+    elif method == 'random':
+        return np.random.rand(dim, 1)
+    else:
+        return None
+
+
+# TODO: use diminishing eps-greedy policy in learning
+def policy_select_action(greedy_action, policy, policy_eps, game_ratio, logger=None):
+    # Select a random action for use in epsilon-greedy or random-walk
+    # exploration.
+    random_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB', 'WAIT'])
+
+    if policy == 'greedy':
+        logger.info('Pick greedy action %s', greedy_action)
+        return greedy_action
+    elif policy == 'epsgreedy':
+        logger.info('Picking greedy action at probability %s', 1-policy_eps)
+        return np.random.choice([greedy_action, random_action], p=[1-policy_eps, policy_eps])
+    elif policy == 'diminishing':
+        eps_dim = min(0.05, policy_eps * (1 - game_ratio))
+        logger.info('Picking greedy action at probability %s', eps_dim)
+        return np.random.choice([greedy_action, random_action], p=eps_dim)
+    else:
+        return None
+
+    
+def new_alpha(method, time_step, c=0.1, eta=1, max_steps=400):
+    if method == 'quotient1':
+        return c / pow(time_step, eta)
+    elif method == 'quotient2':
+        return 10.0 / (9.0 + time_step)
+    elif method == 'fixed':
+        return c
+    elif method == 'subdivision':
+        if (1 <= time_step < max_steps/4):
+            return 0.1
+        elif (max_steps/4 <= time_step < max_steps/2):
+            return 0.05
+        elif (max_steps/2 <= time_step <= max_steps/4):
+            return 0.01
+    else:
+        return None
+
+
+def new_reward(events):
+    # An action is always punished with a small negative reward due to
+    # time constraints on the game.
+    reward = -1
+
+    for event in events:
+        if event == e.BOMB_DROPPED:
+            reward += 1
+        elif event == e.COIN_COLLECTED:
+            reward += 200 # 100?
+        elif event == e.KILLED_SELF:
+            reward -= 300
+        elif event == e.CRATE_DESTROYED:
+            reward += 10
+        elif event == e.COIN_FOUND:
+            reward += 50
+        elif event == e.KILLED_OPPONENT:
+            reward += 300
+        elif event == e.GOT_KILLED:
+            reward -= 300
+        elif event == e.SURVIVED_ROUND:
+            reward += 100            
+        elif event == e.INVALID_ACTION:
+            reward -= 2
+        # elif event == e.WAITED:
+        #     reward += 10
+
+    return reward
+
+
+## LEARNING METHODS
+
+"""
+Learning methods (Q-Learning, SARSA)
+"""
+def UpdateWeightsLFA(X, A, R, Y, weights, alpha=0.1, discount=0.95):
+    """Update the weight vector w for Q-learning with semi-gradient descent.
+    
+    The features X and Y are assumed to have state_action(action) and
+    max_q(weights) methods available. See feature_extraction.py for details.
+    """
+    X_A = X.state_action(A)
+    Q_max, _ = Y.max_q(weights)
+    TD_error = R + (discount * Q_max) - np.dot(X_A, weights)
+
+    return weights + (alpha * TD_error * X_A)
+
 
 ## GAME METHODS
 
@@ -48,14 +146,15 @@ def setup(self):
     You can also use the self.logger object at any time to write to the log
     file for debugging (see https://docs.python.org/3.7/library/logging.html).
     """    
-    np.random.seed()
+    np.random.seed()    
 
     # Reward for full game (10 rounds)
+    self.current_round = 1
     self.accumulated_reward = 0
 
     # Tuples (S,A,R,S') for later sampling.
     self.replay_buffer = []
-    self.discount = 0.95
+    self.discount = 0.8
 
     # Values for first game.
     self.current_game = 1
@@ -65,72 +164,13 @@ def setup(self):
         print("LOADED WEIGHTS", self.weights)
     except EnvironmentError:
         print("INITIALIZING WEIGHTS")
-        if t_weight_begin == 'bestguess':
-            self.weights = np.asarray([1.5, -4, -1, 3, -0.5, 1.5, 1, 1.5, 0.5, 1, 1.5, -3, 2])
-        elif t_weight_begin == 'ones':
-            self.weights = np.ones(13)
-        elif t_weight_begin == 'zero':
-            self.weights = np.zeros(13)
-        elif t_weight_begin == 'random':
-            self.weights = np.random.rand(13, 1)
-            
-    self.z = np.random.rand(13, 1)
+        self.weights = initialize_weights(t_weight_begin, 14)        
+    print(self.weights, sep=" ")
+
     # Load persistent data for subsequent games, depending on training ID.
 
     # Keep copy of loaded weights for optimization problem (see lecture).
     #self.weights_episode = self.weights
-
-
-def act(self):
-    """Called each game step to determine the agent's next action.
-
-    You can find out about the state of the game environment via self.game_state,
-    which is a dictionary. Consult 'get_state_for_agent' in environment.py to see
-    what it contains.
-
-    Set the action you wish to perform by assigning the relevant string to
-    self.next_action. You can assign to this variable multiple times during
-    your computations. If this method takes longer than the time limit specified
-    in settings.py, execution is interrupted by the game and the current value
-    of self.next_action will be used. The default value is 'WAIT'.
-    """
-    self.round = 0
-    # Compute the action with highest Q-value.
-    # TODO: Check for double Q-learning
-    F = RLFeatureExtraction(self.game_state, 2, 8)
-    Q_max, A_max = F.max_q(self.weights)
-
-    # Multiple actions may give the same (optimal) reward. To avoid bias towards
-    # a particular action, shuffle the greedy actions.
-    shuffle(A_max)
-    self.greedy_action = A_max[0]
-    
-    # Save feature extraction of previous state for Q-learning (the
-    # next state is available in reward_update).
-    self.F_prev = F
-
-    # Select a random action for use in epsilon-greedy or random-walk
-    # exploration. TODO: set actions as global variable
-    self.random_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB', 'WAIT'])
-
-    # TODO: Move to reward_update (to allow SARSA use), only use exploitation
-    # strategy (greedy) here for known weights
-
-    # Choose a policy depending on the training parameters.
-    if t_policy == 'greedy':
-        self.logger.info('Pick greedy action %s', self.greedy_action)
-        self.next_action = self.greedy_action
-    elif t_policy == 'epsgreedy':
-        self.logger.info('Picking greedy action at probability %s', 1-t_policy_eps)
-        self.next_action = np.random.choice([self.greedy_action,
-                                             self.random_action], p=[1-t_policy_eps, t_policy_eps])
-    elif t_policy == 'diminishing':
-        eps_dim = min(0.05, t_policy_eps * (1 - self.current_game / total_games))
-        self.logger.info('Picking greedy action at probability %s', eps_dim)
-        self.next_action = np.random.choice([self.greedy_action,
-                                             self.random_action], p=eps_dim)
-    else:
-        raise AttributeError("Invalid policy, check MRBOMBASTIC_POLICY")
 
 
 def reward_update(self):
@@ -157,105 +197,52 @@ def reward_update(self):
     In order to maximize the total reward intake, the agent should learn not to
     die, and kill as many opponents and break most crates with its bombs.
     """
-    # TODO: Use this function to set a marker for training mode
-
     # We need to perform at least one action before computing an
     # intermediary reward.
     if self.game_state['step'] == 1:
         return None
 
-    # An action is always punished with a small negative reward due to
-    # time constraints on the game.
-    reward = -1
-
-    for event in self.events:
-        if event == e.BOMB_DROPPED:
-            # We give no special reward to the action of dropping a
-            # bomb, to leave flexibility in the chosen strategies.
-            reward += 1
-        elif event == e.COIN_COLLECTED:
-            # Collecting coins is the secondary goal of the game.
-            reward += 100 # 100?
-        elif event == e.KILLED_SELF:
-            # Killing ourselves through bomb placement is something we
-            # wish to avoid.
-            reward -= 100
-        elif event == e.CRATE_DESTROYED:
-            # A bomb may destroy many crates simulatenously; adjust
-            # the reward for destroying a single crate accordingly.
-            reward += 10
-        elif event == e.COIN_FOUND:
-            # Give a partial reward for destroying a crate which
-            # contains a coin.
-            reward += 50 # 30 or 100?
-        elif event == e.KILLED_OPPONENT:
-            # Killing opponents is the primary goal of the game.
-            reward += 300
-        elif event == e.GOT_KILLED:
-            # Dying at the hands of an opponent is classified worse as
-            # death by self.
-            reward -= 300
-        elif event == e.SURVIVED_ROUND:
-            # TODO: Change this to 50?
-            reward += 100
-        elif event == e.WAITED or e.INVALID_ACTION:
-            # An invalid action (such as bumping into a wall) is
-            # equivalent to performing no action at all. Punish both
-            # with a small negative reward.
-            reward -= 2
-
+    reward = new_reward(self.events)
     self.logger.info('Given reward of %s', reward)
     self.accumulated_reward += reward
 
-    # TODO: update weights either per step, or every "mini batch"
-    # Update temporary weights used for behavior policy in each step.
-    #self.weights_episode = 
+    # Extract features from the new ("next") game state.
+    self.F = RLFeatureExtraction(self.game_state)
+    print("PREVIOUS STATE:", self.F_prev.state().T)
+    print("NEXT STATE:", self.F.state().T)
 
-    # Get action performed in last step. This variable was set in the previous 'act'
-    # step, and is thus called 'next_action'. The previous state was set in
-    # update_reward.
+    # Get action of the previous step. The previous action was set in
+    # the last act() call and is thus named 'next_action'.
     self.prev_action = self.next_action
-    #self.F_prev
-    # TODO: set crate/coin_limit in global variable
-    # TODO: cache values of F
-    F = RLFeatureExtraction(self.game_state, 2, 8)
 
-    # Set learning schedule (alpha) depending on training parameters.
-    self.alpha = None
-    if t_learning_schedule == 'interval':
-        self.alpha = learning_schedule_1(self.game_state['step']-1)
-    elif t_learning_schedule == 'quotient1':
-        self.alpha = learning_schedule_2(self.game_state['step']-1)
-    elif t_learning_schedule == 'quotient2':
-        self.alpha = learning_schedule_3(self.game_state['step']-1)
-    elif t_learning_schedule == 'fixed':
-        self.alpha = learning_schedule_4()
-    else:
-        raise AttributeError("Invalid learning schedule, check MRBOMBASTIC_ALPHA")
+    # Keep track of all experiences in the episode for later learning.
+    self.replay_buffer += (self.F_prev, self.prev_action, reward, self.F)
 
-    # # Set learning algorithm (Q/SARSA) depending on learning parameters.
-    print("ALPHA:", self.alpha)
-    if t_learning_algorithm == 'qlearning':
-        self.weights = UpdateWeightsLFA(self.F_prev, self.prev_action, reward, F,
-                                        self.weights, self.alpha, self.discount)
-        print(self.weights, sep=" ")
-    elif t_learning_algorithm == 'sarsa':
-        Q_max, A_max = F.max_q(self.weights)
-        shuffle(A_max)
-        self.greedy_action = A_max[0]
-        self.random_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB', 'WAIT'])
-        self.next_action = np.random.choice([self.greedy_action,
-                                             self.random_action], p=[1-t_policy_eps, t_policy_eps])
-        self.weights, self.z = UpdateWeightsLFA_SARSA(self.F_prev, self.prev_action, reward, F,
-                                                      self.next_action, self.weights, self.z,
-                                                      0.2, self.alpha, self.discount)
-        #print(self.weights)
-    elif t_learning_algorithm == 'doubleq':
-        pass # TODO
 
-    # We keep track of all experiences in the episode
-    self.replay_buffer += (self.F_prev, self.prev_action, reward, F)
-    print("Accumulated reward:", self.accumulated_reward)
+def act(self):
+    """Called each game step to determine the agent's next action.
+
+    You can find out about the state of the game environment via self.game_state,
+    which is a dictionary. Consult 'get_state_for_agent' in environment.py to see
+    what it contains.
+
+    Set the action you wish to perform by assigning the relevant string to
+    self.next_action. You can assign to this variable multiple times during
+    your computations. If this method takes longer than the time limit specified
+    in settings.py, execution is interrupted by the game and the current value
+    of self.next_action will be used. The default value is 'WAIT'.
+    """
+    # Update features to for the current ("previous") game state.
+    self.F_prev = RLFeatureExtraction(self.game_state)
+
+    # Multiple actions may give the same (optimal) reward. To avoid bias towards
+    # a particular action, shuffle the greedy actions.
+    Q_max, A_max = self.F_prev.max_q(self.weights)        
+    shuffle(A_max)
+
+    # TODO: Move to reward_update (to allow SARSA use), only use exploitation
+    # strategy (greedy) here for known weights
+    self.next_action = policy_select_action(A_max[0], t_policy, t_policy_eps, 1.0, self.logger)
 
 
 def end_of_episode(self):
@@ -266,9 +253,19 @@ def end_of_episode(self):
     final step. You should place your actual learning code in this method.
     """
     # TODO: Write accumulated reward to files depending on training_id
-    print("Accumulated reward:", self.accumulated_reward)
-    self.accumulated_reward = 0
-    # TODO: update weights at end of game (10 rounds) to reduce bias (temporary w')
-    np.save(weights_file, self.weights)
 
+    print("{} {}".format(self.current_round, self.accumulated_reward))
+    self.accumulated_reward = 0
+
+    # TODO: update weights at end of full game (10 rounds) to reduce bias (temporary w')
+    #np.save(weights_file, self.weights)
+    # Default hyperparameters: c=0.1, eta=0.1, max_steps=400
+    self.alpha = new_alpha(t_learning_schedule, self.game_state['step']-1)
+    print("ALPHA:", self.alpha)
+
+    # # Set learning algorithm (Q/SARSA) depending on learning parameters.
+    #self.weights = UpdateWeightsLFA(self.F_prev, self.prev_action, reward, F,
+    #                                self.weights, self.alpha, self.discount)
+
+    #self.current_round += 1
 
