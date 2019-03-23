@@ -109,6 +109,7 @@ def look_for_targets(free_space, start, targets, logger=None):
     towards tile closest to any target.
     """
     path = look_for_targets_path(free_space, start, targets, logger=None)
+    #print("PATH TO TARGET: ", path, sep=" ")
 
     if len(path):
         return path[0]

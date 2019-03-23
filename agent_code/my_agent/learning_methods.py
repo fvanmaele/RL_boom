@@ -11,7 +11,7 @@ def learning_schedule_1(time_step, max_steps=400):
     elif (max_steps/2 <= time_step <= max_steps/4):
         return 0.01
 
-def learning_schedule_2(time_step, c=1.0, eta=1.0):
+def learning_schedule_2(time_step, c=0.1, eta=1.0):
     return c / pow(time_step, eta)
 
 def learning_schedule_3(time_step):
@@ -59,8 +59,7 @@ def UpdateWeightsLFA_DoubleQ(X, A, R, Y, weights1, weights2, alpha=0.1, discount
         return weights1, weights2 + (alpha * TD_error * X_A)
 
 
-def UpdateWeightsLFA_SARSA(X, A, R, Y, B, weights, traces, Lambda=1,
-                           alpha=0.1, discount=0.95):
+def UpdateWeightsLFA_SARSA(X, A, R, Y, B, weights, z, Lambda=0.5, alpha=0.1, discount=0.95):
     """Update the weight vector w using SARSA.
 
     The features X and Y are assumed to have state_action(action) and
@@ -70,6 +69,6 @@ def UpdateWeightsLFA_SARSA(X, A, R, Y, B, weights, traces, Lambda=1,
     Y_B = Y.state_action(B)
 
     TD_error = R + discount * np.dot(weights, Y_B) - np.dot(weights, X_A)
-    traces_n = X_A + discount * Lambda * eligibility_traces
+    z_next = X_A + discount * Lambda * z
 
-    return weights + alpha * TD_error * traces_n, traces_n
+    return weights + alpha * TD_error * z_next, z_next

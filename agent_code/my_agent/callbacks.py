@@ -1,5 +1,4 @@
 import numpy as np
-import json
 import os # required for training
 from random import shuffle
 
@@ -9,15 +8,6 @@ from settings import e
 from settings import s
 
 ## TRAINING PARAMETERS
-
-# To avoid restarting the game for extended training periods, run the game with a
-# high n_rounds (e.g. 1000) and keep track of the final amount of rounds seperately.
-game_rounds = 10
-
-# The total amount of games used for learning. 1 game represents
-# 10 rounds. n_rounds in settings.py should equal game_rounds * total_games.
-total_games = 100
-
 # Allow to check various combinations of training methods in parallel
 # through multiple agent processes by taking values from the
 # environment.
@@ -32,18 +22,20 @@ t_weight_begin = os.environ.get('MRBOMBASTIC_WEIGHTS_BEGIN')
 # Default values for training.
 if t_batch_size == None: t_batch_size = 1
 if t_learning_algorithm == None: t_learning_algorithm = 'qlearning'
-if t_learning_schedule == None: t_learning_schedule = 'interval'
-if t_policy == None: t_policy = 'greedy'
-if t_policy_eps == None: t_policy_eps = 0.15
-if t_weight_begin == None: t_weight_begin = 'bestguess'
+if t_learning_schedule == None: t_learning_schedule = 'quotient1'
+if t_policy == None: t_policy = 'epsgreedy'
+if t_policy_eps == None: t_policy_eps = 0.2
+if t_weight_begin == None: t_weight_begin = 'random'
 
 # Construct unique id for naming of persistent data.
 # TODO: include eps?
 t_training_id = "N{}_{}_{}_{}_{}".format(t_batch_size, t_learning_algorithm,
                                          t_learning_schedule,
                                          t_policy, t_weight_begin)
+print("TRAINING ID:", t_training_id)
+
 # Save weights to file
-weights_file = "weights_{}.txt".format(t_training_id)
+weights_file = "weights_{}.npy".format(t_training_id)
 
 ## GAME METHODS
 
@@ -65,27 +57,25 @@ def setup(self):
     self.replay_buffer = []
     self.discount = 0.95
 
-    self.current_game = 1
-    self.round = 1
-
     # Values for first game.
     self.current_game = 1
 
-    if t_weight_begin == 'bestguess':
-        self.weights = np.asarray([1, 1.5, -7, -1, 3, -0.5, 1.5, 1, 1.5, 0.5, 1, 1.5, -3, 2])
-    elif t_weight_begin == 'ones':
-        self.weights = np.ones(14)
-    elif t_weight_begin == 'zero':
-        self.weights = np.zeros(14)
-    elif t_weight_begin == 'random':
-        self.weights = np.random.rand(14, 1)
-
-    # Load persistent data for subsequent games, depending on training ID.
     try:
-        with open(weights_file, 'r') as file:
-            self.weights = json.load(file)
+        self.weights = np.load(weights_file)
+        print("LOADED WEIGHTS", self.weights)
     except EnvironmentError:
-        self.logger.info("Could not open weights.txt, using default weights")
+        print("INITIALIZING WEIGHTS")
+        if t_weight_begin == 'bestguess':
+            self.weights = np.asarray([1.5, -4, -1, 3, -0.5, 1.5, 1, 1.5, 0.5, 1, 1.5, -3, 2])
+        elif t_weight_begin == 'ones':
+            self.weights = np.ones(13)
+        elif t_weight_begin == 'zero':
+            self.weights = np.zeros(13)
+        elif t_weight_begin == 'random':
+            self.weights = np.random.rand(13, 1)
+            
+    self.z = np.random.rand(13, 1)
+    # Load persistent data for subsequent games, depending on training ID.
 
     # Keep copy of loaded weights for optimization problem (see lecture).
     #self.weights_episode = self.weights
@@ -104,6 +94,7 @@ def act(self):
     in settings.py, execution is interrupted by the game and the current value
     of self.next_action will be used. The default value is 'WAIT'.
     """
+    self.round = 0
     # Compute the action with highest Q-value.
     # TODO: Check for double Q-learning
     F = RLFeatureExtraction(self.game_state, 2, 8)
@@ -121,6 +112,9 @@ def act(self):
     # Select a random action for use in epsilon-greedy or random-walk
     # exploration. TODO: set actions as global variable
     self.random_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB', 'WAIT'])
+
+    # TODO: Move to reward_update (to allow SARSA use), only use exploitation
+    # strategy (greedy) here for known weights
 
     # Choose a policy depending on the training parameters.
     if t_policy == 'greedy':
@@ -163,6 +157,8 @@ def reward_update(self):
     In order to maximize the total reward intake, the agent should learn not to
     die, and kill as many opponents and break most crates with its bombs.
     """
+    # TODO: Use this function to set a marker for training mode
+
     # We need to perform at least one action before computing an
     # intermediary reward.
     if self.game_state['step'] == 1:
@@ -179,7 +175,7 @@ def reward_update(self):
             reward += 1
         elif event == e.COIN_COLLECTED:
             # Collecting coins is the secondary goal of the game.
-            reward += 200 # 100?
+            reward += 100 # 100?
         elif event == e.KILLED_SELF:
             # Killing ourselves through bomb placement is something we
             # wish to avoid.
@@ -238,16 +234,28 @@ def reward_update(self):
         raise AttributeError("Invalid learning schedule, check MRBOMBASTIC_ALPHA")
 
     # # Set learning algorithm (Q/SARSA) depending on learning parameters.
+    print("ALPHA:", self.alpha)
     if t_learning_algorithm == 'qlearning':
         self.weights = UpdateWeightsLFA(self.F_prev, self.prev_action, reward, F,
                                         self.weights, self.alpha, self.discount)
+        print(self.weights, sep=" ")
     elif t_learning_algorithm == 'sarsa':
-        pass # TODO
+        Q_max, A_max = F.max_q(self.weights)
+        shuffle(A_max)
+        self.greedy_action = A_max[0]
+        self.random_action = np.random.choice(['RIGHT', 'LEFT', 'UP', 'DOWN', 'BOMB', 'WAIT'])
+        self.next_action = np.random.choice([self.greedy_action,
+                                             self.random_action], p=[1-t_policy_eps, t_policy_eps])
+        self.weights, self.z = UpdateWeightsLFA_SARSA(self.F_prev, self.prev_action, reward, F,
+                                                      self.next_action, self.weights, self.z,
+                                                      0.2, self.alpha, self.discount)
+        #print(self.weights)
     elif t_learning_algorithm == 'doubleq':
         pass # TODO
 
     # We keep track of all experiences in the episode
     self.replay_buffer += (self.F_prev, self.prev_action, reward, F)
+    print("Accumulated reward:", self.accumulated_reward)
 
 
 def end_of_episode(self):
@@ -259,11 +267,8 @@ def end_of_episode(self):
     """
     # TODO: Write accumulated reward to files depending on training_id
     print("Accumulated reward:", self.accumulated_reward)
-
+    self.accumulated_reward = 0
     # TODO: update weights at end of game (10 rounds) to reduce bias (temporary w')
-    with open(weights_file, 'w') as file:
-        json.dump(self.weights.tolist(), file)
+    np.save(weights_file, self.weights)
 
-    self.round += 1
-    if self.round % game_rounds:
-        self.current_game += 1
+

@@ -14,7 +14,7 @@ class RLFeatureExtraction:
         # feature matrix. (Take as an argument?)
         self.actions = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT']
         # Set the amount of features / weights
-        self.dim = 14
+        self.dim = 13
 
         # Collect commonly used data from the environment.
         self.arena = game_state['arena']
@@ -95,8 +95,7 @@ class RLFeatureExtraction:
         # Compute the feature matrix with columns F_i(S, A) and rows ordered by the
         # actions defined in self.actions.
         self.feature = np.vstack(
-            ([1] * len(self.actions),
-             self.feature1(),
+            (self.feature1(),
              self.feature2(),
              self.feature3(),
              self.feature4(),
@@ -142,10 +141,6 @@ class RLFeatureExtraction:
         A_max = np.where(Q_lfa == Q_max)[0]
 
         return Q_max, [self.actions[a] for a in A_max]
-
-
-    def feature0(self):
-        return np.ones(len(self.actions))
 
 
     def feature1(self):
