@@ -4,16 +4,7 @@ import numpy as np
 """
 Learning schedules (compute time steps for iterative methods)
 """
-def learning_schedule_1(time_step, c=1.0, eta=0.5):
-    return c / pow(time_step, eta)
-
-def learning_schedule_2(time_step):
-    return 10.0 / (9.0 + time_step)
-
-def learning_schedule_3(time_step):
-    return 0.1
-
-def learning_schedule_4(time_step, max_steps=400):
+def learning_schedule_1(time_step, max_steps=400):
     if (1 <= time_step < max_steps/4):
         return 0.1
     elif (max_steps/4 <= time_step < max_steps/2):
@@ -21,6 +12,14 @@ def learning_schedule_4(time_step, max_steps=400):
     elif (max_steps/2 <= time_step <= max_steps/4):
         return 0.01
 
+def learning_schedule_2(time_step, c=1.0, eta=0.5):
+    return c / pow(time_step, eta)
+
+def learning_schedule_3(time_step):
+    return 10.0 / (9.0 + time_step)
+
+def learning_schedule_4():
+    return 0.1
 
 """
 Learning methods (Q-Learning, SARSA)
