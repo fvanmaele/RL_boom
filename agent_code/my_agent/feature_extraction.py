@@ -4,6 +4,7 @@ from agent_code.my_agent.arena import *
 
 
 class RLFeatureExtraction:
+    # TODO: Allow to set the bias?
     def __init__(self, game_state, coin_limit=2, crate_limit=6):
         """
         Extract relevant properties from the environment for feature
@@ -13,7 +14,7 @@ class RLFeatureExtraction:
         # feature matrix. (Take as an argument?)
         self.actions = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT']
         # Set the amount of features / weights
-        self.dim = 12
+        self.dim = 14
 
         # Collect commonly used data from the environment.
         self.arena = game_state['arena']
@@ -43,11 +44,11 @@ class RLFeatureExtraction:
 
         # Check the arena (np.array) for free tiles, and include the comparison
         # result as a boolean np.array.
-        self.free_space = self.arena == 0
+        self.free_space = (self.arena == 0)
         # Do not include agents as obstacles, as they are likely to
         # move in the next round.
-        # for xb, yb, _ in self.bombs:
-        #     self.free_space[xb, yb] = False
+        for xb, yb, _ in self.bombs:
+            self.free_space[xb, yb] = False
 
         # Observation: look_for_targets requires that any targets are considered
         # free space. (feature 10)
@@ -105,7 +106,11 @@ class RLFeatureExtraction:
              self.feature8(coin_limit, crate_limit),
              self.feature9(),
              self.feature10(),
-             self.feature11(coin_limit, crate_limit)))
+             self.feature11(coin_limit, crate_limit),
+             self.feature12(),
+             self.feature13()))
+        # test
+        #print(self.feature)
 
 
     def state(self):
@@ -139,27 +144,35 @@ class RLFeatureExtraction:
         return Q_max, [self.actions[a] for a in A_max]
 
 
+    def feature0(self):
+        return np.ones(len(self.actions))
+
+
     def feature1(self):
         """
         Reward the agent to move in a direction towards a coin.
         """
         feature = []
 
-        # Check if there are coins available in the game.
-        if len(self.coins) == 0:
+        # Check if there are coins available in the arena, and that they can be
+        # reached directly by the agent.
+        shortest_path = look_for_targets_path(self.free_space, self.agent, self.coins)
+
+        if len(shortest_path) == 0 or shortest_path[-1] not in self.coins:
             return [0] * len(self.actions)
-        best_direction = look_for_targets(self.free_space, self.agent, self.coins)
 
         # Check if the next move action matches the direction of the nearest coin.
         for action in self.actions:
-            if action == 'BOMB' or action == 'WAIT':
-                # Placing a bomb or waiting does not allow the agent to collect a coin.
+            d = self.directions[action]
+
+            # Check if the next action the agent to a different tile (in particular,
+            # not a bomb or wait action).
+            if d == self.agent:
                 feature.append(0)
+            elif d == shortest_path[0]:
+                feature.append(1)
             else:
-                if self.directions[action] == best_direction:
-                    feature.append(1)
-                else:
-                    feature.append(0)
+                feature.append(0)
 
         return feature
 
@@ -222,7 +235,7 @@ class RLFeatureExtraction:
 
     def feature4(self):
         """
-        Reward the agent for moving in the shortest direction outside
+        Reward the agent for moving towards the shortest direction outside
         the blast range of (all) bombs in the game.
         """
         feature = []
@@ -230,12 +243,11 @@ class RLFeatureExtraction:
         # Check if the arena contains any bombs with a blast radius affecting the agent.
         if len(self.bombs) == 0 or (self.agent not in self.danger_zone):
             return [0] * len(self.actions)
-
+        
         # Check if the agent can move into a safe area.
-        if len(self.safe_zone) == 0:
+        best_direction = look_for_targets(self.free_space, self.agent, self.safe_zone)
+        if best_direction == None:
             return [0] * len(self.actions)
-
-        safety_direction = look_for_targets(self.free_space, self.agent, self.safe_zone)
 
         for action in self.actions:
             d = self.directions[action]
@@ -244,7 +256,7 @@ class RLFeatureExtraction:
                 # When the agent is retreating from one or several bombs, we do not
                 # wish to expand the danger zone by dropping a bomb ourselves.
                 feature.append(0)
-            elif d == safety_direction:
+            elif d == best_direction:
                 feature.append(1)
             else:
                 feature.append(0)
@@ -261,15 +273,17 @@ class RLFeatureExtraction:
         for action in self.actions:
             d = self.directions[action]
 
-            if (action == 'WAIT'):
+            if action == 'WAIT':
                 # We should check explicitely if the agent is waiting; when dropping
                 # a bomb, the agent may remain in the same tile until either the
                 # bomb explodes, or the agent takes a move action (after which he
                 # may longer move to the tile containing the placed bomb).
                 feature.append(0)
-            elif (action == 'BOMB') and (self.bombs_left == 0):
+            elif action == 'BOMB' and self.bombs_left == 0:
                 # An agent may only place a bomb if it has any remaining.
                 feature.append(1)
+            elif action == 'BOMB':
+                feature.append(0)
             elif (self.arena[d] != 0) or (d in self.others_xy) or (d in self.bombs_xy):
                 # When checking other objects than walls (immutable), we make the
                 # following observations regarding invalid actions. Which agent
@@ -293,7 +307,7 @@ class RLFeatureExtraction:
         for action in self.actions:
             d = self.directions[action]
 
-            if action == 'BOMB' or action == 'WAIT':
+            if d == self.agent:
                 feature.append(0)
             elif d in self.coins:
                 feature.append(1)
@@ -313,9 +327,7 @@ class RLFeatureExtraction:
             if action == 'BOMB' and self.bombs_left > 0:
                 CHECK_FOR_CRATE = False
                 for d in self.directions.values():
-                    if d == self.agent:
-                        continue
-                    if self.arena[d] == 1:
+                    if d != self.agent and d in self.crates:
                         CHECK_FOR_CRATE = True
                         break
 
@@ -343,9 +355,7 @@ class RLFeatureExtraction:
             if action == 'BOMB' and self.bombs_left > 0:
                 CHECK_FOR_OTHERS = False
                 for d in self.directions.values():
-                    if d == self.agent:
-                        continue
-                    if d in self.others_xy:
+                    if d != self.agent and d in self.others_xy:
                         CHECK_FOR_OTHERS = True
                         break
 
@@ -371,7 +381,7 @@ class RLFeatureExtraction:
 
         # Do not reward if the agent is already in a dead-end, or if there
         # are none in the arena.
-        if self.agent in self.dead_ends or best_direction is None:
+        if (self.agent in self.dead_ends) or (best_direction is None):
             return [0] * len(self.actions)
 
         for action in self.actions:
@@ -396,10 +406,9 @@ class RLFeatureExtraction:
         feature = []
 
         # Check if crates are available in the game.
-        if len(self.crates) == 0:
-            return [0] * len(self.actions)
-
         best_direction = look_for_targets(self.free_space, self.agent, self.crates)
+        if best_direction == None:
+            return [0] * len(self.actions)
 
         # If we are directly next to a create, look_for_targets will
         # return the tile where the agent is located in, rewarding an
@@ -433,15 +442,18 @@ class RLFeatureExtraction:
     def feature11(self, coins_limit, crates_limit):
         """Hunting mode
 
-        Reward moving towards opposing agents with less than a certain
-        amount of coins and crates inside the game arena.
+        Reward moving towards opposing agents when the arena contains less than a
+        certain amount of coins and crates.
         """
         feature = []
 
         if len(self.coins) > coins_limit or len(self.crates) > crates_limit:
             return [0] * len(self.actions)
 
+        # Check the arena for opponents.
         best_direction = look_for_targets(self.free_space, self.agent, self.others_xy)
+        if best_direction == None:
+            return[0] * len(self.actions)
 
         for action in self.actions:
             if action == 'BOMB' or action == 'WAIT':
@@ -452,8 +464,8 @@ class RLFeatureExtraction:
                 d = self.directions[action]
 
                 # We do not get more or less points for blowing up one given agent
-                # over any other. Therefore, do not reward moving to a different
-                # agent if there is already one in direct vicinity.
+                # over any other. Therefore, do not reward the agent for moving from
+                # the direct vicinity of an opposing agent to another agent.
                 if d in self.others_xy:
                     return [0] * len(self.actions)
 
@@ -464,3 +476,99 @@ class RLFeatureExtraction:
 
         return feature
 
+
+    def feature12(self):
+        """
+        Penalize the agent for moving into a dead end when it placed a bomb previously.
+        """
+        feature = []
+
+        for action in self.actions:
+            d = self.directions[action]
+
+            # Only regard move actions.
+            if d == self.agent:
+                feature.append(0)
+            # Check if the next movement results in a dead end, while simultaneously
+            # placed on his own bomb.
+            elif (d in self.dead_ends) and (self.agent in self.bombs_xy):
+                feature.append(1)
+            else:
+                feature.append(0)
+
+        return feature
+
+
+    def feature13(self):
+        """
+        Reward placing a bomb that traps another agent located in a dead end.
+        """
+        feature = []
+
+        for action in self.actions:        
+            if action == 'BOMB' and self.bombs_left > 0:
+                # Check if other agents are in direct vicinity.
+                target_agent = []
+                for d in self.directions.values():
+                    if d != self.agent and d in self.others_xy:
+                        target_agent.append(d)
+                        break
+
+                # Check if any targets are located in a dead end.
+                CHECK_PLACE_BOMB = False
+                if len(target_agent):
+                    for target in target_agent:
+                        if target_agent in self.dead_ends:
+                            CHECK_PLACE_BOMB = True
+                            break
+
+                if CHECK_PLACE_BOMB:
+                    feature.append(1)
+                else:
+                    feature.append(0)
+            else:
+                feature.append(0)
+
+        return feature
+
+
+    # TODO: weigh value of this feature
+    # def feature14(self):
+    #     """
+    #     if not in Hunting mode:
+    #     If no crates and no coins penalize going towards the nearest agent
+    #     """
+
+    #     x, y, _, bombs_left = game_state['self']
+    #     directions = [(x,y-1), (x,y+1), (x-1,y), (x+1,y)]
+    #     arena = game_state['arena']
+    #     others = [(x,y) for (x,y,n,b) in game_state['others']]
+    #     crates = [(x,y) for x in range(1,16) for y in range(1,16) if (arena[x,y] == 1)]
+    #     coins = game_state['coins']
+    #     bombs = game_state['bombs']
+    #     bombs_xy = [(x,y) for (x,y,t) in bombs]
+
+    #     if len(coins) == 0 and len(crates) ==0:
+    #         return np.zeros(6)
+
+    #     # construct the free_space Boolean numpy_array
+    #     free_space = arena == 0
+    #     for xb, yb in bombs_xy:
+    #         free_space[xb, yb] = False
+
+    #     best_coord = look_for_targets(free_space, (x,y), others)
+
+    #     feature = []
+
+    #     if best_coord is None:
+    #         return np.zeros(6)
+
+    #     for d in directions:
+    #         if d != best_coord:
+    #             feature.append(0)
+    #         else:
+    #             feature.append(1)
+
+    #     feature += [0,0]
+
+    #     return feature
