@@ -108,7 +108,7 @@ class RLFeatureExtraction:
              self.feature10(),
              self.feature11(coin_limit, crate_limit),
              self.feature12(),
-             self.feature13()))
+             self.feature13())).T
         # test
         #print(self.feature)
 
@@ -118,7 +118,7 @@ class RLFeatureExtraction:
         Return the feature matrix F, where every column represents an
         a feature F_i(S,A), and rows represent actions A.
         """
-        return self.feature.T
+        return self.feature
 
 
     def state_action(self, action):
@@ -126,7 +126,7 @@ class RLFeatureExtraction:
         Return the column vector for the feature:
            F(S, A) = F_1(S,A) ... F_n(S,A)
         """
-        return self.feature.T[self.actions.index(action)]
+        return self.feature[self.actions.index(action), :]
 
 
     def max_q(self, weights):
@@ -137,7 +137,7 @@ class RLFeatureExtraction:
         taken as a parameter.
         """
         # Compute the dot product (w, F_i(S,A)) for every action.
-        Q_lfa = np.dot(weights, self.feature)
+        Q_lfa = np.dot(self.feature, weights)
         Q_max = np.max(Q_lfa)
         A_max = np.where(Q_lfa == Q_max)[0]
 
