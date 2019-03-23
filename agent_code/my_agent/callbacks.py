@@ -14,7 +14,7 @@ def setup(self):
     self.init_mode = 'initX'
     # load weights
     try:
-        self.weights = np.load('./agent_code/my_agent/models/NOE.npy')
+        self.weights = np.load('./training_res/res_2/weights_Greed_initX.npy')
         print("weights loaded")
     except:
         self.weights = []
