@@ -108,10 +108,22 @@ def look_for_targets(free_space, start, targets, logger=None):
     """Returns the coordinate of first step towards closest target, or
     towards tile closest to any target.
     """
-    path = look_for_targets_path(free_space, start, targets, logger=None)
+    path = look_for_targets_path(free_space, start, targets, logger)
     #print("PATH TO TARGET: ", path, sep=" ")
 
     if len(path):
+        return path[0]
+    else:
+        return None
+
+
+def look_for_targets_strict(free_space, start, targets, logger=None):
+    """Similar to look_for_targets, but only returns a direction if a
+    target is actually reachable from the start point.
+    """
+    path = look_for_targets_path(free_space, start, targets, logger)
+
+    if len(path) and path[-1] in targets:
         return path[0]
     else:
         return None
