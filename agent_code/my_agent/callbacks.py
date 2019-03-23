@@ -3,7 +3,8 @@ import pickle
 from settings import e
 from settings import s
 from random import shuffle
-from agent_code.my_agent.algorithms import *
+from agent_code.my_agent.feature_extraction import *
+from agent_code.my_agent.algorithms import feature_extraction,new_reward, q_gd_linapprox
 
 
 #########################################################################
@@ -12,21 +13,24 @@ def setup(self):
     
     self.actions = [ 'UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT' ]
     self.init_mode = 'initX'
+    # Define Rewards
+    self.total_R = 0
+
+    # Step size or gradient descent 
+    self.alpha = 0.2
+    self.gamma = 0.95
+    self.EPSILON = 0.2
+    self.round = 1
+    
     # load weights
     try:
-        self.weights = np.load('./agent_code/my_agent/models/NOE.npy')
+        self.weights = np.load('./training_res/test_2.npy')
         print("weights loaded")
     except:
         self.weights = []
         print("no weights found ---> create new weights")
 
-    # Define Rewards
-    self.total_R = 0
-    
-    # Step size or gradient descent 
-    self.alpha = 0.2
-    self.gamma = 0.95
-    self.EPSILON = 0.2
+
 
 #####################################################################
 
@@ -35,19 +39,26 @@ def act(self):
     """
     actions order: 'UP', 'DOWN', LEFT', 'RIGHT', 'BOMB', 'WAIT'    
     """
-    
-    # load state 
-    game_state = self.game_state  # isn't it memory waste calling in each feature extraction for coins, self, arena?
 
     # Compute features state 
-    feature_state = feature_extraction(game_state)
+    #'''
+    F = RLFeatureExtraction(self.game_state)
+    feature_state1 = F.state()
+    #self.prev_state = feature_state1
+    #'''
+    #'''
+    feature_state = feature_extraction(self.game_state)
     self.prev_state = feature_state
-
+    #'''
+    
+    
+    
     #different initial guesses can be defined here: 
     if len(self.weights) == 0:
         print('no weights, init weights')
         if self.init_mode == 'initX':
-            self.weights = np.array([1,1,-7,-1,4,-0.5,1.5,2,0.5,0.5,-7,1.5,3,2,-1])  
+            self.weights = np.array([1,1,-7,-1,4,-0.5,1.5,2,0.5,0.5,-7,1.5,3,2,-1])
+            #self.weights = np.array([1,1,-7,-1,4,-0.5,1.5,2,0.5,0.5,-7,1.5,3])            
         elif self.init_mode == 'init1':
             self.weights = np.ones(feature_state.shape[1])  
         elif self.init_mode == 'initRand':
@@ -55,19 +66,19 @@ def act(self):
     
     print(self.weights)
     print("alpha: ",self.alpha)
-
+    print('feature_state_1',feature_state1)
+    print('feature_state_0',feature_state)
     self.logger.info('Pick action')
     
     #'''
-    
     # Linear approximation approach
     q_approx = np.dot(feature_state, self.weights)    
     best_actions = np.where(q_approx == np.max(q_approx))[0] 
     shuffle(best_actions)
-
+    print(best_actions)
     q_next_action = self.actions[best_actions[0]] #GREEDY POLICY
     self.next_action = q_next_action
-    print("q action picked  ", q_next_action)
+    print("q action picked  ", self.next_action)
     #'''
     
     ####### EPSILON GREEDY (TRAINING) #########################
@@ -93,13 +104,18 @@ def reward_update(self):
     self.logger.info('IN TRAINING MODE ')
     print('LEARNING')
 
-
+    print('EVENTS: ',self.events)
     reward = new_reward(self.events)
+    print('Rewards: {}'.format(reward))
     self.total_R += reward        
-
-    feature_state = feature_extraction(self.game_state)
-    next_state = feature_state
-
+    
+    '''
+    F = RLFeatureExtraction(self.game_state)
+    next_state = F.state()
+    '''
+    
+    next_state = feature_extraction(self.game_state)
+    
     if self.game_state['step'] > 1:
 
         prev_state_a = self.prev_state[self.actions.index(self.next_action),:]
@@ -130,5 +146,5 @@ def end_of_episode(self):
     self.weights = weights 
 
     ############## SAVING LEARNING FROM ONE EPISODE 
-    np.save('./agent_code/my_agent/models/NONE.npy', self.weights)
+    #np.save('./agent_code/my_agent/models/NONE.npy', self.weights)
 

@@ -1,4 +1,3 @@
-
 from collections import namedtuple
 import pygame
 from pygame.locals import *
@@ -14,7 +13,7 @@ settings = {
 
     # Main loop
     'update_interval': 0.01, # 0.33,
-    'turn_based': True,
+    'turn_based': False,
     'n_rounds': 10,
     'save_replay': False,
     'make_video_from_replay': False,
