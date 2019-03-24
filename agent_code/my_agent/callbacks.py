@@ -12,15 +12,15 @@ from agent_code.my_agent.algorithms import new_reward, q_gd_linapprox
 def setup(self):
     
     self.actions = [ 'UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT' ]
-    self.train_mode = "Greed_batch_test"
-    #self.init_mode = "handpicked_init"
-    self.init_mode = 'init1'
+    #self.train_mode = "Greed_batch_test"
+    self.init_mode = "handpicked_init"
+    #self.init_mode = 'init1'
     self.alpha_set = "const0.2"
     # load weights
     try:
-        self.weights = np.load('weights_{}_{}_{}.npy'.format(self.train_mode, self.init_mode, self.alpha_set))
-        self.training_weights = np.load('train_weights_{}_{}_{}.npy'.format(self.train_mode, self.init_mode, self.alpha_set))
-        self.training_rewards = np.load('train_rewards_{}_{}_{}.npy'.format(self.train_mode, self.init_mode, self.alpha_set))
+        self.weights = np.load('agent_code/my_agent/models/weights_greed_batch_handpicked_init1_.npy')
+        #self.training_weights = np.load('train_weights_{}_{}_{}.npy'.format(self.train_mode, self.init_mode, self.alpha_set))
+        #self.training_rewards = np.load('train_rewards_{}_{}_{}.npy'.format(self.train_mode, self.init_mode, self.alpha_set))
         print("weights loaded")
     except:
         self.weights = []
@@ -63,12 +63,15 @@ def act(self):
     if len(self.weights) == 0:
         print('no weights, init weights')
         if self.init_mode == 'handpicked_init':
-            self.weights = np.array([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5,1,-1])
+            self.weights = np.array([ 0.35714286,  0.53571429, -2.5       , -0.35714286,  1.42857143,
+       -0.17857143,  0.53571429,  0.35714286,  0.17857143,  0.17857143,
+        0.28571429,  0.17857143,  0.35714286, -0.35714286])
         elif self.init_mode == 'init1':
             self.weights = np.ones(feature_state.shape[1])  
         elif self.init_mode == 'initRand':
             self.weights = np.random.rand(self.prev_state.shape[1])
     
+    print(self.weights)
     self.logger.info('Pick action')
     
     # Linear approximation approach
@@ -99,25 +102,7 @@ def reward_update(self):
         self.history.append(hist_entry)
         
         #print(hist_entry)
-        
-      
-    '''
-    if self.game_state['step'] > 1:
-
-        prev_state_a = self.prev_state[self.actions.index(self.next_action),:]
-
-        # update weights
-        weights = gamma)      
-        self.weights = weights        q_gd_linapprox(next_state, prev_state_a, reward, self.weights, self.alpha, self.
-        
-        # update alpha and gamma for convergence
-        #if self.round >25:
-        #self.alpha = 0.1/self.game_state['step']
-        #else: 
-        self.alpha = 0.2/np.sqrt(self.game_state['step'])
-        #self.gamma = self.gamma ** self.game_state['step']
-    '''
-        
+           
 #####################################################################
 
 def end_of_episode(self):
@@ -155,7 +140,7 @@ def end_of_episode(self):
 
         prev_sa = prev_state[self.actions.index(prev_action),:]
         next_sa = next_state[self.actions.index(next_action),:]
-
+        
         temp = (reward + self.gamma * np.dot(next_sa,weights) - np.dot(prev_sa,weights))             * (np.dot(prev_sa,weights)-np.dot(next_sa, weights))* weights
 
         temp_weights += temp
