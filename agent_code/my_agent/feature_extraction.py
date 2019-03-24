@@ -1,11 +1,12 @@
 import numpy as np
 import copy
+
 from agent_code.my_agent.arena import *
 
 
 class RLFeatureExtraction:
     # TODO: Allow to set the bias?
-    def __init__(self, game_state, bias=0, coin_limit=0, crate_limit=0):
+    def __init__(self, game_state, bias=0, coin_limit=0, crate_limit=2):
         """
         Extract relevant properties from the environment for feature
         extraction.
