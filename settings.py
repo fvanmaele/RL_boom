@@ -1,3 +1,4 @@
+
 from collections import namedtuple
 import pygame
 from pygame.locals import *
@@ -25,8 +26,8 @@ settings = {
     'crate_density': 0.75,#0.75,
     'actions': ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT'],
     'max_agents': 4,
-    'max_steps': 400,  #400
-    'stop_if_not_training': False,
+    'max_steps': 200,  #400
+    'stop_if_not_training': True,
     'bomb_power': 3,
     'bomb_timer': 4,
     'explosion_timer': 2,

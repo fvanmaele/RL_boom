@@ -362,7 +362,7 @@ def feature2(game_state):
             d = (x,y)
             
         if ((d in danger_zone) and  bomb_map[d] == 0) or explosions[d] >1:
-            feature.append(1) 
+            feature.append(-1) 
         else:
             feature.append(0)
     
@@ -403,7 +403,7 @@ def feature3(game_state):
             d = (x,y)
 
         if d in danger_zone:
-            feature.append(1) 
+            feature.append(-1) 
         else:
             feature.append(0)
     
@@ -480,7 +480,7 @@ def feature5(game_state):
         if ((arena[d] != 0) or 
             (d in others) or 
             (d in bombs_xy)):
-            feature.append(1)
+            feature.append(-1)
         else:
             feature.append(0)
 
@@ -680,7 +680,7 @@ def feature11(game_state):
 
     for d in directions:
         if (d in dead_ends) and ((x,y) in bombs_xy):
-            feature.append(1)
+            feature.append(-1)
         else:
             feature.append(0)
 
@@ -839,7 +839,7 @@ def feature15(game_state):
         if d != best_coord:
             feature.append(0)
         else:
-            feature.append(1)
+            feature.append(-1)
 
     feature += [0,0]
 
@@ -866,7 +866,7 @@ def feature_extraction(game_state):
     return np.vstack((f1,f2,f3,f4,f5,f6,f7,f9,f10,f11,f12,f13,f14,f15)).T
 
 def new_reward(events):
-    reward = -1
+    reward = 0
     for event in events:
         if event == e.BOMB_DROPPED:
             reward += 1

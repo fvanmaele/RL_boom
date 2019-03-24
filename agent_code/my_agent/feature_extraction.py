@@ -96,7 +96,7 @@ class RLFeatureExtraction:
         # actions defined in self.actions.
         self.feature = np.vstack(
             (
-            [1] * len(self.actions),
+            [0] * len(self.actions),
              self.feature1(),
              self.feature2(),
              self.feature3(),
