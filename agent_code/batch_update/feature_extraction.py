@@ -1,7 +1,7 @@
 import numpy as np
 from random import shuffle
 import copy
-from agent_code.update_badR.arena import *
+from agent_code.batch_update.arena import *
 
 
 class RLFeatureExtraction:
@@ -95,7 +95,8 @@ class RLFeatureExtraction:
         # Compute the feature matrix with columns F_i(S, A) and rows ordered by the
         # actions defined in self.actions.
         self.feature = np.vstack(
-            ([1] * len(self.actions),
+            (
+            [0] * len(self.actions),
              self.feature1(),
              self.feature2(),
              self.feature3(),
@@ -108,9 +109,7 @@ class RLFeatureExtraction:
              self.feature10(),
              self.feature11(coin_limit, crate_limit),
              self.feature12(),
-             self.feature13(),
-             self.feature14(),
-             self.feature15()))
+             self.feature13()))
         # test
         #print(self.feature)
 
@@ -164,11 +163,6 @@ class RLFeatureExtraction:
         best_path = look_for_targets_path(self.free_space, self.agent, self.coins)
         
         best_path = look_for_targets_path(self.free_space, self.agent, self.coins)
-
-        if len(best_path) == 0:
-            #print("Feature 1: ", [0] * len(self.actions)) 
-            return [0] * len(self.actions)
-
         if best_path[-1] not in self.coins:
             #print("Feature 1: ", [0] * len(self.actions)) 
             return [0] * len(self.actions)   
@@ -194,6 +188,7 @@ class RLFeatureExtraction:
         """
         feature = []
 
+        # TODO: 'BOMB' and 'WAIT' are computed twice here
         for action in self.actions:
             d = self.directions[action]
 
@@ -227,6 +222,7 @@ class RLFeatureExtraction:
         """
         feature = []
 
+        # TODO: 'BOMB' and 'WAIT' are computed twice here
         for action in self.actions:
             d = self.directions[action]
 
@@ -262,11 +258,6 @@ class RLFeatureExtraction:
 
         safety_direction = look_for_targets(self.free_space, self.agent, self.safe_zone)
         best_path = look_for_targets_path(self.free_space, self.agent, self.safe_zone)
-       
-        #TODO necessary this?
-        if len(best_path) == 0:
-            #print("Feature 4: ", [0] * len(self.actions))
-            return [0] * len(self.actions)
 
         if best_path[-1] not in self.safe_zone:
             #print("Feature 4: ", [0] * len(self.actions)) 
@@ -342,7 +333,7 @@ class RLFeatureExtraction:
 
     def feature7(self):
         """
-        Reward the agent for placing a bomb next to a crate if we are safe to scape.
+        Reward the agent for placing a bomb next to a crate.
         """
         feature = []
 
@@ -363,10 +354,7 @@ class RLFeatureExtraction:
                           and (x, y) not in danger_zone]
 
                 best_path = look_for_targets_path(self.free_space, self.agent, safe_zone)
-                
-                if len(best_path) == 0:
-                    #print("Feature 7: ", [0] * len(self.actions))
-                    return [0] * len(self.actions) 
+
                 if CHECK_FOR_CRATE and (best_path[-1] in safe_zone):
                     feature.append(1)
                 else:
@@ -407,9 +395,6 @@ class RLFeatureExtraction:
                           and (x, y) not in danger_zone]
 
                 best_path = look_for_targets_path(self.free_space, self.agent, safe_zone)
-                
-                if len(best_path) == 0:
-                    return [0] * len(self.actions)
 
                 if CHECK_FOR_OTHERS and (best_path[-1] in safe_zone):
                     feature.append(1)
@@ -592,108 +577,4 @@ class RLFeatureExtraction:
                     feature.append(0)
     
         #print("Feature 13: ", feature)
-        return feature
-
-    def feature14(self):
-        """
-        Reward putting a bomb if it can kill an agent and we can scape
-        """
-
-        feature = []  # feature that we want get
-
-        danger_zone = copy.deepcopy(self.danger_zone)
-        my_bomb_zone = get_blast_coords(self.arena, self.x, self.y)
-        danger_zone += my_bomb_zone 
-        safe_zone = [(x, y) for x in range(1, 16) for y in range(1, 16)
-                  if (self.arena[x, y] == 0)
-                  and (x, y) not in danger_zone]
-    
-        best_path = look_for_targets_path(self.free_space, self.agent, safe_zone)
-
-        for action in self.actions:
-            if action == 'BOMB':
-                CHECK_COND = False
-                for others in self.others_xy:
-                    if len(best_path) == 0:
-                        return [0] * len(self.actions)
-                    if (others in my_bomb_zone) and (best_path[-1] in safe_zone):
-                        CHECK_COND = True
-                        break
-                if CHECK_COND and (self.bombs_left > 0):
-                    feature.append(1)
-                else:
-                    feature.append(0)
-            else:
-                feature.append(0)
-    
-        #print("Feature 14: ", feature)
-        return feature
-
-    def feature15(self):
-        """
-        Reward going to an agent if he is nearby 
-        """
-
-        feature = []
-
-        best_direction = look_for_targets(self.free_space, self.agent, self.others_xy)
-        best_path = look_for_targets_path(self.free_space, self.agent, self.others_xy)
-
-        for action in self.actions:
-            if action == 'BOMB' or action == 'WAIT':
-                # The feature rewards movement towards an agent. In particular,
-                # placing a bomb or waiting is given no reward.
-                feature.append(0)
-            else:
-                d = self.directions[action]
-                if d in self.others_xy or (len(best_path) == 0):
-                    #print("Feature 15: ", [0] * len(self.actions))
-                    return [0] * len(self.actions)
-
-                elif (len(best_path) <= 2) and (best_path[-1] in self.others_xy):
-                    if d == best_direction:
-                        feature.append(1)
-                    else:
-                        feature.append(0)
-                else:
-                    feature.append(0)
-        #print("Feature 15", feature)
-        return feature
-
-    def feature16(self):
-        """
-        Reward putting a bomb if it can kill an agent and we can scape
-        """
-
-        feature = []  # feature that we want get
-
-        danger_zone = copy.deepcopy(self.danger_zone)
-        my_bomb_zone = get_blast_coords(self.arena, self.x, self.y)
-        danger_zone += my_bomb_zone 
-        safe_zone = [(x, y) for x in range(1, 16) for y in range(1, 16)
-                  if (self.arena[x, y] == 0)
-                  and (x, y) not in danger_zone]
-    
-        free_space = copy.deepcopy(self.free_space) 
-
-        for action in self.actions:
-            if action == 'BOMB':
-                CHECK_COND = False
-                for others in self.others_xy:
-                    if (others in my_bomb_zone):
-                        free_space[self.x, self.y] = False
-                        best_path_others = look_for_targets_path(free_space, others, safe_zone)
-                        if len(best_path_others) == 0:
-                            continue
-                        elif best_path_others[-1] not in safe_zone:
-                            CHECK_COND = True
-                            break
-                if CHECK_COND and (self.bombs_left > 0):
-                    feature.append(1)
-                else:
-                    feature.append(0)
-            else:
-                feature.append(0)
-    
-        #print("Feature 16: ", feature)
         return feature

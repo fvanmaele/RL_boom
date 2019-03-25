@@ -1,7 +1,7 @@
 import numpy as np
 from random import shuffle
 import copy
-from agent_code.update_badR.arena import *
+from agent_code.update_goodR.arena import *
 
 
 class RLFeatureExtraction:

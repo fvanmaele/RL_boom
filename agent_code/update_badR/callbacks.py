@@ -3,8 +3,8 @@ import pickle
 from settings import e
 from settings import s
 from random import shuffle
-from agent_code.my_agent.feature_extraction import *
-from agent_code.my_agent.algorithms import new_reward, q_gd_linapprox
+from agent_code.update_badR.feature_extraction import *
+from agent_code.update_badR.algorithms import new_reward, q_gd_linapprox
 
 
 #########################################################################
@@ -15,17 +15,17 @@ def setup(self):
     #self.train_mode = "Greed_batch_test"
     self.init_mode = "handpicked_init"
     #self.init_mode = 'init1'
-    self.alpha_set = "const0.2"
+    #self.alpha_set = "const0.2"
     # load weights
     try:
-        self.weights = np.load('agent_code/my_agent/models/.npy')
+        self.weights = np.load('agent_code/update_badR/models/weights.npy')
         #self.training_weights = np.load('train_weights_{}_{}_{}.npy'.format(self.train_mode, self.init_mode, self.alpha_set))
         #self.training_rewards = np.load('train_rewards_{}_{}_{}.npy'.format(self.train_mode, self.init_mode, self.alpha_set))
         print("weights loaded")
     except:
         self.weights = []
-        self.training_weights = []
-        self.training_rewards = []
+        #self.training_weights = []
+        #self.training_rewards = []
         print("no weights found ---> create new weights")
 
     # Define Rewards
@@ -49,11 +49,6 @@ def act(self):
     """
     actions order: 'UP', 'DOWN', LEFT', 'RIGHT', 'BOMB', 'WAIT'    
     """
-    
-    # load state 
-    game_state = self.game_state 
-    #print("step {}".format(game_state['step']))
-
     # Compute features state 
     F = RLFeatureExtraction(self.game_state)
     feature_state = F.state()
@@ -63,7 +58,7 @@ def act(self):
     if len(self.weights) == 0:
         print('no weights, init weights')
         if self.init_mode == 'handpicked_init':
-            self.weights =  np.array([-15, 1.5, -81, -2, 10, -1, 3.5, 1.7, 0.8, 0.8, 1.5, 2, 13, -10, 2, 2])
+            self.weights = np.array([ 0.35714286,  0.53571429, -2.5       , -0.35714286,  1.42857143,-0.17857143,  0.53571429,  0.35714286,  0.17857143,  0.17857143, 0.28571429,  0.17857143,  0.35714286, -0.35714286])
         elif self.init_mode == 'init1':
             self.weights = np.ones(feature_state.shape[1])  
         elif self.init_mode == 'initRand':
@@ -154,10 +149,10 @@ def end_of_episode(self):
     ############## SAVING LEARNING FROM ONE EPISODE 
     #np.save('weights_{}_{}_{}.npy'.format(self.train_mode, self.init_mode, self.alpha_set), self.weights)
 
-    self.training_weights = np.append(self.training_weights, self.weights)
+    #self.training_weights = np.append(self.training_weights, self.weights)
     #np.save('train_weights_{}_{}_{}.npy'.format(self.train_mode, self.init_mode, self.alpha_set), self.training_weights)
     
-    self.training_rewards = np.append(self.training_rewards, self.total_R)
+    #self.training_rewards = np.append(self.training_rewards, self.total_R)
     #np.save('train_rewards_{}_{}_{}.npy'.format(self.train_mode, self.init_mode, self.alpha_set), self.training_rewards)
 
 
