@@ -100,11 +100,11 @@ def act(self):
     others = [(x,y) for (x,y,n,b) in self.game_state['others']]
     coins = self.game_state['coins']
     bomb_map = np.ones(arena.shape) * 5
+
     for xb,yb,t in bombs:
         for (i,j) in [(xb+h, yb) for h in range(-3,4)] + [(xb, yb+h) for h in range(-3,4)]:
             if (0 < i < bomb_map.shape[0]) and (0 < j < bomb_map.shape[1]):
                 bomb_map[i,j] = min(bomb_map[i,j], t)
-
     # If agent has been in the same location three times recently, it's a loop
     if self.coordinate_history.count((x,y)) > 2:
         self.ignore_others_timer = 5
@@ -115,6 +115,7 @@ def act(self):
     # Check which moves make sense at all
     directions = [(x,y), (x+1,y), (x-1,y), (x,y+1), (x,y-1)]
     valid_tiles, valid_actions = [], []
+
     for d in directions:
         if ((arena[d] == 0) and
             (self.game_state['explosions'][d] <= 1) and
