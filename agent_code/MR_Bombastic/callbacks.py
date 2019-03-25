@@ -29,7 +29,6 @@ if t_policy == "greedy":
 print("TRAINING ID:", t_training_id)
 weights_file = "./agent_code/MR_Bombastic/models/{}_weights.npy".format(t_training_id)
 
-
 ## REWARDS AND POLICY
 
 def initialize_weights(method):
@@ -125,7 +124,7 @@ def setup(self):
     self.accumulated_reward_generation = 0
     self.generation_current = 1
     self.generation_nrounds = 10
-    self.generation_total = int(s.n_rounds/self.generation_nrounds)
+    self.generation_total = max(1, int(s.n_rounds/self.generation_nrounds))
     self.game_ratio = self.generation_current/self.generation_total
 
     # Hyperparameters for (prioritized) experience replay.
@@ -142,7 +141,7 @@ def setup(self):
     except EnvironmentError:
         self.weights = initialize_weights(t_weight_begin)
         print("INITIALIZED WEIGHTS", self.weights)
-    
+
     # List for storing y values (matplotlib)
     self.plot_rewards = []
     self.plot_weights = [self.weights]
@@ -285,3 +284,4 @@ def end_of_episode(self):
         self.accumulated_reward_generation = 0
 
     np.save(weights_file, self.weights)
+    
