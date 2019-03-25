@@ -1,11 +1,12 @@
 import numpy as np
-from random import shuffle
 import copy
-from agent_code.my_agent.arena import *
+
+from agent_code.MR_Bombastic.arena import *
 
 
 class RLFeatureExtraction:
-    def __init__(self, game_state, coin_limit=2, crate_limit=6):
+    # TODO: Allow to set the bias?
+    def __init__(self, game_state, bias=0, coin_limit=0, crate_limit=2):
         """
         Extract relevant properties from the environment for feature
         extraction.
@@ -13,8 +14,10 @@ class RLFeatureExtraction:
         # The actions set here determine the order of the columns in the returned
         # feature matrix. (Take as an argument?)
         self.actions = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'BOMB', 'WAIT']
+
         # Set the amount of features / weights
-        #self.dim = 12
+        self.bias = bias
+        self.dim = 15
 
         # Collect commonly used data from the environment.
         self.arena = game_state['arena']
@@ -45,15 +48,11 @@ class RLFeatureExtraction:
         # Check the arena (np.array) for free tiles, and include the comparison
         # result as a boolean np.array.
         self.free_space = self.arena == 0
+
         # Do not include agents as obstacles, as they are likely to
         # move in the next round.
         for xb, yb, _ in self.bombs:
             self.free_space[xb, yb] = False
-
-        # Observation: look_for_targets requires that any targets are considered
-        # free space. (feature 10)
-
-        #     self.free_space[xc, yc] = True
 
         # The blast range (discounted for walls) of a bomb is only available if the
         # bomb has already exploded. We thus compute the range manually.
@@ -95,7 +94,7 @@ class RLFeatureExtraction:
         # Compute the feature matrix with columns F_i(S, A) and rows ordered by the
         # actions defined in self.actions.
         self.feature = np.vstack(
-            ([1] * len(self.actions),
+            ([self.bias] * len(self.actions),
              self.feature1(),
              self.feature2(),
              self.feature3(),
@@ -104,11 +103,12 @@ class RLFeatureExtraction:
              self.feature6(),
              self.feature7(),
              self.feature8(coin_limit, crate_limit),
-             self.feature9(),
              self.feature10(),
              self.feature11(coin_limit, crate_limit),
              self.feature12(),
-             self.feature13()))
+             self.feature13(),
+             self.feature14(),
+             self.feature15())).T
         # test
         #print(self.feature)
 
@@ -118,7 +118,7 @@ class RLFeatureExtraction:
         Return the feature matrix F, where every column represents an
         a feature F_i(S,A), and rows represent actions A.
         """
-        return self.feature.T
+        return self.feature
 
 
     def state_action(self, action):
@@ -126,7 +126,7 @@ class RLFeatureExtraction:
         Return the column vector for the feature:
            F(S, A) = F_1(S,A) ... F_n(S,A)
         """
-        return self.feature.T[self.actions.index(action)]
+        return self.feature[self.actions.index(action), :]
 
 
     def max_q(self, weights):
@@ -137,15 +137,15 @@ class RLFeatureExtraction:
         taken as a parameter.
         """
         # Compute the dot product (w, F_i(S,A)) for every action.
-        Q_lfa = np.dot(weights, self.feature)
+        Q_lfa = np.dot(self.feature, weights)
         Q_max = np.max(Q_lfa)
-
-        # Multiple actions may give the same (optimal) reward. To avoid bias towards
-        # a particular action, shuffle the action index array before returning it.
         A_max = np.where(Q_lfa == Q_max)[0]
-        shuffle(A_max) # in-place sort
 
         return Q_max, [self.actions[a] for a in A_max]
+
+
+    def feature0(self):
+        return [self.bias] * len(self.actions)
 
 
     def feature1(self):
@@ -154,36 +154,32 @@ class RLFeatureExtraction:
         """
         feature = []
 
-        # Check if there are coins available in the game.
-        if len(self.coins) == 0:
-            print("Feature 1: ", [0] * len(self.actions)) 
+        # Check if there are coins available in the arena, and that they can be
+        # reached directly by the agent.
+        best_direction = look_for_targets_strict(self.free_space, self.agent, self.coins)
+        if best_direction == None:
             return [0] * len(self.actions)
-        best_direction = look_for_targets(self.free_space, self.agent, self.coins)
-        best_path = look_for_targets_path(self.free_space, self.agent, self.coins)
-        
-        best_path = look_for_targets_path(self.free_space, self.agent, self.coins)
-        if best_path[-1] not in self.coins:
-            print("Feature 1: ", [0] * len(self.actions)) 
-            return [0] * len(self.actions)   
 
         # Check if the next move action matches the direction of the nearest coin.
         for action in self.actions:
-            if action == 'BOMB' or action == 'WAIT':
-                # Placing a bomb or waiting does not allow the agent to collect a coin.
+            d = self.directions[action]
+
+            # Check if the next action the agent to a different tile (in particular,
+            # not a bomb or wait action).
+            if d == self.agent:
                 feature.append(0)
+            elif d == best_direction:
+                feature.append(1)
             else:
-                if self.directions[action] == best_direction:
-                    feature.append(1)
-                else:
-                    feature.append(0)
-        
-        print("Feature 1: ", feature)
+                feature.append(0)
+
         return feature
 
 
     def feature2(self):
         """
-        Penalize the action that follow the agent to death
+        Penalize the action if it places the agent into a location
+        where it is most likely to die.
         """
         feature = []
 
@@ -207,7 +203,6 @@ class RLFeatureExtraction:
             else:
                 feature.append(0)
 
-        print("Feature 2: ", feature)
         return feature
 
 
@@ -233,34 +228,25 @@ class RLFeatureExtraction:
                 feature.append(1)
             else:
                 feature.append(0)
-        print("Feature 3: ", feature)
 
         return feature
 
 
     def feature4(self):
         """
-        Reward the agent for moving in the shortest direction outside
+        Reward the agent for moving towards the shortest direction outside
         the blast range of (all) bombs in the game.
         """
         feature = []
 
         # Check if the arena contains any bombs with a blast radius affecting the agent.
         if len(self.bombs) == 0 or (self.agent not in self.danger_zone):
-            print("Feature 4: ", [0] * len(self.actions))
             return [0] * len(self.actions)
-
-        ## Check if the agent can move into a safe area.
-        #if len(self.safe_zone) == 0:
-        #    print("Feature 4: ", [0] * len(self.actions))
-        #    return [0] * len(self.actions)
-
-        safety_direction = look_for_targets(self.free_space, self.agent, self.safe_zone)
-        best_path = look_for_targets_path(self.free_space, self.agent, self.safe_zone)
-
-        if best_path[-1] not in self.safe_zone:
-            print("Feature 4: ", [0] * len(self.actions)) 
-            return [0] * len(self.actions)   
+        
+        # Check if the agent can move into a safe area.
+        best_direction = look_for_targets_strict(self.free_space, self.agent, self.safe_zone)
+        if best_direction == None:
+            return [0] * len(self.actions)
 
         for action in self.actions:
             d = self.directions[action]
@@ -269,11 +255,11 @@ class RLFeatureExtraction:
                 # When the agent is retreating from one or several bombs, we do not
                 # wish to expand the danger zone by dropping a bomb ourselves.
                 feature.append(0)
-            elif d == safety_direction:
+            elif d == best_direction:
                 feature.append(1)
             else:
                 feature.append(0)
-        print("Feature 4: ", feature)
+
         return feature
 
 
@@ -286,7 +272,7 @@ class RLFeatureExtraction:
         for action in self.actions:
             d = self.directions[action]
 
-            if (action == 'WAIT'):
+            if action == 'WAIT':
                 # We should check explicitely if the agent is waiting; when dropping
                 # a bomb, the agent may remain in the same tile until either the
                 # bomb explodes, or the agent takes a move action (after which he
@@ -295,6 +281,8 @@ class RLFeatureExtraction:
             elif (action == 'BOMB') and (self.bombs_left == 0):
                 # An agent may only place a bomb if it has any remaining.
                 feature.append(1)
+            elif action == 'BOMB':
+                feature.append(0)
             elif (self.arena[d] != 0) or (d in self.others_xy) or (d in self.bombs_xy):
                 # When checking other objects than walls (immutable), we make the
                 # following observations regarding invalid actions. Which agent
@@ -305,7 +293,6 @@ class RLFeatureExtraction:
                 feature.append(1)
             else:
                 feature.append(0)
-        print("Feature 5: ", feature)
 
         return feature
 
@@ -319,20 +306,20 @@ class RLFeatureExtraction:
         for action in self.actions:
             d = self.directions[action]
 
-            if action == 'BOMB' or action == 'WAIT':
+            if d == self.agent:
                 feature.append(0)
             elif d in self.coins:
                 feature.append(1)
             else:
                 feature.append(0)
 
-        print("Feature 6: ", feature)
         return feature
 
 
     def feature7(self):
         """
-        Reward the agent for placing a bomb next to a crate.
+        Reward the agent for placing a bomb next to a crate, if the
+        agent can possibly escape from the blast radius.
         """
         feature = []
 
@@ -340,102 +327,96 @@ class RLFeatureExtraction:
             if action == 'BOMB' and self.bombs_left > 0:
                 CHECK_FOR_CRATE = False
                 for d in self.directions.values():
-                #    if d == self.agent:
-                #        continue
-                    if self.arena[d] == 1:
+                    if self.arena[d] == 1: # d != self.agent
                         CHECK_FOR_CRATE = True
                         break
-                
+
+                # Do not reward the agent for placing a bomb if he
+                # cannot possibly escape it in a later step.
                 danger_zone = copy.deepcopy(self.danger_zone)
                 danger_zone += get_blast_coords(self.arena, self.x, self.y)
+
                 safe_zone = [(x, y) for x in range(1, 16) for y in range(1, 16)
-                          if (self.arena[x, y] == 0)
-                          and (x, y) not in danger_zone]
+                             if self.arena[x, y] == 0 and (x, y) not in danger_zone]
+                best_coord = look_for_targets_strict(self.free_space, self.agent, safe_zone)
 
-                best_path = look_for_targets_path(self.free_space, self.agent, safe_zone)
-
-                if CHECK_FOR_CRATE and (best_path[-1] in safe_zone):
+                if CHECK_FOR_CRATE and best_coord != None:
                     feature.append(1)
                 else:
                     feature.append(0)
             else:
                 feature.append(0)
 
-        print("Feature 7: ", feature)
         return feature
 
 
     def feature8(self, coins_limit, crates_limit):
         """Hunting mode
 
-        Reward the agent for placing a bomb next to an opponent.
-        If there is a posibility of get saved.
+        Reward the agent for placing a bomb next to an opponent, if
+        the agent can possibly escape from the blast radius.
         """
         feature = []
 
         if len(self.coins) > coins_limit or len(self.crates) > crates_limit:
-            print("Feature 8: ", [0] * len(self.actions))
             return [0] * len(self.actions)
 
         for action in self.actions:
             if action == 'BOMB' and self.bombs_left > 0:
                 CHECK_FOR_OTHERS = False
                 for d in self.directions.values():
-                    #if d == self.agent:
-                    #    continue
-                    if d in self.others_xy:
+                    if d in self.others_xy: # d != self.agent
                         CHECK_FOR_OTHERS = True
                         break
 
+                # Do not reward the agent for placing a bomb if he
+                # cannot possibly escape it in a later step.
                 danger_zone = copy.deepcopy(self.danger_zone)
                 danger_zone += get_blast_coords(self.arena, self.x, self.y)
+
                 safe_zone = [(x, y) for x in range(1, 16) for y in range(1, 16)
-                          if (self.arena[x, y] == 0)
-                          and (x, y) not in danger_zone]
+                             if self.arena[x, y] == 0 and (x, y) not in danger_zone]
+                best_coord = look_for_targets_strict(self.free_space, self.agent, safe_zone)
 
-                best_path = look_for_targets_path(self.free_space, self.agent, safe_zone)
-
-                if CHECK_FOR_OTHERS and (best_path[-1] in safe_zone):
+                if CHECK_FOR_OTHERS and best_coord != None:
                     feature.append(1)
                 else:
                     feature.append(0)
             else:
                 feature.append(0)
 
-        print("Feature 8: ", feature)
         return feature
 
 
     # TODO: Rearding moving towards a dead end might encourage the agent to walk
     # into a trap by other agents...
-    def feature9(self):
-        """
-        Reward the agent taking a step towards a dead end (a tile with
-        only a single free, neighboring tile).
-        """
-        feature = []
-        best_direction = look_for_targets(self.free_space, self.agent, self.dead_ends)
-        #print("PATH TO DEAD END", look_for_targets_path(self.free_space, self.agent, self.dead_ends), sep=" ")
+    # def feature9(self):
+    #     """
+    #     Reward the agent taking a step towards a dead end (a tile with
+    #     only a single free, neighboring tile).
+    #     """
+    #     feature = []
+    #     # Here we make no distinction between dead ends that are
+    #     # reachable by the agent, and those that are not.
+    #     best_direction = look_for_targets(self.free_space, self.agent, self.dead_ends)
 
-        # Do not reward if the agent is already in a dead-end, or if there
-        # are none in the arena.
-        if self.agent in self.dead_ends or best_direction is None:
-            print("Feature 9: ", [0] * len(self.actions))
-            return [0] * len(self.actions)
+    #     # Do not reward if the agent is already in a dead-end, or if there
+    #     # are none in the arena.
+    #     if self.agent in self.dead_ends or best_direction is None:
+    #         return [0] * len(self.actions)
 
-        for action in self.actions:
-            if action == 'BOMB' or action == 'WAIT':
-                # Only a move action can move the agent towards a dead end.
-                feature.append(0)
-            else:
-                d = self.directions[action]
+    #     for action in self.actions:
+    #         d = self.directions[action]
 
-                if d == best_direction:
-                    feature.append(1)
-                else:
-                    feature.append(0)
-        print("Feature 9: ", feature)
-        return feature
+    #         # Only a move action can bring the agent towards a tile.
+    #         if d == self.agent:
+    #             feature.append(0)
+    #         elif d == best_direction:
+    #             feature.append(1)
+    #         else:
+    #             feature.append(0)
+
+    #     return feature
 
 
     def feature10(self):
@@ -444,17 +425,17 @@ class RLFeatureExtraction:
         """
         feature = []
 
-        # Check if crates are available in the game.
-        if len(self.crates) == 0:
-            print("Feature 10: ", [0] * len(self.actions))
-            return [0] * len(self.actions)
-
-        # Turn crates into free_space
-        free_space = copy.deepcopy(self.free_space) 
+        # Observation: look_for_targets requires that any targets are
+        # considered free space. (feature 10)
+        free_space = copy.deepcopy(self.free_space)
         for xc, yc in self.crates:
-            free_space[xc,yc] = True
-
+            free_space[xc, yc] = True
+            
+        # Here we make no distinction between crates that are
+        # reachable by the agent, and those that are not.
         best_direction = look_for_targets(free_space, self.agent, self.crates)
+        if best_direction == None: # in look_for_targets, checks len(self.crates) == 0
+            return [0] * len(self.actions)
 
         # If we are directly next to a create, look_for_targets will
         # return the tile where the agent is located in, rewarding an
@@ -463,43 +444,157 @@ class RLFeatureExtraction:
         #     return np.zeros(6)
 
         for action in self.actions:
-            if action == 'BOMB' or action == 'WAIT':
-                # The feature rewards movement towards a crate. In
-                # particular, placing a bomb or waiting is not given a
-                # reward.
+            d = self.directions[action]
+
+            # Only a move action can bring the agent towards a crate.
+            if d == self.agent:
                 feature.append(0)
             else:
-                d = self.directions[action]
-
-                # A-priori, blowing up one crate is not better than
-                # blowing up another. We thus give no reward for any
-                # movement if the agent is directly next to a crate.
+                # Give no reward if the agent is already next to a crate.
+                # TODO: too specific, already covered by other feature???
                 if d in self.crates:
-                    print("Feature 10: ", [0] * len(self.actions))
                     return [0] * len(self.actions)
-
                 if d == best_direction:
                     feature.append(1)
                 else:
                     feature.append(0)
-    
-        print("Feature 10: ", feature)
+
         return feature
 
 
     def feature11(self, coins_limit, crates_limit):
         """Hunting mode
 
-        Reward moving towards opposing agents with less than a certain
-        amount of coins and crates inside the game arena.
+        Reward moving towards opposing agents when the arena contains less than a
+        given amount of coins and crates.
         """
         feature = []
 
         if len(self.coins) > coins_limit or len(self.crates) > crates_limit:
-            print("Feature 11: ", [0] * len(self.actions))
             return [0] * len(self.actions)
 
+        # Check the arena for opponents.
         best_direction = look_for_targets(self.free_space, self.agent, self.others_xy)
+        if best_direction == None: # in look_for_targets, checks len(self.crates) == 0
+            return[0] * len(self.actions)
+
+        for action in self.actions:
+            d = self.directions[action]
+
+            # Only a move action can bring the agent towards an opponent.
+            if d == self.agent:
+                feature.append(0)
+            else:
+                # Give no reward if the agent is already next to an agent.
+                # TODO: too specific, already covered by other feature???
+                if d in self.others_xy:
+                    return [0] * len(self.actions)
+
+                if d == best_direction:
+                    feature.append(1)
+                else:
+                    feature.append(0)
+
+        return feature
+
+
+    def feature12(self):
+        """
+        Reward placing a bomb that traps another agent located in a dead end.
+        """
+        feature = []
+
+        for action in self.actions:        
+            if action == 'BOMB' and self.bombs_left > 0:
+                # Check if other agents are in direct vicinity.
+                target_agent = []
+                for d in self.directions.values():
+                    if d != self.agent and d in self.others_xy:
+                        target_agent.append(d)
+
+                # Check if a targets are located in a dead end.
+                CHECK_PLACE_BOMB = False
+                if len(target_agent) != 0:
+                    for target in target_agent:
+                        if target in self.dead_ends:
+                            CHECK_PLACE_BOMB = True
+                            break
+
+                if CHECK_PLACE_BOMB:
+                    feature.append(1)
+                else:
+                    feature.append(0)
+            else:
+                feature.append(0)
+
+        return feature
+
+
+    def feature13(self):
+        """
+        Penalize the agent for moving into a dead end when it placed a bomb previously.
+        """
+        feature = []
+
+        for action in self.actions:
+            d = self.directions[action]
+
+            # Only a move action can trap the agent into a dead end.
+            if d == self.agent:
+                feature.append(0)
+            elif d in self.dead_ends and self.agent in self.bombs_xy:
+                feature.append(1)
+            else:
+                feature.append(0)
+
+        return feature
+
+    
+    def feature14(self):
+        """
+        Reward putting a bomb if it can kill an agent and we can scape
+        """
+
+        feature = []  # feature that we want get
+
+        danger_zone = copy.deepcopy(self.danger_zone)
+        my_bomb_zone = get_blast_coords(self.arena, self.x, self.y)
+        danger_zone += my_bomb_zone 
+        safe_zone = [(x, y) for x in range(1, 16) for y in range(1, 16)
+                  if (self.arena[x, y] == 0)
+                  and (x, y) not in danger_zone]
+    
+        best_path = look_for_targets_path(self.free_space, self.agent, safe_zone)
+
+        for action in self.actions:
+            if action == 'BOMB':
+                CHECK_COND = False
+                for others in self.others_xy:
+                    if len(best_path) == 0:
+                        return [0] * len(self.actions)
+                    if (others in my_bomb_zone) and (best_path[-1] in safe_zone):
+                        CHECK_COND = True
+                        break
+                if CHECK_COND and (self.bombs_left > 0):
+                    feature.append(1)
+                else:
+                    feature.append(0)
+            else:
+                feature.append(0)
+    
+        #print("Feature 14: ", feature)
+        return feature
+
+
+    def feature15(self):
+        """
+        Reward going to an agent if he is nearby 
+        """
+
+        feature = []
+
+        best_direction = look_for_targets(self.free_space, self.agent, self.others_xy)
+        best_path = look_for_targets_path(self.free_space, self.agent, self.others_xy)
 
         for action in self.actions:
             if action == 'BOMB' or action == 'WAIT':
@@ -508,72 +603,20 @@ class RLFeatureExtraction:
                 feature.append(0)
             else:
                 d = self.directions[action]
-
-                # We do not get more or less points for blowing up one given agent
-                # over any other. Therefore, do not reward moving to a different
-                # agent if there is already one in direct vicinity.
                 if d in self.others_xy:
-                    print("Feature 11: ", [0] * len(self.actions))
+                    #print("Feature 15: ", [0] * len(self.actions))
+                    return [0] * len(self.actions)
+                
+                if len(best_path) == 0:
+                    #print("Feature 15: ", [0] * len(self.actions))
                     return [0] * len(self.actions)
 
-                if d == best_direction:
-                    feature.append(1)
+                if (len(best_path) <= 3) and (best_path[-1] in self.others_xy):
+                    if d == best_direction:
+                        feature.append(1)
+                    else:
+                        feature.append(0)
                 else:
                     feature.append(0)
-        print("Feature 11: ", feature)
-        return feature
-
-
-    def feature12(self):
-        """
-        Reward putting a bomb that traps another agent if he is dead-ends
-        """
-
-        feature = []
-
-        for action in self.actions:
-            if action == 'BOMB':
-                target_agent = []
-                
-                # check if there is an agent next to you
-                for d in self.directions.values():
-                    if d in self.others_xy:
-                        target_agent.append(d)
-
-                # Check if target is in dead_ends
-                CHECK_PLACE_BOMB = False
-                if len(target_agent) != 0:
-                    for target in target_agent:
-                        if target in self.dead_ends:
-                            CHECK_PLACE_BOMB = True
-                            break
-                
-                if CHECK_PLACE_BOMB:
-                    feature.append(1)
-                else:
-                    feature.append(0)
-            else:
-                feature.append(0)
-    
-        print("Feature 12: ", feature)
-        return feature
-
-    def feature13(self):
-        """
-        Penalize moving getting into dead_ends if the last action was 'BOMB'
-        """
-
-        feature = []  # feature that we want get
-    
-        for action in self.actions:
-            if action == 'BOMB' or action == 'WAIT':
-                feature.append(0)
-            else:
-                d = self.directions[action]
-                if (d in self.dead_ends) and (self.agent in self.bombs_xy):
-                    feature.append(1)
-                else:
-                    feature.append(0)
-    
-        print("Feature 13: ", feature)
+        #print("Feature 15", feature)
         return feature

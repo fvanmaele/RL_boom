@@ -2,7 +2,7 @@ import numpy as np
 import os # required for training
 import random
 
-from agent_code.my_agent.feature_extraction import *
+from agent_code.MR_Bombastic.feature_extraction import *
 from settings import e
 from settings import s
 
@@ -11,8 +11,6 @@ from settings import s
 # Allow to check various combinations of training methods in parallel
 # through multiple agent processes by taking values from the
 # environment.
-
-# TODO: only enable in training mode (move to reward_update?)
 t_policy = os.environ.get('MRBOMBASTIC_POLICY')
 t_policy_eps = os.environ.get('MRBOMBASTIC_POLICY_EPS')
 t_weight_begin = os.environ.get('MRBOMBASTIC_WEIGHTS_BEGIN')
@@ -20,7 +18,7 @@ t_weight_begin = os.environ.get('MRBOMBASTIC_WEIGHTS_BEGIN')
 # Default values for training.
 if t_policy == None: t_policy = 'greedy'
 if t_policy_eps == None: t_policy_eps = 0.15
-if t_weight_begin == None: t_weight_begin = 'bestguess'
+if t_weight_begin == None: t_weight_begin = 'trained'
 
 # Construct unique id for naming of persistent data.
 t_training_id = "{}_{}_{}".format(t_policy, t_policy_eps, t_weight_begin)
@@ -29,19 +27,20 @@ if t_policy == "greedy":
 
 # Save weights to file
 print("TRAINING ID:", t_training_id)
-weights_file = "weights_{}.npy".format(t_training_id)
+weights_file = "./agent_code/MR_Bombastic/models/{}_weights.npy".format(t_training_id)
 
 
 ## REWARDS AND POLICY
 
 def initialize_weights(method):
-    #best_guess = np.asarray([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5, 1, -1])
     best_guess = np.asarray([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.8, 0.5, 1, -1, 0.6, 0.6])
-    #return np.asarray([1, 2.12373693, -7.35402792, -1.30777811,  3.86158356, -0.4928052, 2.12978571,
-                      #1.0519807, 0.52063993, 0.81981339, 1.17232696, 0.53893469, 1, -1])    
-
-    best_g
-    if method == 'bestguess':
+    trained_value = np.asarray([1, 2.36889437, -7.40026249, -1.34216494, 3.69025486,
+                                -0.64679605, 2.34142438, 1.04329996, 0.50236224,
+                                1.25573668, 0.47097264, 1.00000857, -1,
+                                0.51097347, 0.22704274])
+    if method == 'trained':
+        return trained_value
+    elif method == 'bestguess':
         return best_guess
     elif method == 'ones':
         return np.ones(len(best_guess))
@@ -53,7 +52,6 @@ def initialize_weights(method):
         return None
 
 
-# TODO: use diminishing eps-greedy policy in learning
 def policy_select_action(greedy_action, policy, policy_eps, game_ratio, logger=None):
     # Select a random action for use in epsilon-greedy or random-walk
     # exploration.
@@ -126,20 +124,14 @@ def setup(self):
     # Values for diminished epsilon policy.
     self.accumulated_reward_generation = 0
     self.generation_current = 1
-    # TODO: start low, increase as game progresses?
     self.generation_nrounds = 10
     self.generation_total = int(s.n_rounds/self.generation_nrounds)
-    print("TOTAL GENERATIONS:", self.generation_total)
     self.game_ratio = self.generation_current/self.generation_total
 
-    # Hyperparameters for (prioritized) experience replay. We assume
-    # that the amount of rounds is set to 'replay_buffer_max_steps *
-    # replay_buffer_update_after_nrounds'.
+    # Hyperparameters for (prioritized) experience replay.
     self.replay_buffer = []
     self.replay_buffer_max_steps = 200
     self.replay_buffer_update_after_nrounds = 10
-    # FIXME: assumes that there are always sufficient samples available
-    # in the replay buffer
     self.replay_buffer_sample_size = 50
     self.replay_buffer_every_ngenerations = 1
 
@@ -148,16 +140,12 @@ def setup(self):
         self.weights = np.load(weights_file)
         print("LOADED WEIGHTS", self.weights)
     except EnvironmentError:
-        print("INITIALIZING WEIGHTS")
         self.weights = initialize_weights(t_weight_begin)
-    print(self.weights, sep=" ")
+        print("INITIALIZED WEIGHTS", self.weights)
     
     # List for storing y values (matplotlib)
     self.plot_rewards = []
     self.plot_weights = [self.weights]
-
-    # TODO: Keep copy of loaded weights for optimization problem? (see lecture)
-    #self.weights_episode = self.weights
 
 
 def reward_update(self):
@@ -195,8 +183,6 @@ def reward_update(self):
 
     # Extract features from the new ("next") game state.
     self.F = RLFeatureExtraction(self.game_state)
-    #print("PREVIOUS STATE:", self.F_prev.state().T)
-    #print("NEXT STATE:", self.F.state().T)
 
     # Get action of the previous step. The previous action was set in
     # the last act() call and is thus named 'next_action'.
@@ -206,9 +192,6 @@ def reward_update(self):
     if self.game_state['step'] <= self.replay_buffer_max_steps + 1:
         # The last tuple element defines if there was a transition to
         # a terminal state.
-        # TODO: priority experience replay: append values to this list
-        # depending on a certain probability (e.g. 0.9 if in 1-150,
-        # 0.1 otherwise)
         self.replay_buffer.append((self.F_prev, self.prev_action, reward, self.F, False))
 
 
@@ -233,8 +216,6 @@ def act(self):
     Q_max, A_max = self.F_prev.max_q(self.weights)        
     random.shuffle(A_max)
 
-    # TODO: Move to reward_update (to allow SARSA use), only use exploitation
-    # strategy (greedy) here for known weights
     self.next_action = policy_select_action(A_max[0], t_policy, t_policy_eps,
                                             self.game_ratio, self.logger)
 
@@ -254,35 +235,15 @@ def end_of_episode(self):
     self.replay_buffer.append((self.F_prev, self.prev_action, reward, self.F, True))
     self.logger.info('Given end reward of %s', reward)
     self.accumulated_reward += reward
-
-    # TODO: Write accumulated reward to files depending on training_id
     self.accumulated_reward_generation += self.accumulated_reward
     self.accumulated_reward = 0
     self.current_round += 1
-    #print("STARTING ROUND:", self.current_round)
-
-    # TODO: update weights at end of full game (10 rounds) to reduce bias (temporary w')
-    #np.save(weights_file, self.weights)
 
     # Begin experience replay
     if (self.current_round % self.generation_nrounds) == 0:
-        # Sample current experience buffer.
-        # TODO: remove samples afterward?
-        #print(len(self.replay_buffer))
-        #print("ROUNDS", self.current_round)
-        #sample_size = int(len(self.replay_buffer) / 8)
-        # TODO: take samples with probability based on relative to maximum TD error
         experience_mini_batch = random.sample(self.replay_buffer, self.replay_buffer_sample_size)
         print("REPLAY BUFFER SIZE:", len(self.replay_buffer))
         print("MINI BATCH SIZE:", len(experience_mini_batch))
-
-        # Update weights.
-        # TODO: update by action?
-        # experience = self.F_prev, self.prev_action, reward, self.F
-        #TD_error_sum = 0
-
-        # TODO: only increase mini-batch size up to certain ratio of replay buffer
-        #if (self.replay_buffer_sample_size <= int(len(self.replay_buffer) / 2)):
         self.replay_buffer_sample_size += 20 # set as variable
 
         # Reset replay buffer
@@ -301,24 +262,20 @@ def end_of_episode(self):
             #     V = R
             # else:
             #     V = R + self.discount * Q_max
-            # # Take the sum over all TD errors in the mini-batch.
-            # TD_error_sum += V - np.dot(X_A, self.weights)
             if A != None:
                 X_A = X.state_action(A)
                 Q_max, A_max = Y.max_q(self.weights)
                 TD_error = R + (self.discount * Q_max) - np.dot(X_A, self.weights)
 
-                #print("SAMPLE WITH TD ERROR:", TD_error)
                 weights_batch_update = weights_batch_update + self.alpha/self.replay_buffer_sample_size * TD_error * X_A
                 # incremental gradient descent
                 #self.weights = self.weights + self.alpha / self.replay_buffer_sample_size * TD_error * X_A
 
         self.weights = self.weights + weights_batch_update
-        self.plot_weights.append(self.weights)
-        np.save(t_training_id + "weights", self.plot_weights)
-        print("TOTAL REWARD FOR GENERATION {}: {}".format(self.generation_current,
-                                                          self.accumulated_reward_generation))
-        print("WEIGHTS FOR NEXT GENERATION:", self.weights, sep=" ")
+        self.plot_weights.append(self.weights)        
+        #print("TOTAL REWARD FOR GENERATION {}: {}".format(self.generation_current,
+                                                         # self.accumulated_reward_generation))
+        #print("WEIGHTS FOR NEXT GENERATION:", self.weights, sep=" ")
 
         self.generation_current += 1
         self.game_ratio = self.generation_current/self.generation_total
@@ -326,3 +283,5 @@ def end_of_episode(self):
         self.plot_rewards.append(self.accumulated_reward_generation)
         np.save(t_training_id, self.plot_rewards)
         self.accumulated_reward_generation = 0
+
+    np.save(weights_file, self.weights)
