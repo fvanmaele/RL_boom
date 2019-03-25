@@ -36,10 +36,11 @@ weights_file = "weights_{}.npy".format(t_training_id)
 
 def initialize_weights(method):
     #best_guess = np.asarray([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5, 1, -1])
-    best_guess = np.asarray([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.8, 0.5, 1, -1, 0.5, 0.2])
+    best_guess = np.asarray([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.8, 0.5, 1, -1, 0.6, 0.6])
     #return np.asarray([1, 2.12373693, -7.35402792, -1.30777811,  3.86158356, -0.4928052, 2.12978571,
-                      #1.0519807, 0.52063993, 0.81981339, 1.17232696, 0.53893469, 1, -1])
+                      #1.0519807, 0.52063993, 0.81981339, 1.17232696, 0.53893469, 1, -1])    
 
+    best_g
     if method == 'bestguess':
         return best_guess
     elif method == 'ones':
@@ -97,8 +98,6 @@ def new_reward(events):
             reward += 200            
         elif event == e.INVALID_ACTION:
             reward -= 2
-        # elif event == e.WAITED:
-        #     reward += 1
 
     return reward
 
@@ -133,20 +132,16 @@ def setup(self):
     print("TOTAL GENERATIONS:", self.generation_total)
     self.game_ratio = self.generation_current/self.generation_total
 
-    # List for storing y values (matplotlib)
-    self.plot = []
-
     # Hyperparameters for (prioritized) experience replay. We assume
     # that the amount of rounds is set to 'replay_buffer_max_steps *
     # replay_buffer_update_after_nrounds'.
-    self.replay_buffer = [] # array with (S,A,R,S') tuples
-    self.replay_buffer_max_steps = 200 # prioritize early-game experiences
-    #self.replay_buffer_max_size = -1 # maximum total size of buffer
+    self.replay_buffer = []
+    self.replay_buffer_max_steps = 200
     self.replay_buffer_update_after_nrounds = 10
-    # TODO: assumes that there are always sufficient samples available
+    # FIXME: assumes that there are always sufficient samples available
     # in the replay buffer
-    # TODO: increase size of sample size over time
     self.replay_buffer_sample_size = 50
+    self.replay_buffer_every_ngenerations = 1
 
     # Load persistent data for exploitation.
     try:
@@ -156,6 +151,10 @@ def setup(self):
         print("INITIALIZING WEIGHTS")
         self.weights = initialize_weights(t_weight_begin)
     print(self.weights, sep=" ")
+    
+    # List for storing y values (matplotlib)
+    self.plot_rewards = []
+    self.plot_weights = [self.weights]
 
     # TODO: Keep copy of loaded weights for optimization problem? (see lecture)
     #self.weights_episode = self.weights
@@ -282,10 +281,16 @@ def end_of_episode(self):
         # experience = self.F_prev, self.prev_action, reward, self.F
         #TD_error_sum = 0
 
-        # Reset replay buffer
-        self.replay_buffer = []
-        weights_batch_update = np.zeros(len(self.weights))
+        # TODO: only increase mini-batch size up to certain ratio of replay buffer
+        #if (self.replay_buffer_sample_size <= int(len(self.replay_buffer) / 2)):
+        self.replay_buffer_sample_size += 20 # set as variable
 
+        # Reset replay buffer
+        if self.generation_current % self.replay_buffer_every_ngenerations == 0:
+            print("RESETTING REPLAY BUFFER")
+            self.replay_buffer = []
+
+        weights_batch_update = np.zeros(len(self.weights))
         for X, A, R, Y, terminal in experience_mini_batch:
             # # Compute maximum Q value and corresponding action.
             # X_A = X.state_action(A)
@@ -303,21 +308,21 @@ def end_of_episode(self):
                 Q_max, A_max = Y.max_q(self.weights)
                 TD_error = R + (self.discount * Q_max) - np.dot(X_A, self.weights)
 
-                print("SAMPLE WITH TD ERROR:", TD_error)
+                #print("SAMPLE WITH TD ERROR:", TD_error)
                 weights_batch_update = weights_batch_update + self.alpha/self.replay_buffer_sample_size * TD_error * X_A
                 # incremental gradient descent
                 #self.weights = self.weights + self.alpha / self.replay_buffer_sample_size * TD_error * X_A
 
         self.weights = self.weights + weights_batch_update
-        print("TOTAL REWARD FOR GENERATION {}: {}".format(self.generation_current, self.accumulated_reward_generation))
+        self.plot_weights.append(self.weights)
+        np.save(t_training_id + "weights", self.plot_weights)
+        print("TOTAL REWARD FOR GENERATION {}: {}".format(self.generation_current,
+                                                          self.accumulated_reward_generation))
         print("WEIGHTS FOR NEXT GENERATION:", self.weights, sep=" ")
 
         self.generation_current += 1
         self.game_ratio = self.generation_current/self.generation_total
 
-        self.plot.append(self.accumulated_reward_generation)
-        np.save(t_training_id, self.plot)
+        self.plot_rewards.append(self.accumulated_reward_generation)
+        np.save(t_training_id, self.plot_rewards)
         self.accumulated_reward_generation = 0
-
-        # gradually increase mini-batch size
-        self.replay_buffer_sample_size += 20
