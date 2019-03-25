@@ -1,9 +1,8 @@
 import numpy as np
 import os # required for training
-from random import shuffle
+import random
 
 from agent_code.my_agent.feature_extraction import *
-from agent_code.my_agent.learning_methods import *
 from settings import e
 from settings import s
 
@@ -14,20 +13,19 @@ from settings import s
 # environment.
 
 # TODO: only enable in training mode (move to reward_update?)
-t_learning_schedule = os.environ.get('MRBOMBASTIC_ALPHA')
 t_policy = os.environ.get('MRBOMBASTIC_POLICY')
 t_policy_eps = os.environ.get('MRBOMBASTIC_POLICY_EPS')
 t_weight_begin = os.environ.get('MRBOMBASTIC_WEIGHTS_BEGIN')
 
 # Default values for training.
-if t_learning_schedule == None: t_learning_schedule = 'fixed'
 if t_policy == None: t_policy = 'greedy'
-if t_policy_eps == None: t_policy_eps = 0.1
+if t_policy_eps == None: t_policy_eps = 0.15
 if t_weight_begin == None: t_weight_begin = 'bestguess'
 
 # Construct unique id for naming of persistent data.
-# TODO: include eps?
-t_training_id = "{}_{}_{}".format(t_learning_schedule, t_policy, t_weight_begin)
+t_training_id = "{}_{}_{}".format(t_policy, t_policy_eps, t_weight_begin)
+if t_policy == "greedy":
+    t_training_id = "{}_{}".format(t_policy, t_weight_begin)
 
 # Save weights to file
 print("TRAINING ID:", t_training_id)
@@ -36,15 +34,20 @@ weights_file = "weights_{}.npy".format(t_training_id)
 
 ## REWARDS AND POLICY
 
-def initialize_weights(method, dim):
+def initialize_weights(method):
+    #best_guess = np.asarray([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5, 1, -1])
+    best_guess = np.asarray([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.8, 0.5, 1, -1, 0.5, 0.2])
+    #return np.asarray([1, 2.12373693, -7.35402792, -1.30777811,  3.86158356, -0.4928052, 2.12978571,
+                      #1.0519807, 0.52063993, 0.81981339, 1.17232696, 0.53893469, 1, -1])
+
     if method == 'bestguess':
-        return np.asarray([1, 1.5, -7, -1, 4, -0.5, 1.5, 1, 0.5, 0.5, 0.8, 0.5, 1, -1])
+        return best_guess
     elif method == 'ones':
-        return np.ones(dim)
+        return np.ones(len(best_guess))
     elif method == 'zero':
-        return np.zeros(dim)
+        return np.zeros(len(best_guess))
     elif method == 'random':
-        return np.random.rand(dim, 1)
+        return np.random.rand(1, len(best_guess)).flatten()
     else:
         return None
 
@@ -60,29 +63,13 @@ def policy_select_action(greedy_action, policy, policy_eps, game_ratio, logger=N
         return greedy_action
     elif policy == 'epsgreedy':
         logger.info('Picking greedy action at probability %s', 1-policy_eps)
-        return np.random.choice([greedy_action, random_action], p=[1-policy_eps, policy_eps])
+        return np.random.choice([greedy_action, random_action],
+                                p=[1-policy_eps, policy_eps])
     elif policy == 'diminishing':
-        eps_dim = min(0.05, policy_eps * (1 - game_ratio))
-        logger.info('Picking greedy action at probability %s', eps_dim)
-        return np.random.choice([greedy_action, random_action], p=eps_dim)
-    else:
-        return None
-
-    
-def new_alpha(method, time_step, c=0.1, eta=1, max_steps=400):
-    if method == 'quotient1':
-        return c / pow(time_step, eta)
-    elif method == 'quotient2':
-        return 10.0 / (9.0 + time_step)
-    elif method == 'fixed':
-        return c
-    elif method == 'subdivision':
-        if (1 <= time_step < max_steps/4):
-            return 0.1
-        elif (max_steps/4 <= time_step < max_steps/2):
-            return 0.05
-        elif (max_steps/2 <= time_step <= max_steps/4):
-            return 0.01
+        policy_eps_dim = max(0.05, (1 - game_ratio) * policy_eps)
+        logger.info('Picking greedy action at probability %s', 1-policy_eps_dim)
+        return np.random.choice([greedy_action, random_action],
+                                p=[1-policy_eps_dim, policy_eps_dim])
     else:
         return None
 
@@ -90,49 +77,30 @@ def new_alpha(method, time_step, c=0.1, eta=1, max_steps=400):
 def new_reward(events):
     # An action is always punished with a small negative reward due to
     # time constraints on the game.
-    reward = -1
-
+    reward = 0
     for event in events:
         if event == e.BOMB_DROPPED:
             reward += 1
         elif event == e.COIN_COLLECTED:
-            reward += 200 # 100?
+            reward += 200
         elif event == e.KILLED_SELF:
-            reward -= 300
+            reward -= 1000
         elif event == e.CRATE_DESTROYED:
             reward += 10
         elif event == e.COIN_FOUND:
-            reward += 50
+            reward += 100
         elif event == e.KILLED_OPPONENT:
-            reward += 300
+            reward += 700
         elif event == e.GOT_KILLED:
-            reward -= 300
+            reward -= 500
         elif event == e.SURVIVED_ROUND:
-            reward += 100            
+            reward += 200            
         elif event == e.INVALID_ACTION:
             reward -= 2
         # elif event == e.WAITED:
-        #     reward += 10
+        #     reward += 1
 
     return reward
-
-
-## LEARNING METHODS
-
-"""
-Learning methods (Q-Learning, SARSA)
-"""
-def UpdateWeightsLFA(X, A, R, Y, weights, alpha=0.1, discount=0.95):
-    """Update the weight vector w for Q-learning with semi-gradient descent.
-    
-    The features X and Y are assumed to have state_action(action) and
-    max_q(weights) methods available. See feature_extraction.py for details.
-    """
-    X_A = X.state_action(A)
-    Q_max, _ = Y.max_q(weights)
-    TD_error = R + (discount * Q_max) - np.dot(X_A, weights)
-
-    return weights + (alpha * TD_error * X_A)
 
 
 ## GAME METHODS
@@ -149,27 +117,47 @@ def setup(self):
     np.random.seed()    
 
     # Reward for full game (10 rounds)
+    self.accumulated_reward = 0    
     self.current_round = 1
-    self.accumulated_reward = 0
 
-    # Tuples (S,A,R,S') for later sampling.
-    self.replay_buffer = []
-    self.discount = 0.8
+    # Hyperparameters for learning methods.
+    self.discount = 0.95
+    self.alpha = 0.01
 
-    # Values for first game.
-    self.current_game = 1
+    # Values for diminished epsilon policy.
+    self.accumulated_reward_generation = 0
+    self.generation_current = 1
+    # TODO: start low, increase as game progresses?
+    self.generation_nrounds = 10
+    self.generation_total = int(s.n_rounds/self.generation_nrounds)
+    print("TOTAL GENERATIONS:", self.generation_total)
+    self.game_ratio = self.generation_current/self.generation_total
 
+    # List for storing y values (matplotlib)
+    self.plot = []
+
+    # Hyperparameters for (prioritized) experience replay. We assume
+    # that the amount of rounds is set to 'replay_buffer_max_steps *
+    # replay_buffer_update_after_nrounds'.
+    self.replay_buffer = [] # array with (S,A,R,S') tuples
+    self.replay_buffer_max_steps = 200 # prioritize early-game experiences
+    #self.replay_buffer_max_size = -1 # maximum total size of buffer
+    self.replay_buffer_update_after_nrounds = 10
+    # TODO: assumes that there are always sufficient samples available
+    # in the replay buffer
+    # TODO: increase size of sample size over time
+    self.replay_buffer_sample_size = 50
+
+    # Load persistent data for exploitation.
     try:
         self.weights = np.load(weights_file)
         print("LOADED WEIGHTS", self.weights)
     except EnvironmentError:
         print("INITIALIZING WEIGHTS")
-        self.weights = initialize_weights(t_weight_begin, 14)        
+        self.weights = initialize_weights(t_weight_begin)
     print(self.weights, sep=" ")
 
-    # Load persistent data for subsequent games, depending on training ID.
-
-    # Keep copy of loaded weights for optimization problem (see lecture).
+    # TODO: Keep copy of loaded weights for optimization problem? (see lecture)
     #self.weights_episode = self.weights
 
 
@@ -208,15 +196,21 @@ def reward_update(self):
 
     # Extract features from the new ("next") game state.
     self.F = RLFeatureExtraction(self.game_state)
-    print("PREVIOUS STATE:", self.F_prev.state().T)
-    print("NEXT STATE:", self.F.state().T)
+    #print("PREVIOUS STATE:", self.F_prev.state().T)
+    #print("NEXT STATE:", self.F.state().T)
 
     # Get action of the previous step. The previous action was set in
     # the last act() call and is thus named 'next_action'.
     self.prev_action = self.next_action
 
     # Keep track of all experiences in the episode for later learning.
-    self.replay_buffer += (self.F_prev, self.prev_action, reward, self.F)
+    if self.game_state['step'] <= self.replay_buffer_max_steps + 1:
+        # The last tuple element defines if there was a transition to
+        # a terminal state.
+        # TODO: priority experience replay: append values to this list
+        # depending on a certain probability (e.g. 0.9 if in 1-150,
+        # 0.1 otherwise)
+        self.replay_buffer.append((self.F_prev, self.prev_action, reward, self.F, False))
 
 
 def act(self):
@@ -238,11 +232,12 @@ def act(self):
     # Multiple actions may give the same (optimal) reward. To avoid bias towards
     # a particular action, shuffle the greedy actions.
     Q_max, A_max = self.F_prev.max_q(self.weights)        
-    shuffle(A_max)
+    random.shuffle(A_max)
 
     # TODO: Move to reward_update (to allow SARSA use), only use exploitation
     # strategy (greedy) here for known weights
-    self.next_action = policy_select_action(A_max[0], t_policy, t_policy_eps, 1.0, self.logger)
+    self.next_action = policy_select_action(A_max[0], t_policy, t_policy_eps,
+                                            self.game_ratio, self.logger)
 
 
 def end_of_episode(self):
@@ -251,21 +246,78 @@ def end_of_episode(self):
     This is similar to reward_update, except it is only called at the end of a
     game. self.events will contain all events that occured during your agent's
     final step. You should place your actual learning code in this method.
-    """
-    # TODO: Write accumulated reward to files depending on training_id
+    """    
+    # Add experience for transition to terminal state.
+    self.F = RLFeatureExtraction(self.game_state)
+    self.prev_action = self.next_action
+    reward = new_reward(self.events)
 
-    print("{} {}".format(self.current_round, self.accumulated_reward))
+    self.replay_buffer.append((self.F_prev, self.prev_action, reward, self.F, True))
+    self.logger.info('Given end reward of %s', reward)
+    self.accumulated_reward += reward
+
+    # TODO: Write accumulated reward to files depending on training_id
+    self.accumulated_reward_generation += self.accumulated_reward
     self.accumulated_reward = 0
+    self.current_round += 1
+    #print("STARTING ROUND:", self.current_round)
 
     # TODO: update weights at end of full game (10 rounds) to reduce bias (temporary w')
     #np.save(weights_file, self.weights)
-    # Default hyperparameters: c=0.1, eta=0.1, max_steps=400
-    self.alpha = new_alpha(t_learning_schedule, self.game_state['step']-1)
-    print("ALPHA:", self.alpha)
 
-    # # Set learning algorithm (Q/SARSA) depending on learning parameters.
-    #self.weights = UpdateWeightsLFA(self.F_prev, self.prev_action, reward, F,
-    #                                self.weights, self.alpha, self.discount)
+    # Begin experience replay
+    if (self.current_round % self.generation_nrounds) == 0:
+        # Sample current experience buffer.
+        # TODO: remove samples afterward?
+        #print(len(self.replay_buffer))
+        #print("ROUNDS", self.current_round)
+        #sample_size = int(len(self.replay_buffer) / 8)
+        # TODO: take samples with probability based on relative to maximum TD error
+        experience_mini_batch = random.sample(self.replay_buffer, self.replay_buffer_sample_size)
+        print("REPLAY BUFFER SIZE:", len(self.replay_buffer))
+        print("MINI BATCH SIZE:", len(experience_mini_batch))
 
-    #self.current_round += 1
+        # Update weights.
+        # TODO: update by action?
+        # experience = self.F_prev, self.prev_action, reward, self.F
+        #TD_error_sum = 0
 
+        # Reset replay buffer
+        self.replay_buffer = []
+        weights_batch_update = np.zeros(len(self.weights))
+
+        for X, A, R, Y, terminal in experience_mini_batch:
+            # # Compute maximum Q value and corresponding action.
+            # X_A = X.state_action(A)
+            # Q_max, A_max = Y.max_q(self.weights)
+
+            # # Do not change the reward if the state is terminal.
+            # if terminal == True:
+            #     V = R
+            # else:
+            #     V = R + self.discount * Q_max
+            # # Take the sum over all TD errors in the mini-batch.
+            # TD_error_sum += V - np.dot(X_A, self.weights)
+            if A != None:
+                X_A = X.state_action(A)
+                Q_max, A_max = Y.max_q(self.weights)
+                TD_error = R + (self.discount * Q_max) - np.dot(X_A, self.weights)
+
+                print("SAMPLE WITH TD ERROR:", TD_error)
+                weights_batch_update = weights_batch_update + self.alpha/self.replay_buffer_sample_size * TD_error * X_A
+                # incremental gradient descent
+                #self.weights = self.weights + self.alpha / self.replay_buffer_sample_size * TD_error * X_A
+
+        self.weights = self.weights + weights_batch_update
+        print("TOTAL REWARD FOR GENERATION {}: {}".format(self.generation_current, self.accumulated_reward_generation))
+        print("WEIGHTS FOR NEXT GENERATION:", self.weights, sep=" ")
+
+        self.generation_current += 1
+        self.game_ratio = self.generation_current/self.generation_total
+
+        self.plot.append(self.accumulated_reward_generation)
+        np.save(t_training_id, self.plot)
+        self.accumulated_reward_generation = 0
+
+        # gradually increase mini-batch size
+        self.replay_buffer_sample_size += 20
